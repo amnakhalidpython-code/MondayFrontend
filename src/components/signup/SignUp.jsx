@@ -16,7 +16,6 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { saveEmailForSignup, login } = useAuth();
   
-  // Navigation guards
   const hasNavigated = useRef(false);
   const isAuthenticating = useRef(false);
   const unsubscribeRef = useRef(null);
