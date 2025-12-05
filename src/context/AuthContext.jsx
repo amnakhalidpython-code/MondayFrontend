@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { auth, onAuthStateChanged } from '../utils/firebase';
 
 const AuthContext = createContext();
 
@@ -16,14 +17,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let unsubscribe;
+    
     // Check if user data exists in sessionStorage
     const storedUser = sessionStorage.getItem('mondayUser');
     const storedEmail = sessionStorage.getItem('mondaySignupEmail');
     
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
       } catch (e) {
+        console.error('Error parsing stored user:', e);
         sessionStorage.removeItem('mondayUser');
       }
     }
@@ -32,7 +37,31 @@ export const AuthProvider = ({ children }) => {
       setEmailForSignup(storedEmail);
     }
     
-    setLoading(false);
+    // Also listen to Firebase auth state changes
+    unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser && !storedUser) {
+        // If Firebase has a user but sessionStorage doesn't, sync them
+        const userData = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL
+        };
+        setUser(userData);
+        sessionStorage.setItem('mondayUser', JSON.stringify(userData));
+      }
+      setLoading(false);
+    });
+
+    // If no Firebase auth state change, just set loading to false after a brief moment
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   // Save email after first step

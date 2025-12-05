@@ -14,7 +14,7 @@ import {
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { saveEmailForSignup, login } = useAuth();
+  const { saveEmailForSignup, login, user: contextUser } = useAuth();
   
   const hasNavigated = useRef(false);
   const isAuthenticating = useRef(false);
@@ -32,11 +32,24 @@ const SignUp = () => {
     let isMounted = true;
 
     const checkAuth = () => {
+      // First check context user (from sessionStorage)
+      if (contextUser && !hasNavigated.current) {
+        console.log('User already authenticated in context, redirecting...');
+        hasNavigated.current = true;
+        setCheckingAuth(false);
+        
+        setTimeout(() => {
+          navigate('/three', { replace: true });
+        }, 0);
+        return;
+      }
+
+      // Then listen to Firebase auth state
       unsubscribeRef.current = onAuthStateChanged(auth, (user) => {
         if (!isMounted) return;
         
         if (user && !hasNavigated.current) {
-          console.log('User already authenticated, redirecting...');
+          console.log('User already authenticated in Firebase, redirecting...');
           hasNavigated.current = true;
           
           // Cleanup listener before navigation
@@ -62,7 +75,7 @@ const SignUp = () => {
         unsubscribeRef.current();
       }
     };
-  }, []); // Empty dependency array - run ONCE only
+  }, [contextUser, navigate]);
 
   // Show loading spinner while checking authentication
   if (checkingAuth) {
@@ -169,9 +182,7 @@ const SignUp = () => {
         hasNavigated.current = true;
         console.log('Navigating to /three...');
         
-        setTimeout(() => {
-          navigate('/three', { replace: true });
-        }, 100);
+        navigate('/three', { replace: true });
       }
       
     } catch (error) {
@@ -235,9 +246,7 @@ const SignUp = () => {
         hasNavigated.current = true;
         console.log('Navigating to /three...');
         
-        setTimeout(() => {
-          navigate('/three', { replace: true });
-        }, 100);
+        navigate('/three', { replace: true });
       }
       
     } catch (error) {
