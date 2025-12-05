@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from '/logo.png'
 
 export default function MondayNavbar() {
   const [openMenu, setOpenMenu] = useState(null);
@@ -125,7 +126,7 @@ export default function MondayNavbar() {
       <nav className="fixed top-0 left-0 right-0 bg-white z-50" style={{ height: '80px' }}>
         <div className="mx-auto px-8 h-full flex items-center justify-between" style={{ maxWidth: '1440px' }}>
           <a href="/" className="flex-shrink-0">
-            <img src="https://dapulse-res.cloudinary.com/image/upload/f_auto,q_auto/remote_mondaycom_static/img/monday-logo-x2.png" alt="monday.com" className="h-11" />
+            <img src={logo} alt="monday.com" className="h-40" />
           </a>
 
           <div className="hidden lg:flex items-center h-full flex-1 justify-between ml-6">

@@ -6,7 +6,7 @@ const RecognizedAsLeadersSection = () => {
       id: 1,
       logo: "https://cdn.prod.website-files.com/656da6fea306219773d04208/66f9303acb68be0e77a29876_Frame%201561554242.avif",
       description: "Forrester Total Economic Impact™ research: ",
-      highlight: "Motorola sees 346% ROI with monday.com",
+      highlight: "Motorola sees 346% ROI with futures.com",
       link: "https://monday.com/lp/motorola-forrester-report",
     },
     {

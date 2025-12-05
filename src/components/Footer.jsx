@@ -38,72 +38,72 @@ const MondayFooter = () => {
         }}>
           {/* Column 1 */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: '300px' }}>
-            <a href="https://www.monday.com" style={{ display: 'inline-block', marginBottom: '16px' }}>
+            <a href="https://www.futures..com" style={{ display: 'inline-block', marginBottom: '16px' }}>
               <img 
-                src="https://cdn.prod.website-files.com/656da6fea306219773d04208/65829074fc3601290cdb4483_monday.com.webp" 
-                alt="monday.com logo" 
+                src="https://cdn.prod.website-files.com/656da6fea306219773d04208/65829074fc3601290cdb4483_futures..com.webp" 
+                alt="futures..com logo" 
                 width="107"
                 style={{ marginBottom: '16px' }}
               />
             </a>
             <a href="/work-management/pricing" style={linkStyle}>Pricing</a>
-            <a href="https://monday.com/help" style={linkStyle}>Contact us</a>
-            <a href="https://monday.com/templates/" style={linkStyle}>Templates</a>
-            <a href="https://monday.com/smb/" style={linkStyle}>SMB</a>
-            <a href="https://monday.com/w/enterprise/" style={linkStyle}>Enterprise</a>
-            <a href="https://monday.com/nonprofits" style={linkStyle}>Nonprofits</a>
-            <a href="https://monday.com/marketplace" style={linkStyle}>App marketplace</a>
-            <a href="https://monday.com/helpcenter" style={linkStyle}>24/7 support</a>
+            <a href="https://futures..com/help" style={linkStyle}>Contact us</a>
+            <a href="https://futures..com/templates/" style={linkStyle}>Templates</a>
+            <a href="https://futures..com/smb/" style={linkStyle}>SMB</a>
+            <a href="https://futures..com/w/enterprise/" style={linkStyle}>Enterprise</a>
+            <a href="https://futures..com/nonprofits" style={linkStyle}>Nonprofits</a>
+            <a href="https://futures..com/marketplace" style={linkStyle}>App marketplace</a>
+            <a href="https://futures..com/helpcenter" style={linkStyle}>24/7 support</a>
           </div>
 
           {/* Column 2 - Features */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: '300px' }}>
             <div style={headingStyle}>Features</div>
-            <a href="https://monday.com/workdocs" style={linkStyle}>Docs</a>
-            <a href="https://monday.com/integrations/" style={linkStyle}>Integrations</a>
-            <a href="https://monday.com/features/automations" style={linkStyle}>Automations</a>
+            <a href="https://futures..com/workdocs" style={linkStyle}>Docs</a>
+            <a href="https://futures..com/integrations/" style={linkStyle}>Integrations</a>
+            <a href="https://futures..com/features/automations" style={linkStyle}>Automations</a>
             <a href="/w/ai" style={linkStyle}>AI</a>
-            <a href="https://monday.com/features/dashboards" style={linkStyle}>Dashboard</a>
-            <a href="https://monday.com/features/kanban" style={linkStyle}>Kanban</a>
-            <a href="https://monday.com/features/gantt" style={linkStyle}>Gantt</a>
+            <a href="https://futures..com/features/dashboards" style={linkStyle}>Dashboard</a>
+            <a href="https://futures..com/features/kanban" style={linkStyle}>Kanban</a>
+            <a href="https://futures..com/features/gantt" style={linkStyle}>Gantt</a>
           </div>
 
-          {/* Column 3 - Monday Products */}
+          {/* Column 3 - futures. Products */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: '300px' }}>
-            <div style={headingStyle}>monday products</div>
+            <div style={headingStyle}>futures. products</div>
             
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/6827ab54688e3dd2d5bca021_WM_Symbol.svg" 
                 alt="" style={iconStyle} />
-              <a href="https://monday.com/work-management" style={linkStyle}>monday work management</a>
+              <a href="https://futures..com/work-management" style={linkStyle}>futures. work management</a>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/6827ab46e3eb7d10d106048a_CRM_Symbol.svg" 
                 alt="" style={iconStyle} />
-              <a href="https://monday.com/crm" style={linkStyle}>monday CRM</a>
+              <a href="https://futures..com/crm" style={linkStyle}>futures. CRM</a>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/690735b4354cf7990ff6f515_camp%20logo.svg" 
                 alt="" style={iconStyle} />
-              <a href="/w/crm/campaigns" style={linkStyle}>monday campaigns</a>
+              <a href="/w/crm/campaigns" style={linkStyle}>futures. campaigns</a>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/6827ab2aea46b8d3ee1f3ce4_DEV_Symbol.svg" 
                 alt="" style={iconStyle} />
-              <a href="https://monday.com/w/dev" style={linkStyle}>monday dev</a>
+              <a href="https://futures..com/w/dev" style={linkStyle}>futures. dev</a>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/6827aa82ed04cf73eed78f9e_SVC_Symbol.svg" 
                 alt="" style={iconStyle} />
-              <a href="/w/service" style={linkStyle}>monday service</a>
+              <a href="/w/service" style={linkStyle}>futures. service</a>
             </div>
 
             <div style={{ ...headingStyle, marginTop: '16px' }}>
-              <br />More by monday.com
+              <br />More by futures..com
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -122,47 +122,47 @@ const MondayFooter = () => {
           {/* Column 4 - Use Case */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: '300px' }}>
             <div style={headingStyle}>Use case</div>
-            <a href="https://monday.com/marketing" style={linkStyle}>Marketing</a>
-            <a href="https://monday.com/project-management" style={linkStyle}>Project management</a>
-            <a href="https://monday.com/crm" style={linkStyle}>Sales</a>
-            <a href="https://monday.com/dev" style={linkStyle}>Developers</a>
-            <a href="https://monday.com/use-cases/hr-management-software" style={linkStyle}>HR</a>
-            <a href="https://monday.com/use-cases/it-operations" style={linkStyle}>IT</a>
-            <a href="https://monday.com/operations" style={linkStyle}>Operations</a>
-            <a href="https://monday.com/construction" style={linkStyle}>Construction</a>
-            <a href="https://monday.com/education" style={linkStyle}>Education</a>
+            <a href="https://futures..com/marketing" style={linkStyle}>Marketing</a>
+            <a href="https://futures..com/project-management" style={linkStyle}>Project management</a>
+            <a href="https://futures..com/crm" style={linkStyle}>Sales</a>
+            <a href="https://futures..com/dev" style={linkStyle}>Developers</a>
+            <a href="https://futures..com/use-cases/hr-management-software" style={linkStyle}>HR</a>
+            <a href="https://futures..com/use-cases/it-operations" style={linkStyle}>IT</a>
+            <a href="https://futures..com/operations" style={linkStyle}>Operations</a>
+            <a href="https://futures..com/construction" style={linkStyle}>Construction</a>
+            <a href="https://futures..com/education" style={linkStyle}>Education</a>
           </div>
 
           {/* Column 5 - Company */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: '300px' }}>
             <div style={headingStyle}>Company</div>
-            <a href="https://monday.com/p/about/" style={linkStyle}>About us</a>
-            <a href="https://monday.com/careers/" style={linkStyle}>Careers - We're hiring!</a>
-            <a href="https://monday.com/w/insights" style={linkStyle}>Insights for leaders</a>
-            <a href="https://monday.com/p/news/" style={linkStyle}>Press</a>
-            <a href="https://monday.com/w/customer-stories" style={linkStyle}>Customer stories</a>
-            <a href="https://monday.com/w/partnership/" style={linkStyle}>Become a partner</a>
-            <a href="https://monday.com/p/esg" style={linkStyle}>Sustainability & ESG</a>
-            <a href="https://monday.com/affiliate-program/" style={linkStyle}>Affiliates</a>
-            <a href="https://mondayert.org" style={linkStyle}>Emergency Response</a>
-            <a href="https://ir.monday.com/" style={linkStyle}>Investor relations</a>
+            <a href="https://futures..com/p/about/" style={linkStyle}>About us</a>
+            <a href="https://futures..com/careers/" style={linkStyle}>Careers - We're hiring!</a>
+            <a href="https://futures..com/w/insights" style={linkStyle}>Insights for leaders</a>
+            <a href="https://futures..com/p/news/" style={linkStyle}>Press</a>
+            <a href="https://futures..com/w/customer-stories" style={linkStyle}>Customer stories</a>
+            <a href="https://futures..com/w/partnership/" style={linkStyle}>Become a partner</a>
+            <a href="https://futures..com/p/esg" style={linkStyle}>Sustainability & ESG</a>
+            <a href="https://futures..com/affiliate-program/" style={linkStyle}>Affiliates</a>
+            <a href="https://futures.ert.org" style={linkStyle}>Emergency Response</a>
+            <a href="https://ir.futures..com/" style={linkStyle}>Investor relations</a>
           </div>
 
           {/* Column 6 - Resources */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: '300px' }}>
             <div style={headingStyle}>Resources</div>
-            <a href="https://monday.com/helpcenter" style={linkStyle}>Help Center</a>
-            <a href="https://community.monday.com/" style={linkStyle}>Community</a>
-            <a href="https://monday.com/blog" style={linkStyle}>Blog</a>
-            <a href="https://monday.com/whats-new" style={linkStyle}>What's new</a>
-            <a href="https://monday.com/helpcenter/academy" style={linkStyle}>Academy</a>
-            <a href="https://monday.com/p/events-hub/" style={linkStyle}>Global events</a>
-            <a href="https://mondayspaces.com" style={linkStyle}>monday spaces</a>
+            <a href="https://futures..com/helpcenter" style={linkStyle}>Help Center</a>
+            <a href="https://community.futures..com/" style={linkStyle}>Community</a>
+            <a href="https://futures..com/blog" style={linkStyle}>Blog</a>
+            <a href="https://futures..com/whats-new" style={linkStyle}>What's new</a>
+            <a href="https://futures..com/helpcenter/academy" style={linkStyle}>Academy</a>
+            <a href="https://futures..com/p/events-hub/" style={linkStyle}>Global events</a>
+            <a href="https://futures.spaces.com" style={linkStyle}>futures. spaces</a>
             <a href="https://www.startupforstartup.com/ww/" style={linkStyle}>Startup for startup</a>
-            <a href="https://monday.com/appsdeveloper" style={linkStyle}>App development</a>
-            <a href="https://monday.com/p/find-a-partner/" style={linkStyle}>Find a partner</a>
-            <a href="https://monday.com/expertcatalog" style={linkStyle}>Hire an expert</a>
-            <a href="https://monday.com/alternative" style={linkStyle}>Compare</a>
+            <a href="https://futures..com/appsdeveloper" style={linkStyle}>App development</a>
+            <a href="https://futures..com/p/find-a-partner/" style={linkStyle}>Find a partner</a>
+            <a href="https://futures..com/expertcatalog" style={linkStyle}>Hire an expert</a>
+            <a href="https://futures..com/alternative" style={linkStyle}>Compare</a>
           </div>
         </div>
 
@@ -247,19 +247,19 @@ const MondayFooter = () => {
 
             {/* Compliance Icons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <a href="https://monday.com/terms/gdpr" target="_blank" rel="noopener noreferrer">
+              <a href="https://futures..com/terms/gdpr" target="_blank" rel="noopener noreferrer">
                 <img src="https://cdn.prod.website-files.com/6318588b0036387847c21c9a/632b459adca58ef19316e143_gdpr-logo.png" 
                   alt="GDPR" style={{ height: 'auto', width: '40px' }} />
               </a>
-              <a href="https://monday.com/trustcenter/iso" target="_blank" rel="noopener noreferrer">
+              <a href="https://futures..com/trustcenter/iso" target="_blank" rel="noopener noreferrer">
                 <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/65829074fc3601290cdb447c_iso-logo1.png" 
                   alt="ISO" style={{ height: 'auto', width: '40px' }} />
               </a>
-              <a href="https://monday.com/terms/soc2" target="_blank" rel="noopener noreferrer">
+              <a href="https://futures..com/terms/soc2" target="_blank" rel="noopener noreferrer">
                 <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/65829074fc3601290cdb447a_soc-logo.webp" 
                   alt="SOC" style={{ height: 'auto', width: '40px' }} />
               </a>
-              <a href="https://support.monday.com/hc/en-us/articles/360006506699" target="_blank" rel="noopener noreferrer">
+              <a href="https://support.futures..com/hc/en-us/articles/360006506699" target="_blank" rel="noopener noreferrer">
                 <img src="https://cdn.prod.website-files.com/656da6fea306219773d04208/65829074fc3601290cdb447e_hipaa-logo.png" 
                   alt="HIPAA" style={{ height: 'auto', width: '40px' }} />
               </a>
@@ -285,23 +285,23 @@ const MondayFooter = () => {
 
             {/* Bottom Links */}
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#585965' }}>
-              <a href="https://monday.com/trustcenter" style={smallLinkStyle}>Security</a>
+              <a href="https://futures..com/trustcenter" style={smallLinkStyle}>Security</a>
               <span>·</span>
-              <a href="https://monday.com/trustcenter" style={smallLinkStyle}>Terms and privacy</a>
+              <a href="https://futures..com/trustcenter" style={smallLinkStyle}>Terms and privacy</a>
               <span>·</span>
-              <a href="https://monday.com/terms/privacy" style={smallLinkStyle}>Privacy policy</a>
+              <a href="https://futures..com/terms/privacy" style={smallLinkStyle}>Privacy policy</a>
               <span>·</span>
               <a href="#" style={smallLinkStyle}>Your privacy choices</a>
               <span>·</span>
-              <a href="https://status.monday.com/" style={smallLinkStyle}>Status</a>
+              <a href="https://status.futures..com/" style={smallLinkStyle}>Status</a>
               <span>·</span>
-              <span>All Rights Reserved © monday.com</span>
+              <span>All Rights Reserved © futures..com</span>
             </div>
           </div>
 
           {/* Right - App Stores */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginLeft: 'auto' }}>
-            <a href="https://play.google.com/store/apps/details?id=com.monday.monday" target="_blank" rel="noopener noreferrer">
+            <a href="https://play.google.com/store/apps/details?id=com.futures..futures." target="_blank" rel="noopener noreferrer">
               <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
                 alt="Get it on Google Play" style={{ height: '40px', width: 'auto' }} />
             </a>
@@ -309,7 +309,7 @@ const MondayFooter = () => {
               <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" 
                 alt="Download on the App Store" style={{ height: '40px', width: 'auto' }} />
             </a>
-            <a href="https://monday.com/accessibility-statement" target="_blank" rel="noopener noreferrer" 
+            <a href="https://futures..com/accessibility-statement" target="_blank" rel="noopener noreferrer" 
               style={{ display: 'flex', alignItems: 'center', marginTop: '16px', fontSize: '14px', color: '#585965', textDecoration: 'none' }}>
               <span style={{ marginRight: '8px' }}>♿</span>
               Accessibility statement

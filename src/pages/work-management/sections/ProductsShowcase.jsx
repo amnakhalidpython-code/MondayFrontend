@@ -4,7 +4,7 @@ const ProductsShowcase = () => {
   const products = [
     {
       id: 'work-management',
-      name: 'monday',
+      name: 'futures',
       subName: 'work management',
       description: 'For projects, resources, & goals',
       color: '#6161FF',
@@ -24,7 +24,7 @@ const ProductsShowcase = () => {
     },
     {
       id: 'crm',
-      name: 'monday',
+      name: 'futures',
       subName: 'CRM',
       description: 'For customer-facing teams',
       color: '#00D2D2',
@@ -41,7 +41,7 @@ const ProductsShowcase = () => {
     },
     {
       id: 'dev',
-      name: 'monday',
+      name: 'futures',
       subName: 'dev',
       description: 'For development & product teams',
       color: '#00C875',
@@ -58,7 +58,7 @@ const ProductsShowcase = () => {
     },
     {
       id: 'service',
-      name: 'monday',
+      name: 'futures',
       subName: 'service',
       description: 'For IT & support teams',
       color: '#FB275D',

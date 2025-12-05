@@ -7,7 +7,7 @@ export default function CustomerTestimonials() {
     {
       id: 1,
       logo: 'https://cdn.prod.website-files.com/656da6fea306219773d04208/664ddf2598bee29293a42051_HOLT%20Cat.svg',
-      quote: 'We have dozens of complex projects going on at any given time. monday.com has given us the visibility we need to get everyone on the same page and keep track of all the moving parts.',
+      quote: 'We have dozens of complex projects going on at any given time futures.com has given us the visibility we need to get everyone on the same page and keep track of all the moving parts.',
       avatar: 'https://cdn.prod.website-files.com/656da6fea306219773d04208/66f931c7319410829f9822ef_Mask%20group.avif',
       name: 'Jason Doan',
       title: 'VP of Heavy Rental and Sales Operations',
