@@ -102,7 +102,7 @@ const SignUp = () => {
   // Save email to backend
   const saveEmailToBackend = async (emailAddress) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/email', {
+      const response = await fetch('https://monday-clone-backend.vercel.app/api/users/email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

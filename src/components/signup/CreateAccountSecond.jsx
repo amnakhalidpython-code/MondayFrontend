@@ -15,7 +15,7 @@ const handleContinue = async () => {
   }
 
   try {
-    const res = await fetch("http://localhost:5000/api/account/save-account", {
+    const res = await fetch("https://monday-clone-backend.vercel.app/api/account/save-account", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fullName, accountName })
