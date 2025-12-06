@@ -19,48 +19,73 @@ const CreateAccountEight = () => {
   });
   
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [accountUrl, setAccountUrl] = useState('');
 
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Get data from Firebase user (from context)
-        if (user) {
-          const name = user.displayName || '';
-          const email = user.email || '';
+        setDataLoading(true);
+        
+        if (!user) {
+          console.error('❌ No user found in context');
+          setDataLoading(false);
+          return;
+        }
+
+        const name = user.displayName || '';
+        const email = user.email || '';
+        
+        console.log('👤 Fetching account for email:', email);
+
+        // Fetch accountName from MongoDB
+        const response = await fetch('https://monday-clone-backend.vercel.app/api/account/get-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        console.log('📦 Response from backend:', data);
+        
+        if (response.ok && data.account) {
+          const accountData = {
+            name: data.account.fullName || name,
+            email: email,
+            accountName: data.account.accountName || ''
+          };
           
-          // Fetch accountName from MongoDB
-          const response = await fetch('https://monday-clone-backend.vercel.app/api/account/get-account', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-          });
+          console.log('✅ Setting userData:', accountData);
+          setUserData(accountData);
           
-          const data = await response.json();
-          
-          if (response.ok && data.account) {
-            setUserData({
-              name: data.account.fullName || name,
-              email: email,
-              accountName: data.account.accountName || ''
-            });
-            
-            // Set account URL
-            if (data.account.accountName) {
-              setAccountUrl(`${data.account.accountName}.monday.com`);
-            }
+          // Set account URL
+          if (data.account.accountName) {
+            setAccountUrl(`${data.account.accountName}.monday.com`);
           } else {
-            // Fallback to Firebase data only
-            setUserData({
-              name: name,
-              email: email,
-              accountName: ''
-            });
+            console.warn('⚠️ Account name is missing!');
           }
+        } else {
+          console.warn('⚠️ Account not found, using Firebase data only');
+          setUserData({
+            name: name,
+            email: email,
+            accountName: ''
+          });
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('❌ Error fetching user data:', error);
+        // Fallback to Firebase data
+        if (user) {
+          setUserData({
+            name: user.displayName || '',
+            email: user.email || '',
+            accountName: ''
+          });
+        }
+      } finally {
+        setDataLoading(false);
       }
     };
 
@@ -84,44 +109,74 @@ const CreateAccountEight = () => {
   const hasValidEmails = invites.some(invite => invite.email.trim().length > 0);
 
   const handleInviteTeam = async () => {
-    if (!hasValidEmails) return;
+    if (!hasValidEmails) {
+      alert('Please add at least one email address');
+      return;
+    }
+    
+    // Check if accountName exists
+    if (!userData.accountName || userData.accountName.trim() === '') {
+      alert('❌ Account name is missing! Please go back and complete your account setup.');
+      console.error('Missing accountName:', userData);
+      return;
+    }
     
     setLoading(true);
     
     try {
+      // Filter only valid invitations
       const validInvitations = invites.filter(invite => invite.email.trim().length > 0);
+      
+      const payload = {
+        inviterUserId: user?.uid || '',
+        inviterName: userData.name,
+        inviterEmail: userData.email,
+        accountName: userData.accountName,
+        invitations: validInvitations
+      };
+      
+      console.log('📤 Sending invitation data:', payload);
       
       const response = await fetch('https://monday-clone-backend.vercel.app/api/invitations/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inviterUserId: user?.uid || '',
-          inviterName: userData.name,
-          inviterEmail: userData.email,
-          accountName: userData.accountName,
-          invitations: validInvitations
-        })
+        body: JSON.stringify(payload)
       });
       
       const data = await response.json();
       
+      console.log('📥 Response from server:', data);
+      
       if (response.ok) {
-        alert('Invitations sent successfully!');
-        navigate('/nine'); // Move to next step
+        alert(`✅ Successfully sent ${data.sentCount} invitation(s)!`);
+        navigate('/nine');
       } else {
-        alert('Failed to send invitations: ' + data.message);
+        console.error('❌ Server error:', data);
+        alert(`❌ Failed: ${data.message}`);
       }
     } catch (error) {
-      console.error('Error sending invitations:', error);
-      alert('Error sending invitations. Please try again.');
+      console.error('❌ Network error:', error);
+      alert('❌ Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRemindLater = () => {
-    navigate('/nine'); // Skip to next step
+    navigate('/nine');
   };
+
+  // Show loading state
+  if (dataLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your account...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full flex bg-white overflow-hidden">
@@ -150,9 +205,13 @@ const CreateAccountEight = () => {
           </h2>
           
           {/* Display Account URL */}
-          {accountUrl && (
+          {accountUrl ? (
             <p className="text-sm text-gray-600 mt-4">
               Your team will join: <span className="font-semibold text-blue-600">{accountUrl}</span>
+            </p>
+          ) : (
+            <p className="text-sm text-red-600 mt-4">
+              ⚠️ Warning: Account name is missing. Please go back and complete setup.
             </p>
           )}
         </div>
@@ -238,9 +297,9 @@ const CreateAccountEight = () => {
           </button>
           <button 
             onClick={handleInviteTeam}
-            disabled={!hasValidEmails || loading}
+            disabled={!hasValidEmails || loading || !userData.accountName}
             className={`px-8 py-3 rounded text-base font-normal transition-colors ${
-              hasValidEmails && !loading
+              hasValidEmails && !loading && userData.accountName
                 ? 'bg-blue-600 text-white hover:bg-blue-700' 
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
