@@ -89,7 +89,6 @@ const CreateAccountEight = () => {
     setLoading(true);
     
     try {
-      // Filter only valid invitations
       const validInvitations = invites.filter(invite => invite.email.trim().length > 0);
       
       const response = await fetch('https://monday-clone-backend.vercel.app/api/invitations/send', {
