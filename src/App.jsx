@@ -18,6 +18,7 @@ import CreateAccountSixth from "./components/signup/CreateAccountSixth";
 import CreateAccountSeven from "./components/signup/CreateAccountSeven";
 import CreateAccountEight from "./components/signup/CreateAccountEight";
 import CreateAccountNine from "./components/signup/CreateAccountNine";
+import AcceptInvitation from "./components/AcceptInvitation"; // NEW IMPORT
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -40,7 +41,7 @@ function AppContent() {
 
   return (
     <>
-      {/* Navbar conditionally show/hide here in these pages  */}
+      {/* Navbar conditionally show/hide */}
       {!hideNavbar && <Navbar />}
 
       <Routes>
@@ -51,7 +52,7 @@ function AppContent() {
         {/* Signup Page - PUBLIC (No Protection) */}
         <Route path="/one" element={<SignUp />} />
 
-        {/* Protected Signup Steps - Require email from /one */}
+        {/* Protected Signup Steps */}
         <Route 
           path="/two" 
           element={
@@ -102,7 +103,6 @@ function AppContent() {
           element={
             <SignupProtectedRoute>
               <CreateAccountSeven />
-
             </SignupProtectedRoute>
           } 
         />
@@ -113,18 +113,17 @@ function AppContent() {
             <SignupProtectedRoute>
               <CreateAccountEight />
             </SignupProtectedRoute>
-
           } 
         />
         
         <Route 
           path="/nine" 
-          element={
-           
-              <CreateAccountNine/>
-            
-          }
+          element={<CreateAccountNine />}
         />
+
+        {/* ✅ DYNAMIC ROUTE - Account name invitation acceptance */}
+        {/* This should be LAST to avoid conflicts */}
+        <Route path="/:accountName" element={<AcceptInvitation />} />
       </Routes>
     </>
   );
