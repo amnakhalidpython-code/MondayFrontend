@@ -176,6 +176,7 @@ const SignUp = () => {
         photoURL: user.photoURL,
         provider: 'google'
       });
+      localStorage.setItem('userEmail', user.email);
       
       // Navigate only once
       if (!hasNavigated.current) {
@@ -240,6 +241,7 @@ const SignUp = () => {
         photoURL: user.photoURL,
         provider: 'microsoft'
       });
+      localStorage.setItem('userEmail', user.email);
       
       // Navigate only once
       if (!hasNavigated.current) {
@@ -266,25 +268,29 @@ const SignUp = () => {
     }
   };
 
-  const handleContinue = async () => {
-    if (!email || !isValidEmail(email)) {
-      setEmailError(true);
-      setTimeout(() => setEmailError(false), 3000);
-      return;
-    }
+const handleContinue = async () => {
+  if (!email || !isValidEmail(email)) {
+    setEmailError(true);
+    setTimeout(() => setEmailError(false), 3000);
+    return;
+  }
+  
+  setContinueLoading(true);
+  
+  const saved = await saveEmailToBackend(email);
+  
+  if (saved) {
+    console.log('Continue with email:', email);
     
-    setContinueLoading(true);
+    // ✅ SAVE EMAIL TO LOCALSTORAGE
+    localStorage.setItem('userEmail', email);
     
-    const saved = await saveEmailToBackend(email);
-    
-    if (saved) {
-      console.log('Continue with email:', email);
-      saveEmailForSignup(email);
-      navigate('/two');
-    }
-    
-    setContinueLoading(false);
-  };
+    saveEmailForSignup(email);
+    navigate('/two');
+  }
+  
+  setContinueLoading(false);
+};
 
   return (
     <div style={{

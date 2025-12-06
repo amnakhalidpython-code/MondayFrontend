@@ -15,23 +15,42 @@ const handleContinue = async () => {
   }
 
   try {
+    // Get email from localStorage (saved in SignUp component)
+    const userEmail = localStorage.getItem('userEmail');
+    
+    if (!userEmail) {
+      alert('Email not found. Please go back and enter your email again.');
+      navigate('/one');
+      return;
+    }
+
+    console.log('Saving account with:', { email: userEmail, fullName, accountName });
+
     const res = await fetch("https://monday-clone-backend.vercel.app/api/account/save-account", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, accountName })
+      body: JSON.stringify({ 
+        email: userEmail,      // ✅ EMAIL ADDED
+        fullName, 
+        accountName 
+      })
     });
 
     const data = await res.json();
     console.log("Saved:", data);
 
-    // NEXT PAGE REDIRECT
-    navigate("/three");
+    if (res.ok) {
+      // NEXT PAGE REDIRECT
+      navigate("/three");
+    } else {
+      alert('Failed to save account: ' + data.message);
+    }
 
   } catch (error) {
     console.log("Error:", error);
+    alert('Error saving account. Please try again.');
   }
 };
-
 
   const handleBack = () => {
     console.log('Back clicked');
