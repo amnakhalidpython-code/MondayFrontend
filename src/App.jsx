@@ -16,6 +16,8 @@ import CreateAccountForth from "./components/signup/CreateAccountForth";
 import CreateAccountFifth from "./components/signup/CreateAccountFifth";
 import CreateAccountSixth from "./components/signup/CreateAccountSixth";
 import CreateAccountSeven from "./components/signup/CreateAccountSeven";
+import CreateAccountEight from "./components/signup/CreateAccountEight";
+import CreateAccountNine from "./components/signup/CreateAccountNine";
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -29,7 +31,9 @@ function AppContent() {
     "/four",
     "/five",
     "/six",
-    "/seven"
+    "/seven",
+    "/eight",
+    "/nine"
   ];
 
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
@@ -98,8 +102,28 @@ function AppContent() {
           element={
             <SignupProtectedRoute>
               <CreateAccountSeven />
+
             </SignupProtectedRoute>
           } 
+        />
+        
+        <Route 
+          path="/eight" 
+          element={
+            <SignupProtectedRoute>
+              <CreateAccountEight />
+            </SignupProtectedRoute>
+
+          } 
+        />
+        
+        <Route 
+          path="/nine" 
+          element={
+           
+              <CreateAccountNine/>
+            
+          }
         />
       </Routes>
     </>

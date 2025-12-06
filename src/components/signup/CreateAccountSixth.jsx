@@ -1,54 +1,47 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { categoryOptions } from './data/categoryData';
 
-const CreateAccountSeven = () => {
+const CreateAccountSixth = () => {
   const navigate = useNavigate();
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const location = useLocation();
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [subOptions, setSubOptions] = useState([]);
 
-  const options = [
-    { id: 'ai_chatbots', label: 'AI Chatbots (e.g. ChatGPT, Claude, etc.)' },
-    { id: 'social_media', label: 'Facebook / Instagram' },
-    { id: 'email', label: 'Email' },
-    { id: 'search_engine', label: 'Online search engines (e.g. Google, Bing, etc.)' },
-    { id: 'linkedin', label: 'Linkedin' },
-    { id: 'billboard', label: 'Outdoors ad (billboards / transport / airport)' },
-    { id: 'consultant', label: 'Consultant' },
-    { id: 'software_review_sites', label: 'Software Review Site' },
-    { id: 'tv', label: 'TV / Streaming' },
-    { id: 'podcast', label: 'Podcast' },
-    { id: 'news', label: 'News publications' },
-    { id: 'audio_ad', label: 'Audio streaming services' },
-    { id: 'friend', label: 'Friend' },
-    { id: 'events', label: 'Events/conferences' },
-    { id: 'youtube_ad', label: 'YouTube' },
-    { id: 'other', label: 'Other' }
-  ];
+  // Get selected category from Step 4
+  const selectedCategory = location.state?.selectedCategory;
 
-  const handleCheckboxChange = (id) => {
-    setSelectedOptions(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(optionId => optionId !== id);
-      } else {
-        return [...prev, id];
-      }
-    });
+  useEffect(() => {
+    // If no category selected, redirect back to Step 4
+    if (!selectedCategory) {
+      navigate('/signup/manage');
+      return;
+    }
+
+    // Get sub-options for selected category
+    const categoryData = categoryOptions[selectedCategory];
+    if (categoryData && categoryData.subOptions) {
+      setSubOptions(categoryData.subOptions);
+    }
+  }, [selectedCategory, navigate]);
+
+  const handleOptionSelect = (id) => {
+    setSelectedOption(id);
   };
 
   const handleBack = () => {
-    console.log('Back clicked');
-    // Navigate to previous step
-    navigate('/five');
+    navigate(-1); // Go back to Step 4
   };
 
   const handleContinue = () => {
-    if (selectedOptions.length > 0) {
-      console.log('Selected options:', selectedOptions);
-      // Navigate to next step
+    if (selectedOption) {
+      console.log('Selected Category:', selectedCategory);
+      console.log('Selected Sub-option:', selectedOption);
       navigate('/seven');
     }
   };
 
-  const isFormValid = selectedOptions.length > 0;
+  const isFormValid = selectedOption !== null;
 
   return (
     <div style={{
@@ -104,114 +97,104 @@ const CreateAccountSeven = () => {
               lineHeight: '30px',
               fontWeight: 500,
               color: '#323338',
-              marginBottom: '16px',
+              marginBottom: '4px',
               marginTop: 0,
               fontFamily: 'Poppins, Roboto, Noto Sans Hebrew, Noto Kufi Arabic, Noto Sans JP, sans-serif',
               letterSpacing: '-0.1px',
               display: 'block',
-              height: '60px',
+              height: '30px',
               overflow: 'hidden',
               textAlign: 'start',
               WebkitFontSmoothing: 'antialiased'
             }}>
-              One last question, how did you hear about us?
+              Select what you'd like to focus on first
             </h2>
 
-            {/* Checkboxes Grid */}
+            {/* Subtitle */}
+            <div style={{
+              fontSize: '16px',
+              lineHeight: '22px',
+              fontWeight: 400,
+              color: '#323338',
+              marginBottom: '16px',
+              display: 'block',
+              height: '22px',
+              overflow: 'hidden',
+              textAlign: 'start',
+              WebkitFontSmoothing: 'antialiased'
+            }}>
+              Help us tailor the best experience for you
+            </div>
+
+            {/* Options Grid */}
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '12px',
+              gap: '16px 8px',
               paddingTop: '16px',
-              alignItems: 'flex-start'
+              alignItems: 'center'
             }}>
-              {options.map((option) => {
-                const isChecked = selectedOptions.includes(option.id);
-                
-                return (
-                  <div key={option.id} style={{ 
-                    minWidth: 'fit-content',
-                    display: 'block'
-                  }}>
-                    <label style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
+              {subOptions.map((option) => (
+                <div key={option.id} style={{ 
+                  minWidth: 'fit-content',
+                  display: 'block'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => handleOptionSelect(option.id)}
+                    style={{
                       padding: '8px 16px',
-                      backgroundColor: '#ffffff',
-                      border: '1px solid rgb(195, 198, 212)',
+                      fontSize: '16px',
+                      fontWeight: 400,
+                      lineHeight: '22px',
+                      color: '#323338',
+                      backgroundColor: selectedOption === option.id ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0)',
+                      border: selectedOption === option.id ? '0.8px solid rgb(0, 115, 234)' : '0.8px solid rgb(195, 198, 212)',
                       borderRadius: '32px',
                       cursor: 'pointer',
-                      minHeight: '36px',
-                      columnGap: '8px',
-                      position: 'relative',
-                      userSelect: 'none',
-                      transition: 'all 0.15s ease',
-                      whiteSpace: 'nowrap'
+                      outline: 'none',
+                      transition: 'transform 0.07s ease, min-width 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
+                      height: '40px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: 0,
+                      whiteSpace: 'nowrap',
+                      WebkitFontSmoothing: 'antialiased',
+                      textAlign: 'center',
+                      boxShadow: selectedOption === option.id ? 'rgb(0, 115, 234) 0px 0px 0px 1px inset' : 'none',
+                      boxSizing: 'border-box',
+                      margin: 0,
+                      userSelect: 'none'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(103, 104, 121, 0.1)';
+                      if (selectedOption !== option.id) {
+                        e.currentTarget.style.backgroundColor = 'rgba(103, 104, 121, 0.1)';
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#ffffff';
+                      if (selectedOption !== option.id) {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+                      }
                     }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => handleCheckboxChange(option.id)}
-                        style={{
-                          position: 'absolute',
-                          opacity: 0,
-                          width: 0,
-                          height: 0,
-                          margin: 0,
-                          padding: 0
-                        }}
-                      />
-                      
-                      {/* Custom Checkbox */}
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        backgroundColor: isChecked ? '#0073ea' : '#ffffff',
-                        border: '0.8px solid rgb(195, 198, 212)',
-                        borderRadius: '2px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        transition: 'all 0.07s cubic-bezier(0, 0, 0.35, 1)'
-                      }}>
-                        {isChecked && (
-                          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style={{ 
-                            color: '#ffffff',
-                            display: 'block'
-                          }}>
-                            <path d="M8.53033 14.2478L8 13.7175L7.46967 14.2478C7.76256 14.5407 8.23744 14.5407 8.53033 14.2478ZM8 12.6569L4.53033 9.18718C4.23744 8.89429 3.76256 8.89429 3.46967 9.18718C3.17678 9.48008 3.17678 9.95495 3.46967 10.2478L7.46967 14.2478L8 13.7175L8.53033 14.2478L16.2478 6.53033C16.5407 6.23743 16.5407 5.76256 16.2478 5.46967C15.955 5.17677 15.4801 5.17677 15.1872 5.46967L8 12.6569Z" 
-                            fill="currentColor" 
-                            fillRule="evenodd" 
-                            clipRule="evenodd"/>
-                          </svg>
-                        )}
-                      </div>
-
-                      {/* Label Text */}
-                      <span style={{
-                        fontSize: '14px',
-                        lineHeight: '20px',
-                        fontWeight: 400,
-                        color: '#323338',
-                        overflow: 'visible',
-                        textOverflow: 'clip',
-                        whiteSpace: 'nowrap',
-                        WebkitFontSmoothing: 'antialiased'
-                      }}>
-                        {option.label}
-                      </span>
-                    </label>
-                  </div>
-                );
-              })}
+                  >
+                    <div style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      fontWeight: 400,
+                      height: '20px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'start',
+                      WebkitFontSmoothing: 'antialiased'
+                    }}>
+                      {option.label}
+                    </div>
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -243,10 +226,15 @@ const CreateAccountSeven = () => {
                 display: 'flex',
                 alignItems: 'center',
                 height: '40px',
-                transition: 'transform 0.07s ease',
+                transition: 'transform 0.07s ease, min-width 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
                 outline: 'none',
                 minWidth: 'auto',
-                WebkitFontSmoothing: 'antialiased'
+                WebkitFontSmoothing: 'antialiased',
+                boxSizing: 'border-box',
+                justifyContent: 'center',
+                textAlign: 'center',
+                margin: 0,
+                userSelect: 'none'
               }}
             >
               <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20" style={{ display: 'block' }}>
@@ -259,6 +247,7 @@ const CreateAccountSeven = () => {
               type="button"
               onClick={handleContinue}
               disabled={!isFormValid}
+              tabIndex={isFormValid ? 0 : -1}
               style={{
                 padding: '8px 16px',
                 fontSize: '16px',
@@ -272,11 +261,16 @@ const CreateAccountSeven = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 height: '40px',
-                transition: 'transform 0.07s ease',
+                transition: 'transform 0.07s ease, min-width 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
                 outline: 'none',
                 minWidth: 0,
                 pointerEvents: isFormValid ? 'auto' : 'none',
                 WebkitFontSmoothing: 'antialiased',
+                boxSizing: 'border-box',
+                justifyContent: 'center',
+                textAlign: 'center',
+                margin: 0,
+                userSelect: 'none',
                 whiteSpace: 'nowrap'
               }}
             >
@@ -304,7 +298,7 @@ const CreateAccountSeven = () => {
           overflow: 'hidden'
         }}>
           <img
-            src="https://dapulse-res.cloudinary.com/image/upload/monday_platform/signup/signup-right-side-assets-new-flow/how-did-you-hear-about-us-with-invite.png"
+            src="https://dapulse-res.cloudinary.com/image/upload/monday_platform/signup/signup-right-side-assets-new-flow/select-what-youd-like-to-focus-on.png"
             alt=""
             style={{
               display: 'block',
@@ -319,4 +313,4 @@ const CreateAccountSeven = () => {
   );
 };
 
-export default CreateAccountSeven;
+export default CreateAccountSixth;

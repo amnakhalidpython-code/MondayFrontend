@@ -44,6 +44,9 @@ const CreateAccountSeven = () => {
   const handleContinue = () => {
     if (selectedOptions.length > 0) {
       console.log('Selected options:', selectedOptions);
+
+      // Navigate to next step
+      navigate('/eight');
     }
   };
 
