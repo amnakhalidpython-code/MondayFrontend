@@ -18,7 +18,6 @@ import CreateAccountSixth from "./components/signup/CreateAccountSixth";
 import CreateAccountSeven from "./components/signup/CreateAccountSeven";
 import CreateAccountEight from "./components/signup/CreateAccountEight";
 import CreateAccountNine from "./components/signup/CreateAccountNine";
-import AcceptInvitation from "./components/AcceptInvitation"; // NEW IMPORT
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -121,9 +120,6 @@ function AppContent() {
           element={<CreateAccountNine />}
         />
 
-        {/* ✅ DYNAMIC ROUTE - Account name invitation acceptance */}
-        {/* This should be LAST to avoid conflicts */}
-        <Route path="/:accountName" element={<AcceptInvitation />} />
       </Routes>
     </>
   );
