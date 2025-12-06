@@ -64,13 +64,13 @@ const CreateAccountEight = () => {
           console.log('✅ Setting userData:', accountData);
           setUserData(accountData);
           
-         // Set account URL with futures.com
-if (data.account.accountName) {
-  setAccountUrl(`${data.account.accountName}.futures.com`); // ✅ Changed
-  console.log('✅ Account URL:', `${data.account.accountName}.futures.com`);
-} else {
-  console.warn('⚠️ Account name is missing!');
-}
+          // Set account URL
+          if (data.account.accountName) {
+            setAccountUrl(`${data.account.accountName}.monday.com`);
+            console.log('✅ Account URL:', `${data.account.accountName}.monday.com`);
+          } else {
+            console.warn('⚠️ Account name is missing!');
+          }
         } else {
           console.warn('⚠️ Account not found in database');
           // Use available data

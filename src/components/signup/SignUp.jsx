@@ -138,135 +138,197 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    if (googleLoading || isAuthenticating.current || hasNavigated.current) {
-      console.log('Auth already in progress');
-      return;
+ const handleGoogleSignIn = async () => {
+  if (googleLoading || isAuthenticating.current || hasNavigated.current) {
+    console.log('Auth already in progress');
+    return;
+  }
+  
+  isAuthenticating.current = true;
+  setGoogleLoading(true);
+  
+  try {
+    // Cleanup auth listener before popup to prevent double navigation
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
     }
     
-    isAuthenticating.current = true;
-    setGoogleLoading(true);
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
     
+    console.log('Google Sign-In successful:', user);
+    
+    // Save user data to Firebase database
+    await set(ref(database, 'users/' + user.uid), {
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      provider: 'google',
+      createdAt: new Date().toISOString()
+    });
+    
+    // ✅ NEW: Save account to MongoDB
     try {
-      // Cleanup auth listener before popup to prevent double navigation
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
-      }
+      // Generate account name from email (before @ symbol)
+      const accountName = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
       
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
+      console.log('💾 Saving account to MongoDB...');
       
-      console.log('Google Sign-In successful:', user);
-      
-      // Save user data to Firebase database
-      await set(ref(database, 'users/' + user.uid), {
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        provider: 'google',
-        createdAt: new Date().toISOString()
+      const accountResponse = await fetch('https://monday-clone-backend.vercel.app/api/account/save-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          fullName: user.displayName || user.email.split('@')[0],
+          accountName: accountName
+        })
       });
       
-      // Save user to context
-      await login({
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        provider: 'google'
-      });
-      localStorage.setItem('userEmail', user.email);
+      const accountData = await accountResponse.json();
       
-      // Navigate only once
-      if (!hasNavigated.current) {
-        hasNavigated.current = true;
-        console.log('Navigating to /three...');
-        
-        navigate('/three', { replace: true });
-      }
-      
-    } catch (error) {
-      console.error('Google Sign-In error:', error);
-      isAuthenticating.current = false;
-      setGoogleLoading(false);
-      
-      if (error.code === 'auth/popup-closed-by-user') {
-        return;
-      } else if (error.code === 'auth/popup-blocked') {
-        alert('Pop-up blocked by browser. Please allow pop-ups and try again.');
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        return;
+      if (accountResponse.ok) {
+        console.log('✅ Account saved to MongoDB:', accountData);
       } else {
-        alert('Google Sign-In failed: ' + error.message);
+        console.warn('⚠️ Account save failed:', accountData.message);
       }
+    } catch (accountError) {
+      console.error('❌ MongoDB account save error:', accountError);
+      // Continue anyway - user can update later
     }
-  };
+    
+    // Save email to localStorage
+    localStorage.setItem('userEmail', user.email);
+    
+    // Save user to context
+    await login({
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      provider: 'google'
+    });
+    
+    // Navigate only once
+    if (!hasNavigated.current) {
+      hasNavigated.current = true;
+      console.log('Navigating to /three...');
+      
+      navigate('/three', { replace: true });
+    }
+    
+  } catch (error) {
+    console.error('Google Sign-In error:', error);
+    isAuthenticating.current = false;
+    setGoogleLoading(false);
+    
+    if (error.code === 'auth/popup-closed-by-user') {
+      return;
+    } else if (error.code === 'auth/popup-blocked') {
+      alert('Pop-up blocked by browser. Please allow pop-ups and try again.');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      return;
+    } else {
+      alert('Google Sign-In failed: ' + error.message);
+    }
+  }
+};
 
-  const handleMicrosoftSignIn = async () => {
-    if (microsoftLoading || isAuthenticating.current || hasNavigated.current) {
-      console.log('Auth already in progress');
-      return;
+const handleMicrosoftSignIn = async () => {
+  if (microsoftLoading || isAuthenticating.current || hasNavigated.current) {
+    console.log('Auth already in progress');
+    return;
+  }
+  
+  isAuthenticating.current = true;
+  setMicrosoftLoading(true);
+  
+  try {
+    // Cleanup auth listener before popup to prevent double navigation
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
     }
     
-    isAuthenticating.current = true;
-    setMicrosoftLoading(true);
+    const result = await signInWithPopup(auth, microsoftProvider);
+    const user = result.user;
     
+    console.log('Microsoft Sign-In successful:', user);
+    
+    // Save user data to Firebase database
+    await set(ref(database, 'users/' + user.uid), {
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      provider: 'microsoft',
+      createdAt: new Date().toISOString()
+    });
+    
+    // ✅ NEW: Save account to MongoDB
     try {
-      // Cleanup auth listener before popup to prevent double navigation
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
-      }
+      // Generate account name from email (before @ symbol)
+      const accountName = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
       
-      const result = await signInWithPopup(auth, microsoftProvider);
-      const user = result.user;
+      console.log('💾 Saving account to MongoDB...');
       
-      console.log('Microsoft Sign-In successful:', user);
-      
-      // Save user data to Firebase database
-      await set(ref(database, 'users/' + user.uid), {
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        provider: 'microsoft',
-        createdAt: new Date().toISOString()
+      const accountResponse = await fetch('https://monday-clone-backend.vercel.app/api/account/save-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          fullName: user.displayName || user.email.split('@')[0],
+          accountName: accountName
+        })
       });
       
-      // Save user to context
-      await login({
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        provider: 'microsoft'
-      });
-      localStorage.setItem('userEmail', user.email);
+      const accountData = await accountResponse.json();
       
-      // Navigate only once
-      if (!hasNavigated.current) {
-        hasNavigated.current = true;
-        console.log('Navigating to /three...');
-        
-        navigate('/three', { replace: true });
-      }
-      
-    } catch (error) {
-      console.error('Microsoft Sign-In error:', error);
-      isAuthenticating.current = false;
-      setMicrosoftLoading(false);
-      
-      if (error.code === 'auth/popup-closed-by-user') {
-        return;
-      } else if (error.code === 'auth/popup-blocked') {
-        alert('Pop-up blocked by browser. Please allow pop-ups and try again.');
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        return;
+      if (accountResponse.ok) {
+        console.log('✅ Account saved to MongoDB:', accountData);
       } else {
-        alert('Microsoft Sign-In failed: ' + error.message);
+        console.warn('⚠️ Account save failed:', accountData.message);
       }
+    } catch (accountError) {
+      console.error('❌ MongoDB account save error:', accountError);
+      // Continue anyway - user can update later
     }
-  };
+    
+    // Save email to localStorage
+    localStorage.setItem('userEmail', user.email);
+    
+    // Save user to context
+    await login({
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      provider: 'microsoft'
+    });
+    
+    // Navigate only once
+    if (!hasNavigated.current) {
+      hasNavigated.current = true;
+      console.log('Navigating to /three...');
+      
+      navigate('/three', { replace: true });
+    }
+    
+  } catch (error) {
+    console.error('Microsoft Sign-In error:', error);
+    isAuthenticating.current = false;
+    setMicrosoftLoading(false);
+    
+    if (error.code === 'auth/popup-closed-by-user') {
+      return;
+    } else if (error.code === 'auth/popup-blocked') {
+      alert('Pop-up blocked by browser. Please allow pop-ups and try again.');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      return;
+    } else {
+      alert('Microsoft Sign-In failed: ' + error.message);
+    }
+  }
+};
 
 const handleContinue = async () => {
   if (!email || !isValidEmail(email)) {
