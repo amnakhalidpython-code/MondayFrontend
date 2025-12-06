@@ -28,16 +28,20 @@ const CreateAccountEight = () => {
       try {
         setDataLoading(true);
         
-        if (!user) {
-          console.error('❌ No user found in context');
-          setDataLoading(false);
+        // Try multiple sources for email
+        let email = user?.email || localStorage.getItem('userEmail');
+        let name = user?.displayName || '';
+        let userId = user?.uid || 'email-user';
+        
+        if (!email) {
+          console.error('❌ No email found anywhere');
+          alert('Session expired. Please start again.');
+          navigate('/one');
           return;
         }
 
-        const name = user.displayName || '';
-        const email = user.email || '';
-        
-        console.log('👤 Fetching account for email:', email);
+        console.log('✅ Found email:', email);
+        console.log('👤 Fetching account data...');
 
         // Fetch accountName from MongoDB
         const response = await fetch('https://monday-clone-backend.vercel.app/api/account/get-account', {
@@ -48,11 +52,11 @@ const CreateAccountEight = () => {
         
         const data = await response.json();
         
-        console.log('📦 Response from backend:', data);
+        console.log('📦 Account data response:', data);
         
         if (response.ok && data.account) {
           const accountData = {
-            name: data.account.fullName || name,
+            name: data.account.fullName || name || 'User',
             email: email,
             accountName: data.account.accountName || ''
           };
@@ -63,24 +67,27 @@ const CreateAccountEight = () => {
           // Set account URL
           if (data.account.accountName) {
             setAccountUrl(`${data.account.accountName}.monday.com`);
+            console.log('✅ Account URL:', `${data.account.accountName}.monday.com`);
           } else {
             console.warn('⚠️ Account name is missing!');
           }
         } else {
-          console.warn('⚠️ Account not found, using Firebase data only');
+          console.warn('⚠️ Account not found in database');
+          // Use available data
           setUserData({
-            name: name,
+            name: name || 'User',
             email: email,
             accountName: ''
           });
         }
       } catch (error) {
-        console.error('❌ Error fetching user data:', error);
-        // Fallback to Firebase data
-        if (user) {
+        console.error('❌ Error fetching account data:', error);
+        // Fallback
+        const email = localStorage.getItem('userEmail');
+        if (email) {
           setUserData({
-            name: user.displayName || '',
-            email: user.email || '',
+            name: user?.displayName || 'User',
+            email: email,
             accountName: ''
           });
         }
@@ -90,7 +97,7 @@ const CreateAccountEight = () => {
     };
 
     fetchUserData();
-  }, [user]);
+  }, [user, navigate]);
 
   const addInvite = () => {
     setInvites([...invites, { id: Date.now(), email: '', role: 'Admin' }]);
@@ -127,8 +134,11 @@ const CreateAccountEight = () => {
       // Filter only valid invitations
       const validInvitations = invites.filter(invite => invite.email.trim().length > 0);
       
+      // Get user ID - either from Firebase or create a temporary one
+      const userId = user?.uid || `email-user-${Date.now()}`;
+      
       const payload = {
-        inviterUserId: user?.uid || '',
+        inviterUserId: userId,
         inviterName: userData.name,
         inviterEmail: userData.email,
         accountName: userData.accountName,
