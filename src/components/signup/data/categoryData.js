@@ -1,4 +1,3 @@
-// src/components/signup/data/categoryData.js
 
 export const categoryOptions = {
   product_management: {
@@ -325,3 +324,107 @@ export const mainCategories = [
   { id: 'ngo', label: 'Nonprofits' },
   { id: 'other', label: 'Other' }
 ];
+
+
+
+
+ export const goalOptions = [
+    { id: 'work', label: 'Work' },
+    { id: 'personal', label: 'Personal' },
+    { id: 'school', label: 'School' },
+    { id: 'ngo', label: 'Nonprofits' }
+  ];
+
+  // Step 2 options based on selection
+  export const roleOptions = {
+    work: [
+      { id: 'business_owner', label: 'Business owner' },
+      { id: 'team_lead', label: 'Team leader' },
+      { id: 'team_member', label: 'Team member' },
+      { id: 'freelance', label: 'Freelancer' },
+      { id: 'director', label: 'Director' },
+      { id: 'c_level', label: 'C-Level' },
+      { id: 'vp', label: 'VP' }
+    ],
+    school: [
+      { id: 'undergraduate_student', label: 'Undergraduate student' },
+      { id: 'graduate_student', label: 'Graduate student' },
+      { id: 'university_faculty_member', label: 'Faculty member' },
+      { id: 'other', label: 'Other' }
+    ],
+    ngo: [
+      { id: 'board_member', label: 'Board member' },
+      { id: 'executive', label: 'Executive' },
+      { id: 'employee', label: 'Employee' },
+      { id: 'volunteer', label: 'Volunteer' },
+      { id: 'it_staff', label: 'IT staff' },
+      { id: 'other', label: 'Other' }
+    ]
+  };
+
+
+  export  const teamSizeOptions = [
+    { id: '1-1', label: 'Only me' },
+    { id: '2-5', label: '2-5' },
+    { id: '6-10', label: '6-10' },
+    { id: '11-15', label: '11-15' },
+    { id: '16-25', label: '16-25' },
+    { id: '26-50', label: '26-50' },
+    { id: '51-100', label: '51-100' },
+    { id: '101-500', label: '101-500' }
+  ];
+
+ export  const companySizeOptions = [
+    { id: '1-19', label: '1-19' },
+    { id: '20-49', label: '20-49' },
+    { id: '50-99', label: '50-99' },
+    { id: '100-250', label: '100-250' },
+    { id: '251-500', label: '251-500' },
+    { id: '501-1500', label: '501-1500' },
+    { id: '1500+', label: '1500+' }
+  ];
+
+
+   export  const managementOptions = [
+    { id: 'product_management', label: 'Product management' },
+    { id: 'hr', label: 'HR and Recruiting' },
+    { id: 'pmo', label: 'PMO' },
+    { id: 'finance', label: 'Finance' },
+    { id: 'marketing', label: 'Marketing' },
+    { id: 'operations', label: 'Operations' },
+    { id: 'construction', label: 'Construction' },
+    { id: 'legal', label: 'Legal' },
+    { id: 'education', label: 'Education' },
+    { id: 'crm', label: 'Sales and CRM' },
+    { id: 'design_and_creative', label: 'Design and Creative' },
+    { id: 'tech', label: 'Software development' },
+    { id: 'information_technology', label: 'IT' },
+    { id: 'ngo', label: 'Nonprofits' },
+    { id: 'other', label: 'Other' }
+  ];
+
+
+    export const options = [
+    { id: 'news', label: 'News publications' },
+    { id: 'tv', label: 'TV / Streaming' },
+    { id: 'search_engine', label: 'Online search engines (e.g. Google, Bing, etc.)' },
+    { id: 'social_media', label: 'Facebook / Instagram' },
+
+    { id: 'ai_chatbots', label: 'AI Chatbots (e.g. ChatGPT, Claude, etc.)' },
+    { id: 'email', label: 'Email' },
+    { id: 'linkedin', label: 'Linkedin' },
+    { id: 'billboard', label: 'Outdoors ad (billboards / transport / airport)' },
+    { id: 'consultant', label: 'Consultant' },
+    { id: 'software_review_sites', label: 'Software Review Site' },
+    { id: 'podcast', label: 'Podcast' },
+    { id: 'audio_ad', label: 'Audio streaming services' },
+    { id: 'friend', label: 'Friend' },
+    { id: 'events', label: 'Events/conferences' },
+    { id: 'youtube_ad', label: 'YouTube' },
+    { id: 'other', label: 'Other' }
+  ];
+
+
+
+
+

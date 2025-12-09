@@ -9,15 +9,18 @@ import Navbar from "./components/Navbar";
 
 // Pages
 import WorkManagementPage from "./pages/work-management/WorkManagementBasicPage";
-import SignUp from "./components/signup/SignUp";
-import CreateAccountSecond from "./components/signup/CreateAccountSecond";
-import CreateAccountThird from "./components/signup/CreateAccountThird";
-import CreateAccountForth from "./components/signup/CreateAccountForth";
-import CreateAccountFifth from "./components/signup/CreateAccountFifth";
-import CreateAccountSixth from "./components/signup/CreateAccountSixth";
-import CreateAccountSeven from "./components/signup/CreateAccountSeven";
-import CreateAccountEight from "./components/signup/CreateAccountEight";
-import CreateAccountNine from "./components/signup/CreateAccountNine";
+import SignUp from "./components/signup/singupfirst/SignUp";
+import CreateAccountSecond from "./components/signup/signup2/CreateAccountSecond";
+import CreateAccountThird from "./components/signup/signup3/CreateAccountThird";
+import CreateAccountForth from "./components/signup/signup4/CreateAccountForth";
+import CreateAccountFifth from "./components/signup/signup5/CreateAccountFifth";
+import CreateAccountSixth from "./components/signup/signup6/CreateAccountSixth";
+import CreateAccountSeven from "./components/signup/signup7/CreateAccountSeven";
+import CreateAccountEight from "./components/signup/signup8/CreateAccountEight";
+import CreateAccountNine from "./components/signup/signup9/CreateAccountNine";
+import CreateAccountTen from "./components/signup/signup10/CreateAccountTen";
+import CreateAccountEleven from "./components/signup/signup11/CreateAccountElev";
+import CreateAccount12 from "./components/signup/signup12/CreateAccount12";
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -33,7 +36,10 @@ function AppContent() {
     "/six",
     "/seven",
     "/eight",
-    "/nine"
+    "/nine",
+    "/ten",
+    "/eleven",
+    "/twelve"
   ];
 
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
@@ -120,7 +126,25 @@ function AppContent() {
           element={<CreateAccountNine />}
         />
 
+        <Route 
+          path="/ten" 
+          element={<CreateAccountTen/>}
+          
+        />
+
+        <Route 
+          path="/eleven" 
+          element={<CreateAccountEleven/>}
+          
+        />
+        <Route
+          path="/twelve"
+          element={<CreateAccount12/>}
+        />
+
       </Routes>
+      
+
     </>
   );
 }
