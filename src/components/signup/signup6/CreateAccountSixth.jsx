@@ -46,7 +46,7 @@ const CreateAccountSixth = () => {
   useEffect(() => {
     // If no category selected, redirect back to Step 4
     if (!selectedCategory) {
-      navigate('/signup/manage');
+      navigate('/five');
       return;
     }
 

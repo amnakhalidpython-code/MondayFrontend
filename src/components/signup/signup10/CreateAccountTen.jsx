@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
 import { X, ChevronLeft, ChevronRight,  } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useBoardContext } from '../../../context/BoardContext'; // Add this import
+
 import { OwnerIcon, StatusIcon, DueDateIcon, BudgetIcon, FilesIcon, TimelineIcon, LastUpdatedIcon, PriorityIcon, NotesIcon } from '../../icons/BoardIcons'
 
 const CreateAccountTen = () => {
-  const [boardName] = useState('My first project');
-  
-  const [selectedColumns, setSelectedColumns] = useState({
-    owner: true,
-    status: true,
-    dueDate: true,
-    priority: false,
-    lastUpdated: false,
-    timeline: false,
-    notes: false,
-    budget: false,
-    files: false
-  });
+    const { boardData, setBoardData } = useBoardContext(); // Add this line
 
-  const toggleColumn = (column) => {
-    setSelectedColumns(prev => ({ ...prev, [column]: !prev[column] }));
+  const [boardName] = useState(boardData.boardName || 'My first project'); // Update this - context se name lega
+  
+ const [selectedColumns, setSelectedColumns] = useState(
+    boardData.selectedColumns || {  // Update this - context se columns lega
+      owner: true,
+      status: true,
+      dueDate: true,
+      priority: false,
+      lastUpdated: false,
+      timeline: false,
+      notes: false,
+      budget: false,
+      files: false
+    }
+  );
+
+    const toggleColumn = (column) => {
+    setSelectedColumns(prev => {
+      const updated = { ...prev, [column]: !prev[column] };
+      
+      // Context mein bhi save karo
+      setBoardData(prevData => ({
+        ...prevData,
+        selectedColumns: updated
+      }));
+      
+      return updated;
+    });
   };
+
 
   const columns = [
     { id: 'owner', label: 'Owner', Icon: OwnerIcon },

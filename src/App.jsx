@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
+import { BoardProvider } from "./context/BoardContext";
 import { SignupProtectedRoute } from "./utils/ProtectedRoute";
 
 import Loader from "./components/Loader";
@@ -21,6 +22,7 @@ import CreateAccountNine from "./components/signup/signup9/CreateAccountNine";
 import CreateAccountTen from "./components/signup/signup10/CreateAccountTen";
 import CreateAccountEleven from "./components/signup/signup11/CreateAccountElev";
 import CreateAccount12 from "./components/signup/signup12/CreateAccount12";
+import CreateAccount13 from "./components/signup/signup13/CreateAccount13";
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -39,7 +41,8 @@ function AppContent() {
     "/nine",
     "/ten",
     "/eleven",
-    "/twelve"
+    "/twelve",
+    "/thirteen",
   ];
 
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
@@ -142,6 +145,12 @@ function AppContent() {
           element={<CreateAccount12/>}
         />
 
+          <Route
+          path="/thirteen"
+          element={<CreateAccount13/>}
+        />
+        
+
       </Routes>
       
 
@@ -166,9 +175,11 @@ function App() {
 
   return (
     <AuthProvider>
+      <BoardProvider>
       <Router>
         <AppContent />
       </Router>
+      </BoardProvider>
     </AuthProvider>
   );
 }

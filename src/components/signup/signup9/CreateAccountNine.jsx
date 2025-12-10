@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useBoardContext } from '../../../context/BoardContext';
 
 const CreateAccountNine = () => {
-  const [boardName, setBoardName] = useState('');
-  const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const { boardData, setBoardData } = useBoardContext();
+  const [boardName, setBoardName] = useState(boardData.boardName || ''); // Update this line
+  const [isNextEnabled, setIsNextEnabled] = useState(boardData.boardName?.trim().length > 0); // Update this line
+
+ const handleNext = () => {
+    // Save to context
+    setBoardData(prev => ({
+      ...prev,
+      boardName: boardName.trim()
+    }));
+  };
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -80,18 +90,19 @@ const CreateAccountNine = () => {
           {/* Footer Buttons */}
           <div className="sticky bottom-0 px-20 py-6 flex justify-end items-center bg-white ">
             <Link to='/ten'>
-            <button 
-              className={`px-6 py-2 rounded flex items-center gap-2 transition-colors ${
-                isNextEnabled 
-                  ? 'bg-[#0073ea] text-white hover:bg-[#0060b9]' 
-                  : 'bg-[#e7e9ef] text-gray-400 cursor-not-allowed'
-              }`}
-              disabled={!isNextEnabled}
-            >
-              <span>Next</span>
-              <ChevronRight className="w-5 h-5" />
-            </button>
-            </Link>
+      <button 
+        onClick={handleNext}  // SIRF YE LINE ADD KARO
+        className={`px-6 py-2 rounded flex items-center gap-2 transition-colors ${
+          isNextEnabled 
+            ? 'bg-[#0073ea] text-white hover:bg-[#0060b9]' 
+            : 'bg-[#e7e9ef] text-gray-400 cursor-not-allowed'
+        }`}
+        disabled={!isNextEnabled}
+      >
+        <span>Next</span>
+        <ChevronRight className="w-5 h-5" />
+      </button>
+    </Link>
           </div>
         </div>
 
