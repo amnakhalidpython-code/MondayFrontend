@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useBoardContext } from '../../../context/BoardContext';
 
 const CreateAccount13 = () => {
+  const { boardData, setBoardData } = useBoardContext(); // ✅ Get context
+  
+  // ✅ Dynamic board name from context
+  const boardName = boardData.boardName || 'first';
+  
   const [taskNames, setTaskNames] = useState(['', '', '']);
 
   const handleTaskChange = (index, value) => {
     const newTasks = [...taskNames];
     newTasks[index] = value;
     setTaskNames(newTasks);
+    
+    // ✅ Optional: Save tasks to context
+    setBoardData(prevData => ({
+      ...prevData,
+      tasks: newTasks
+    }));
   };
 
   return (
@@ -49,14 +62,18 @@ const CreateAccount13 = () => {
           </div>
 
           <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white">
-            <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
-              <ChevronLeft className="w-5 h-5" />
-              Back
-            </button>
-            <button className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1">
-              Get started
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            <Link to='/twelve'>
+              <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
+                <ChevronLeft className="w-5 h-5" />
+                Back
+              </button>
+            </Link>
+            <Link to='/dashboard'>
+              <button className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1">
+                Get started
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -65,8 +82,9 @@ const CreateAccount13 = () => {
           <div className="bg-white w-full h-[650px] relative ml-16 rounded-tl-2xl rounded-bl-2xl overflow-hidden" style={{ filter: 'drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.2))', paddingTop: '30px', paddingLeft: '30px' }}>
             
             <div className="mb-6">
+              {/* ✅ Dynamic Board Name */}
               <h1 className="text-[32px] font-medium text-[#323338] leading-[40px] tracking-[-0.5px] mb-4" style={{ fontFamily: 'Poppins, Roboto, sans-serif' }}>
-                first
+                {boardName}
               </h1>
               
               {/* Tabs */}
@@ -106,7 +124,7 @@ const CreateAccount13 = () => {
                       <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
                     </div>
 
-                    {/* Item Rows - 3 items */}
+                    {/* Item Rows - 3 items with DYNAMIC TASK NAMES */}
                     {[0, 1, 2].map((i) => (
                       <div 
                         key={i}
@@ -119,7 +137,12 @@ const CreateAccount13 = () => {
                           paddingLeft: '12px'
                         }}
                       >
-                        <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
+                        {/* ✅ Show actual task name or placeholder */}
+                        {taskNames[i] ? (
+                          <span className="text-[15px] text-[#323338] truncate">{taskNames[i]}</span>
+                        ) : (
+                          <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
+                        )}
                       </div>
                     ))}
 
