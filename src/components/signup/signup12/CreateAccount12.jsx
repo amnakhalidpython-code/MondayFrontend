@@ -9,9 +9,14 @@ import {
   CalendarIcon,
 } from '../../icons/BoardIcons';
 import { Link } from 'react-router-dom';
+import { useBoardContext } from '../../../context/BoardContext';
+
 
 const CreateAccount12 = () => {
+  const { boardData } = useBoardContext();
   const [selectedView, setSelectedView] = useState('table');
+    const boardName = boardData.boardName || 'first'; // Default 'first' rakho agar empty ho
+
 
 const views = [
     {
@@ -123,10 +128,13 @@ const views = [
                        Back
                      </button>
                       </Link>
+
+                     <Link to='/thirteen'> 
                      <button className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1">
                        Next
                        <ChevronRight className="w-5 h-5" />
                      </button>
+                      </Link>
                    </div>
                  </div>
 
@@ -135,9 +143,9 @@ const views = [
   <div className="bg-white w-full h-[650px] relative ml-16 rounded-tl-2xl rounded-bl-2xl overflow-hidden" style={{ filter: 'drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.2))', paddingTop: '30px', paddingLeft: '30px' }}>
 
    <div className="mb-6">
-              <h1 className="text-[32px] font-medium text-[#323338] leading-[40px] tracking-[-0.5px] mb-4" style={{ fontFamily: 'Poppins, Roboto, sans-serif' }}>
-                first
-              </h1>
+             <h1 className="text-[32px] font-medium text-[#323338] leading-[40px] tracking-[-0.5px] mb-4" style={{ fontFamily: 'Poppins, Roboto, sans-serif' }}>
+  {boardName}  {/* Dynamic board name */}
+</h1>
               
               {/* Tabs */}
               <div className="flex gap-4 border-b border-[#d0d4e4]">
