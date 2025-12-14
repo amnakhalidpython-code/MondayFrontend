@@ -23,7 +23,7 @@ import CreateAccountTen from "./components/signup/signup10/CreateAccountTen";
 import CreateAccountEleven from "./components/signup/signup11/CreateAccountElev";
 import CreateAccount12 from "./components/signup/signup12/CreateAccount12";
 import CreateAccount13 from "./components/signup/signup13/CreateAccount13";
-
+import CRMDashboard from "./pages/work-management/Dashboard/CRMDashboard";
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
   const location = useLocation();
@@ -43,6 +43,7 @@ function AppContent() {
     "/eleven",
     "/twelve",
     "/thirteen",
+    "/dashboard"
   ];
 
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
@@ -126,29 +127,57 @@ function AppContent() {
         
         <Route 
           path="/nine" 
-          element={<CreateAccountNine />}
+          element={
+            <SignupProtectedRoute>
+              <CreateAccountNine />
+            </SignupProtectedRoute>
+          } 
         />
 
         <Route 
           path="/ten" 
-          element={<CreateAccountTen/>}
-          
+          element={
+            <SignupProtectedRoute>
+              <CreateAccountTen />
+            </SignupProtectedRoute>
+          } 
         />
 
         <Route 
           path="/eleven" 
-          element={<CreateAccountEleven/>}
-          
+          element={
+            <SignupProtectedRoute>
+              <CreateAccountEleven />
+            </SignupProtectedRoute>
+          } 
         />
         <Route
           path="/twelve"
-          element={<CreateAccount12/>}
+          element={
+            <SignupProtectedRoute>
+              <CreateAccount12 />
+            </SignupProtectedRoute>
+          }
         />
 
-          <Route
+        <Route
           path="/thirteen"
-          element={<CreateAccount13/>}
+          element={
+            <SignupProtectedRoute>
+              <CreateAccount13 />
+            </SignupProtectedRoute>
+          }
         />
+
+        <Route
+          path="/dashboard"
+          element={
+           
+              <CRMDashboard />
+           
+          }
+        />
+
         
 
       </Routes>
