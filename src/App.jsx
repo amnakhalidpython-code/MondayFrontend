@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import TemplateCenterPage from './components/templates/TemplateCenterPage';
+import BoardPage from './pages/BoardPage';
 
 import { AuthProvider } from "./context/AuthContext";
 import { BoardProvider } from "./context/BoardContext";
@@ -44,7 +45,8 @@ function AppContent() {
     "/eleven",
     "/twelve",
     "/thirteen",
-    "/dashboard"
+    "/dashboard",
+    "/board/:id",
   ];
 
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
@@ -179,7 +181,13 @@ function AppContent() {
           }
         />
 
-         <Route path="/templates" element={<TemplateCenterPage />} />
+         <Route
+          path="/templates"
+          element={
+          <TemplateCenterPage />} 
+          />
+
+          <Route path="/boards/:boardId" element={<BoardPage />} />
 
         
 
