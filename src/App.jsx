@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import TemplateCenterPage from './components/templates/TemplateCenterPage';
 
 import { AuthProvider } from "./context/AuthContext";
 import { BoardProvider } from "./context/BoardContext";
@@ -177,6 +178,8 @@ function AppContent() {
            
           }
         />
+
+         <Route path="/templates" element={<TemplateCenterPage />} />
 
         
 
