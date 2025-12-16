@@ -1,6 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 
 export default function MondayHeader() {
+  const [userName, setUserName] = useState('User');
+  const [greeting, setGreeting] = useState('Good day');
+
+  useEffect(() => {
+    // Get user name
+    const storedEmail = sessionStorage.getItem('mondaySignupEmail') || localStorage.getItem('userEmail');
+    let storedName = sessionStorage.getItem('userName') || localStorage.getItem('userName');
+    
+    // Check if userName is JSON object
+    if (storedName && storedName.startsWith('{')) {
+      try {
+        const nameObj = JSON.parse(storedName);
+        storedName = nameObj.fullName || nameObj.firstName || nameObj.lastName || null;
+      } catch (e) {
+        console.error('Error parsing userName:', e);
+      }
+    }
+    
+    const name = storedName || storedEmail?.split('@')[0] || 'User';
+    setUserName(name);
+
+    // Set greeting based on time
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting('Good morning');
+    } else if (hour < 18) {
+      setGreeting('Good afternoon');
+    } else {
+      setGreeting('Good evening');
+    }
+  }, []);
+
   return (
     <div className="w-full">
       {/* Header Container */}
@@ -11,35 +44,10 @@ export default function MondayHeader() {
           fontFamily: 'system-ui, -apple-system, sans-serif'
         }}
       >
-        {/* Animation Container */}
-        <div className="overflow-hidden h-[75px] block relative mr-3" style={{ width: '120px', minWidth: '120px' }}>
-          {/* Gift Icon */}
-          <div className="flex items-center justify-center h-full">
-            <svg width="60" height="60" viewBox="0 0 60 60">
-              {/* Gift Box Base */}
-              <rect x="15" y="25" width="30" height="25" fill="rgb(97,97,255)" rx="2" />
-              
-              {/* Ribbon Vertical */}
-              <rect x="27" y="15" width="6" height="35" fill="rgb(255,204,0)" />
-              
-              {/* Ribbon Horizontal */}
-              <rect x="10" y="32" width="40" height="6" fill="rgb(255,204,0)" />
-              
-              {/* Bow Left */}
-              <circle cx="22" cy="17" r="5" fill="rgb(255,204,0)" />
-              {/* Bow Right */}
-              <circle cx="38" cy="17" r="5" fill="rgb(255,204,0)" />
-              {/* Bow Center */}
-              <circle cx="30" cy="17" r="4" fill="rgb(255,204,0)" />
-              
-              {/* Confetti */}
-              <circle cx="12" cy="15" r="2" fill="rgb(203,221,255)" opacity="0.8">
-                <animate attributeName="cy" values="15;12;15" dur="2s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="48" cy="18" r="2" fill="rgb(97,97,255)" opacity="0.6">
-                <animate attributeName="cy" values="18;15;18" dur="2.5s" repeatCount="indefinite" />
-              </circle>
-            </svg>
+        {/* Icon */}
+        <div className="overflow-hidden h-[75px] flex items-center justify-center mr-4" style={{ width: '60px', minWidth: '60px' }}>
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-white" />
           </div>
         </div>
 
@@ -47,13 +55,13 @@ export default function MondayHeader() {
         <div className="flex flex-col justify-center flex-grow mr-3">
           {/* Welcome Message */}
           <div 
-            className="text-base font-normal mb-0.5"
+            className="text-base font-semibold mb-0.5"
             style={{ 
               color: 'rgb(50, 51, 56)',
               lineHeight: '22.5px'
             }}
           >
-            Good night, Staff!
+            {greeting}, {userName}!
           </div>
           
           {/* Subtitle */}
@@ -71,7 +79,7 @@ export default function MondayHeader() {
 
         {/* Give Feedback Link */}
         <button 
-          className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors mr-2 flex items-center gap-1"
+          className="px-3 py-2 text-sm hover:bg-gray-100 rounded-lg transition-colors mr-2 flex items-center gap-2"
           style={{ 
             color: 'rgb(50, 51, 56)',
             opacity: 0.8
@@ -85,14 +93,14 @@ export default function MondayHeader() {
 
         {/* Quick Search Button */}
         <button 
-          className="px-4 py-2 rounded-md text-sm font-medium text-white transition-colors flex items-center gap-2"
+          className="px-4 py-2 rounded-md text-sm font-medium text-white hover:opacity-90 transition-all flex items-center gap-2"
           style={{ 
-            backgroundColor: 'rgb(0, 134, 192)',
+            backgroundColor: 'rgb(0, 115, 234)',
             border: 'none'
           }}
         >
           <span className="text-lg">⚡</span>
-          Quick Search
+          Quick search
         </button>
       </div>
     </div>

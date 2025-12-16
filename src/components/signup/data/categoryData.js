@@ -331,7 +331,6 @@ export const mainCategories = [
  export const goalOptions = [
     { id: 'work', label: 'Work' },
     { id: 'personal', label: 'Personal' },
-    { id: 'school', label: 'School' },
     { id: 'ngo', label: 'Nonprofits' }
   ];
 
@@ -346,12 +345,7 @@ export const mainCategories = [
       { id: 'c_level', label: 'C-Level' },
       { id: 'vp', label: 'VP' }
     ],
-    school: [
-      { id: 'undergraduate_student', label: 'Undergraduate student' },
-      { id: 'graduate_student', label: 'Graduate student' },
-      { id: 'university_faculty_member', label: 'Faculty member' },
-      { id: 'other', label: 'Other' }
-    ],
+   
     ngo: [
       { id: 'board_member', label: 'Board member' },
       { id: 'executive', label: 'Executive' },

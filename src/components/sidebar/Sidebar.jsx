@@ -7,7 +7,7 @@ import SidebarAppFeatures from './components/SidebarAppFeatures';
 import SidebarCollapsed from './components/SidebarCollapsed';
 import WorkspaceSection from './components/WorkspaceSection';
 
-const Sidebar = () => {
+const Sidebar = ({ boards = [], onBoardClick }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState('home');
   const [sidebarWidth, setSidebarWidth] = useState(306);
@@ -35,6 +35,8 @@ const Sidebar = () => {
           <WorkspaceSection
             activeItem={activeItem}
             setActiveItem={setActiveItem}
+            boards={boards}
+            onBoardClick={onBoardClick}
           />
         </>
       ) : (

@@ -25,17 +25,16 @@ const CreateAccountTen = () => {
   );
 
     const toggleColumn = (column) => {
-    setSelectedColumns(prev => {
-      const updated = { ...prev, [column]: !prev[column] };
-      
-      // Context mein bhi save karo
-      setBoardData(prevData => ({
-        ...prevData,
-        selectedColumns: updated
-      }));
-      
-      return updated;
-    });
+    const updated = { ...selectedColumns, [column]: !selectedColumns[column] };
+    
+    // Update local state
+    setSelectedColumns(updated);
+    
+    // Update context
+    setBoardData(prevData => ({
+      ...prevData,
+      selectedColumns: updated
+    }));
   };
 
 

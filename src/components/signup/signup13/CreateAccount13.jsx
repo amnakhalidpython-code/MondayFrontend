@@ -1,26 +1,114 @@
 import React, { useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useBoardContext } from '../../../context/BoardContext';
+import { useAuth } from '../../../context/AuthContext';
 
 const CreateAccount13 = () => {
-  const { boardData, setBoardData } = useBoardContext(); // ✅ Get context
+  const navigate = useNavigate();
+  const { boardData, setBoardData } = useBoardContext();
+  const { user } = useAuth();
   
-  // ✅ Dynamic board name from context
   const boardName = boardData.boardName || 'first';
-  
   const [taskNames, setTaskNames] = useState(['', '', '']);
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleTaskChange = (index, value) => {
     const newTasks = [...taskNames];
     newTasks[index] = value;
     setTaskNames(newTasks);
     
-    // ✅ Optional: Save tasks to context
     setBoardData(prevData => ({
       ...prevData,
       tasks: newTasks
     }));
+  };
+
+  // ✅ MAIN FUNCTION: Create Board in Database
+  const handleGetStarted = async () => {
+    setIsCreating(true);
+    
+    try {
+      // Get user from sessionStorage OR context
+      const storedUser = sessionStorage.getItem('mondayUser');
+      const storedEmail = sessionStorage.getItem('mondaySignupEmail') || localStorage.getItem('userEmail');
+      
+      let userId = null;
+      let userEmail = null;
+
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          userId = parsedUser.uid;
+          userEmail = parsedUser.email;
+        } catch (e) {
+          console.error('Error parsing user:', e);
+        }
+      }
+
+      // If no user in session, use email as fallback userId
+      if (!userId && storedEmail) {
+        userId = storedEmail; // Use email as temporary user ID
+        userEmail = storedEmail;
+      }
+
+      // If still no user, use context
+      if (!userId && user) {
+        userId = user.uid;
+        userEmail = user.email;
+      }
+
+      const boardPayload = {
+        boardName: boardData.boardName || 'My first project',
+        selectedColumns: boardData.selectedColumns || {
+          owner: true,
+          status: true,
+          dueDate: true,
+          priority: false,
+          lastUpdated: false,
+          timeline: false,
+          notes: false,
+          budget: false,
+          files: false
+        },
+        tasks: taskNames.filter(task => task.trim() !== ''),
+        userId: userId || storedEmail || 'anonymous-user',
+        userEmail: userEmail || storedEmail || 'no-email'
+      };
+
+      console.log('Creating board with data:', boardPayload);
+
+      const response = await fetch('http://localhost:5000/api/boards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(boardPayload)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('✅ Board created successfully:', data.board);
+        
+        setBoardData(prev => ({
+          ...prev,
+          createdBoardId: data.board._id
+        }));
+
+        // Redirect to dashboard page to see all boards
+        navigate('/dashboard');
+      } else {
+        console.error('❌ Failed to create board:', data.message);
+        alert('Failed to create board: ' + data.message);
+      }
+
+    } catch (error) {
+      console.error('❌ Error creating board:', error);
+      alert('Network error. Please check if backend is running.');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -68,12 +156,19 @@ const CreateAccount13 = () => {
                 Back
               </button>
             </Link>
-            <Link to='/dashboard'>
-              <button className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1">
-                Get started
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </Link>
+            
+            <button 
+              onClick={handleGetStarted}
+              disabled={isCreating}
+              className={`px-4 py-2 rounded text-white transition-colors flex items-center gap-1 ${
+                isCreating 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-[#0073ea] hover:bg-[#0060b9]'
+              }`}
+            >
+              {isCreating ? 'Creating...' : 'Get started'}
+              {!isCreating && <ChevronRight className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
@@ -82,12 +177,10 @@ const CreateAccount13 = () => {
           <div className="bg-white w-full h-[650px] relative ml-16 rounded-tl-2xl rounded-bl-2xl overflow-hidden" style={{ filter: 'drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.2))', paddingTop: '30px', paddingLeft: '30px' }}>
             
             <div className="mb-6">
-              {/* ✅ Dynamic Board Name */}
               <h1 className="text-[32px] font-medium text-[#323338] leading-[40px] tracking-[-0.5px] mb-4" style={{ fontFamily: 'Poppins, Roboto, sans-serif' }}>
                 {boardName}
               </h1>
               
-              {/* Tabs */}
               <div className="flex gap-4 border-b border-[#d0d4e4]">
                 <button className="pb-2 px-1 text-[15px] font-medium text-[#323338] border-b-2 border-[#0073ea]">
                   Table
@@ -96,48 +189,20 @@ const CreateAccount13 = () => {
               </div>
             </div>
 
-            {/* TABLE CONTENT */}
             <div className="h-[456px] overflow-hidden">
               <div className="flex gap-0">
-                {/* Left Column - Items (Fixed 240px width) */}
                 <div style={{ width: '240px', flexShrink: 0 }}>
-                  {/* Group 1 - Blue (#579bfc) */}
                   <div className="mb-0">
-                    {/* Group Header */}
                     <div className="flex items-center mb-3" style={{ height: '24px' }}>
                       <div className="h-1.5 w-[120px] bg-[#579bfc] rounded"></div>
                     </div>
 
-                    {/* Column Name Header */}
-                    <div 
-                      className="flex items-center bg-white" 
-                      style={{ 
-                        borderLeft: '4px solid #579bfc',
-                        borderTop: '0.8px solid #d0d4e4',
-                        borderBottom: '0.8px solid #d0d4e4',
-                        borderRight: '0.8px solid #d0d4e4',
-                        borderTopLeftRadius: '4px',
-                        height: '40px',
-                        paddingLeft: '12px'
-                      }}
-                    >
+                    <div className="flex items-center bg-white" style={{ borderLeft: '4px solid #579bfc', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderTopLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
                       <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
                     </div>
 
-                    {/* Item Rows - 3 items with DYNAMIC TASK NAMES */}
                     {[0, 1, 2].map((i) => (
-                      <div 
-                        key={i}
-                        className="flex items-center bg-white" 
-                        style={{ 
-                          borderLeft: '4px solid #579bfc',
-                          borderBottom: '0.8px solid #d0d4e4',
-                          borderRight: '0.8px solid #d0d4e4',
-                          height: '40px',
-                          paddingLeft: '12px'
-                        }}
-                      >
-                        {/* ✅ Show actual task name or placeholder */}
+                      <div key={i} className="flex items-center bg-white" style={{ borderLeft: '4px solid #579bfc', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', height: '40px', paddingLeft: '12px' }}>
                         {taskNames[i] ? (
                           <span className="text-[15px] text-[#323338] truncate">{taskNames[i]}</span>
                         ) : (
@@ -146,76 +211,34 @@ const CreateAccount13 = () => {
                       </div>
                     ))}
 
-                    {/* Add Item Row */}
-                    <div 
-                      className="flex items-center bg-white" 
-                      style={{ 
-                        borderLeft: '4px solid rgba(87, 155, 252, 0.5)',
-                        borderBottom: '0.8px solid #d0d4e4',
-                        borderRight: '0.8px solid #d0d4e4',
-                        borderBottomLeftRadius: '4px',
-                        height: '40px',
-                        paddingLeft: '12px'
-                      }}
-                    >
+                    <div className="flex items-center bg-white" style={{ borderLeft: '4px solid rgba(87, 155, 252, 0.5)', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderBottomLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
                       <div className="h-1 w-20 bg-[rgba(103,104,121,0.1)] rounded"></div>
                     </div>
 
-                    {/* Empty Row */}
                     <div style={{ height: '40px', borderRight: '0.8px solid #d0d4e4' }}></div>
                   </div>
 
-                  {/* Group 2 - Green (#00c875) */}
                   <div>
-                    {/* Group Header */}
                     <div className="flex items-center mb-3" style={{ height: '24px' }}>
                       <div className="h-1.5 w-[120px] bg-[#00c875] rounded"></div>
                     </div>
 
-                    {/* Column Name Header */}
-                    <div 
-                      className="flex items-center bg-white" 
-                      style={{ 
-                        borderLeft: '4px solid #00c875',
-                        borderTop: '0.8px solid #d0d4e4',
-                        borderBottom: '0.8px solid #d0d4e4',
-                        borderRight: '0.8px solid #d0d4e4',
-                        borderTopLeftRadius: '4px',
-                        height: '40px',
-                        paddingLeft: '12px'
-                      }}
-                    >
+                    <div className="flex items-center bg-white" style={{ borderLeft: '4px solid #00c875', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderTopLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
                       <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
                     </div>
 
-                    {/* Add Item Row */}
-                    <div 
-                      className="flex items-center bg-white" 
-                      style={{ 
-                        borderLeft: '4px solid rgba(0, 200, 117, 0.5)',
-                        borderBottom: '0.8px solid #d0d4e4',
-                        borderRight: '0.8px solid #d0d4e4',
-                        borderBottomLeftRadius: '4px',
-                        height: '40px',
-                        paddingLeft: '12px'
-                      }}
-                    >
+                    <div className="flex items-center bg-white" style={{ borderLeft: '4px solid rgba(0, 200, 117, 0.5)', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderBottomLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
                       <div className="h-1 w-20 bg-[rgba(103,104,121,0.1)] rounded"></div>
                     </div>
 
-                    {/* Empty Row */}
                     <div style={{ height: '40px', borderRight: '0.8px solid #d0d4e4' }}></div>
                   </div>
                 </div>
 
-                {/* Right Columns - Data Columns */}
                 <div className="flex-1 min-w-0">
-                  {/* Group 1 Data Columns */}
                   <div className="mb-0">
-                    {/* Empty space for group header alignment */}
                     <div style={{ height: '24px', marginBottom: '12px' }}></div>
 
-                    {/* Column Headers Row */}
                     <div className="flex" style={{ height: '40px' }}>
                       <div className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
                         <span className="text-[15px] text-[#323338]">Owner</span>
@@ -231,7 +254,6 @@ const CreateAccount13 = () => {
                       </div>
                     </div>
 
-                    {/* Item Rows - 3 rows of data */}
                     {[0, 1, 2].map((rowIdx) => (
                       <div key={rowIdx} className="flex" style={{ height: '40px' }}>
                         <div className="flex items-center justify-center bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
@@ -251,7 +273,6 @@ const CreateAccount13 = () => {
                       </div>
                     ))}
 
-                    {/* Add Item Row - Empty */}
                     <div className="flex" style={{ height: '40px' }}>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
@@ -259,7 +280,6 @@ const CreateAccount13 = () => {
                       <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
                     </div>
 
-                    {/* Empty Row */}
                     <div className="flex" style={{ height: '40px' }}>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
@@ -268,12 +288,9 @@ const CreateAccount13 = () => {
                     </div>
                   </div>
 
-                  {/* Group 2 Data Columns */}
                   <div>
-                    {/* Empty space for group header alignment */}
                     <div style={{ height: '24px', marginBottom: '12px' }}></div>
 
-                    {/* Column Headers Row */}
                     <div className="flex" style={{ height: '40px' }}>
                       <div className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}><span className="text-[15px] text-[#323338]">Owner</span></div>
                       <div className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}><span className="text-[15px] text-[#323338]">Status</span></div>
@@ -281,7 +298,6 @@ const CreateAccount13 = () => {
                       <div className="flex items-center justify-center bg-white" style={{ width: '48px', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4' }}><span className="text-[#676879] text-lg font-light">+</span></div>
                     </div>
 
-                    {/* Add Item Row - Empty */}
                     <div className="flex" style={{ height: '40px' }}>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
@@ -289,7 +305,6 @@ const CreateAccount13 = () => {
                       <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
                     </div>
 
-                    {/* Empty Row */}
                     <div className="flex" style={{ height: '40px' }}>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
                       <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>

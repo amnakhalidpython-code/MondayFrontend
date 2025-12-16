@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MoreVertical, Search, Plus, ChevronRight, Home } from 'lucide-react';
-import { workspaceItems } from '../data/workspaceItems';
 import WorkspaceMenu from './WorkspaceMenu';
 import AddNewMenu from './AddNewMenu';
 
-const WorkspaceSection = ({ activeItem, setActiveItem }) => {
+const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick }) => {
+  const navigate = useNavigate();
   const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false);
   const [showEditSubmenu, setShowEditSubmenu] = useState(false);
 
@@ -12,6 +13,15 @@ const WorkspaceSection = ({ activeItem, setActiveItem }) => {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showBoardSubmenu, setShowBoardSubmenu] = useState(false);
   const [showDocSubmenu, setShowDocSubmenu] = useState(false);
+
+  const handleBoardClick = (boardId, boardName) => {
+    setActiveItem(boardName);
+    if (onBoardClick) {
+      onBoardClick(boardId);
+    } else {
+      navigate(`/boards/${boardId}`);
+    }
+  };
 
   return (
     <div className="workspace-section">
@@ -51,7 +61,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem }) => {
               <Home size={8} />
             </div>
           </div>
-          <span className="workspace-name">Grants Management</span>
+          <span className="workspace-name">Main workspace</span>
           <ChevronRight size={18} className="workspace-chevron" />
         </button>
 
@@ -75,18 +85,66 @@ const WorkspaceSection = ({ activeItem, setActiveItem }) => {
 
       {/* WORKSPACE ITEMS */}
       <div className="workspace-items">
-        {workspaceItems.map((item, idx) => (
+        {/* ✅ Dynamic Boards from Database */}
+        {boards.length === 0 ? (
+          <div className="workspace-item" style={{ opacity: 0.6, cursor: 'default', fontSize: '13px', color: '#676879' }}>
+            <span>No boards yet</span>
+          </div>
+        ) : (
+          boards.map((board) => (
+            <button
+              key={board._id}
+              onClick={() => handleBoardClick(board._id, board.name)}
+              className={`workspace-item ${
+                activeItem === board.name ? 'active' : ''
+              }`}
+            >
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+                style={{ flexShrink: 0 }}
+              >
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 1v10h10V5H5z"/>
+                <path d="M7 7h2v6H7V7zm4 0h2v6h-2V7z"/>
+              </svg>
+              <span>{board.name}</span>
+              {board.items?.length > 0 && (
+                <span className="item-count" style={{ 
+                  marginLeft: 'auto', 
+                  fontSize: '11px', 
+                  color: '#676879',
+                  backgroundColor: 'rgba(0,0,0,0.06)',
+                  padding: '2px 6px',
+                  borderRadius: '10px'
+                }}>
+                  {board.items.length}
+                </span>
+              )}
+            </button>
+          ))
+        )}
+
+        {/* Dashboard and reporting - Show only if boards exist */}
+        {boards.length > 0 && (
           <button
-            key={idx}
-            onClick={() => setActiveItem(item.label)}
+            onClick={() => setActiveItem('Dashboard and reporting')}
             className={`workspace-item ${
-              activeItem === item.label ? 'active' : ''
+              activeItem === 'Dashboard and reporting' ? 'active' : ''
             }`}
           >
-            <item.icon size={16} />
-            <span>{item.label}</span>
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 20 20" 
+              fill="currentColor"
+            >
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+            </svg>
+            <span>Dashboard and reporting</span>
           </button>
-        ))}
+        )}
       </div>
 
     </div>

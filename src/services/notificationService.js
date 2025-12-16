@@ -22,12 +22,13 @@ const handleResponse = async (response) => {
 
 export const notificationService = {
   // Get all notifications
-  getNotifications: async (limit = 50, skip = 0) => {
+  getNotifications: async (limit = 50, skip = 0, userId = null) => {
     try {
-      const response = await fetch(
-        `${API_URL}/notifications?limit=${limit}&skip=${skip}`,
-        { headers: getAuthHeader() }
-      );
+      const url = userId 
+        ? `${API_URL}/notifications?limit=${limit}&skip=${skip}&userId=${userId}`
+        : `${API_URL}/notifications?limit=${limit}&skip=${skip}`;
+        
+      const response = await fetch(url, { headers: getAuthHeader() });
       return handleResponse(response);
     } catch (error) {
       console.error('Error fetching notifications:', error);

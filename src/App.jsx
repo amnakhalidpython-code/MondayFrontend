@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import TemplateCenterPage from './components/templates/TemplateCenterPage';
 import BoardPage from './pages/BoardPage';
+import WorkspacePage from './pages/WorkspacePage';
+import DashboardLayout from './pages/DashboardLayout';
+import DashboardHome from './pages/DashboardHome';
 
 import { AuthProvider } from "./context/AuthContext";
 import { BoardProvider } from "./context/BoardContext";
@@ -45,11 +48,12 @@ function AppContent() {
     "/eleven",
     "/twelve",
     "/thirteen",
-    "/dashboard",
-    "/board/:id",
+    "/workspace",
   ];
 
-  const hideNavbar = hideNavbarRoutes.includes(location.pathname);
+  // Check if current path starts with /dashboard or /boards
+  const isDashboardRoute = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/boards');
+  const hideNavbar = hideNavbarRoutes.includes(location.pathname) || isDashboardRoute;
 
   return (
     <>
@@ -172,22 +176,27 @@ function AppContent() {
           }
         />
 
+        {/* Dashboard with Sidebar - Nested Routes */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<DashboardHome />} />
+        </Route>
+
+        {/* Board Page with Sidebar */}
+        <Route path="/boards/:boardId" element={<DashboardLayout />}>
+          <Route index element={<BoardPage />} />
+        </Route>
+
+        
         <Route
-          path="/dashboard"
+          path="/templates"
           element={
            
-              <CRMDashboard />
+              <TemplateCenterPage />
            
           }
         />
 
-         <Route
-          path="/templates"
-          element={
-          <TemplateCenterPage />} 
-          />
-
-          <Route path="/boards/:boardId" element={<BoardPage />} />
+        <Route path="/workspace" element={<WorkspacePage />} />
 
         
 

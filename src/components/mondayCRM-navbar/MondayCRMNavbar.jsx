@@ -1,21 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, Inbox, UserPlus, Puzzle, Bot, Settings, Search, HelpCircle, Grid, X, Trash2, Check, RefreshCw, Heart, Gem } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Bell, Inbox, UserPlus, Puzzle, Bot, Settings, Search, HelpCircle, Grid, X, Trash2, Check, RefreshCw, Heart, Gem, Mail, Users, Plus, LogOut, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import notificationService from '../../services/notificationService';
 import './MondayCRMNavbar.css';
 
 const MondayCRMNavbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  // Notification states
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Other dropdowns states
+  const [isInboxOpen, setIsInboxOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isAppsOpen, setIsAppsOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isAppsLauncherOpen, setIsAppsLauncherOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Data states
+  const [inboxMessages, setInboxMessages] = useState([]);
+  const [inboxUnreadCount, setInboxUnreadCount] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [userInfo, setUserInfo] = useState({});
+  const [inviteEmail, setInviteEmail] = useState('');
+  
+  const navigate = useNavigate();
+  const searchInputRef = useRef(null);
 
   const fetchNotifications = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await notificationService.getNotifications(50, 0);
+      const userId = sessionStorage.getItem('mondaySignupEmail') || 
+                    localStorage.getItem('userEmail') || 
+                    'demo@user.com';
+      
+      const response = await notificationService.getNotifications(50, 0, userId);
       
       if (response.success) {
         setNotifications(response.data.notifications);
@@ -56,11 +86,131 @@ const MondayCRMNavbar = () => {
     setUnreadCount(2);
   };
 
+  // Load user info
   useEffect(() => {
+    const email = sessionStorage.getItem('mondaySignupEmail') || localStorage.getItem('userEmail') || 'user@example.com';
+    let storedName = sessionStorage.getItem('userName') || localStorage.getItem('userName');
+    
+    // Parse if it's a JSON object
+    let name = email.split('@')[0];
+    if (storedName) {
+      if (storedName.startsWith('{')) {
+        try {
+          const nameObj = JSON.parse(storedName);
+          name = nameObj.fullName || nameObj.firstName || nameObj.lastName || name;
+        } catch (e) {
+          name = storedName;
+        }
+      } else {
+        name = storedName;
+      }
+    }
+    
+    const company = sessionStorage.getItem('companyName') || 'My Company';
+    
+    setUserInfo({
+      email,
+      name,
+      company,
+      initials: name.charAt(0).toUpperCase()
+    });
+
+    // Load inbox messages (demo data for now)
+    setInboxMessages([
+      {
+        id: 1,
+        from: 'John Doe',
+        subject: 'New task assigned',
+        preview: 'You have been assigned to the Q1 Planning task',
+        time: new Date(Date.now() - 10 * 60 * 1000),
+        isRead: false
+      }
+    ]);
+
+    // Load favorites (demo data)
+    setFavorites([
+      { id: 1, name: 'Main Board', type: 'board', icon: '📊' },
+      { id: 2, name: 'CRM Dashboard', type: 'dashboard', icon: '📈' },
+      { id: 3, name: 'Marketing Campaign', type: 'board', icon: '🎯' }
+    ]);
+
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Close all dropdowns except the specified one
+  const closeAllDropdowns = (exceptThis = null) => {
+    if (exceptThis !== 'notification') setIsNotificationOpen(false);
+    if (exceptThis !== 'inbox') setIsInboxOpen(false);
+    if (exceptThis !== 'invite') setIsInviteOpen(false);
+    if (exceptThis !== 'apps') setIsAppsOpen(false);
+    if (exceptThis !== 'ai') setIsAIOpen(false);
+    if (exceptThis !== 'settings') setIsSettingsOpen(false);
+    if (exceptThis !== 'search') setIsSearchOpen(false);
+    if (exceptThis !== 'help') setIsHelpOpen(false);
+    if (exceptThis !== 'favorites') setIsFavoritesOpen(false);
+    if (exceptThis !== 'appsLauncher') setIsAppsLauncherOpen(false);
+    if (exceptThis !== 'profile') setIsProfileOpen(false);
+  };
+
+  // Handle search
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Simulate search - in real app, call backend API
+    setSearchResults([
+      { id: 1, type: 'board', title: 'Sales Pipeline', subtitle: 'Board' },
+      { id: 2, type: 'task', title: 'Follow up with client', subtitle: 'Task in Sales Board' },
+      { id: 3, type: 'contact', title: 'John Smith', subtitle: 'Contact' }
+    ]);
+  };
+
+  // Handle invite
+  const handleInvite = async () => {
+    if (!inviteEmail) return;
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/invitations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inviterUserId: userInfo.email,
+          inviterName: userInfo.name,
+          inviterEmail: userInfo.email,
+          accountName: userInfo.company || 'My Workspace',
+          invitations: [{
+            email: inviteEmail,
+            role: 'member'
+          }]
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.sentCount > 0) {
+        alert(`✅ Invitation sent successfully to ${inviteEmail}!`);
+        setInviteEmail('');
+        setIsInviteOpen(false);
+      } else {
+        alert(data.message || 'Failed to send invitation');
+      }
+    } catch (err) {
+      console.error('Failed to send invitation:', err);
+      alert('Failed to send invitation. Please try again.');
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    sessionStorage.clear();
+    localStorage.clear();
+    navigate('/');
+  };
 
   const handleMarkAsRead = async (notificationId) => {
     try {
@@ -170,11 +320,15 @@ const MondayCRMNavbar = () => {
       <div className="navbar-spacer"></div>
 
       <nav className="navbar-nav">
+        {/* Notifications */}
         <div className="nav-icon-wrapper">
           <div className="notification-bell-wrapper">
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className={`nav-btn ${isOpen ? 'active' : ''}`}
+              onClick={() => {
+                closeAllDropdowns('notification');
+                setIsNotificationOpen(!isNotificationOpen);
+              }}
+              className={`nav-btn ${isNotificationOpen ? 'active' : ''}`}
             >
               <Bell size={20} />
             </button>
@@ -186,7 +340,7 @@ const MondayCRMNavbar = () => {
             )}
           </div>
 
-          {isOpen && (
+          {isNotificationOpen && (
             <div className="notification-dropdown">
               <div className="dropdown-header">
                 <div>
@@ -217,7 +371,7 @@ const MondayCRMNavbar = () => {
                     </button>
                   )}
                   
-                  <button onClick={() => setIsOpen(false)} className="action-btn">
+                  <button onClick={() => setIsNotificationOpen(false)} className="action-btn">
                     <X size={20} />
                   </button>
                 </div>
@@ -282,57 +436,477 @@ const MondayCRMNavbar = () => {
           )}
         </div>
 
+        {/* Inbox */}
         <div className="nav-icon-wrapper">
-          <button className="nav-btn">
+          <button 
+            className="nav-btn"
+            onClick={() => {
+              closeAllDropdowns('inbox');
+              setIsInboxOpen(!isInboxOpen);
+            }}
+          >
             <Inbox size={20} />
           </button>
-          <span className="badge-static">1</span>
+          {inboxUnreadCount > 0 && (
+            <span className="badge-static">{inboxUnreadCount}</span>
+          )}
+
+          {isInboxOpen && (
+            <div className="notification-dropdown">
+              <div className="dropdown-header">
+                <h3 className="dropdown-title">Inbox</h3>
+                <button onClick={() => setIsInboxOpen(false)} className="action-btn">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="notifications-list">
+                {inboxMessages.length === 0 ? (
+                  <div className="empty-state">
+                    <Mail size={48} className="empty-icon" />
+                    <div className="empty-title">No messages</div>
+                    <div className="empty-subtitle">Your inbox is empty</div>
+                  </div>
+                ) : (
+                  inboxMessages.map(msg => (
+                    <div key={msg.id} className={`notification-item ${!msg.isRead ? 'unread' : ''}`}>
+                      <div className="notification-indicator" style={{ backgroundColor: '#0086c0' }} />
+                      <div className="notification-content">
+                        <div className="notification-title">{msg.from}</div>
+                        <div className="notification-message">{msg.subject}</div>
+                        <div className="notification-time">{timeAgo(msg.time)}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        <button className="nav-btn">
+        {/* Invite Members */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('invite');
+            setIsInviteOpen(!isInviteOpen);
+          }}
+        >
           <UserPlus size={20} />
         </button>
+        {isInviteOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '400px' }}>
+            <div className="dropdown-header">
+              <h3 className="dropdown-title">Invite Team Members</h3>
+              <button onClick={() => setIsInviteOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#323338' }}>
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="colleague@company.com"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #d0d4e4',
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              <button
+                onClick={handleInvite}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#0073ea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Send Invitation
+              </button>
+              <div style={{ marginTop: '15px', fontSize: '12px', color: '#676879' }}>
+                <Users size={16} style={{ display: 'inline', marginRight: '5px' }} />
+                Invite your team to collaborate on monday.com
+              </div>
+            </div>
+          </div>
+        )}
 
-        <button className="nav-btn">
+        {/* Apps/Integrations */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('apps');
+            setIsAppsOpen(!isAppsOpen);
+          }}
+        >
           <Puzzle size={20} />
         </button>
+        {isAppsOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '350px' }}>
+            <div className="dropdown-header">
+              <h3 className="dropdown-title">Apps & Integrations</h3>
+              <button onClick={() => setIsAppsOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="notifications-list">
+              <div className="notification-item" style={{ cursor: 'pointer' }}>
+                <div className="notification-content">
+                  <div className="notification-title">🔗 Slack</div>
+                  <div className="notification-message">Connect your Slack workspace</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }}>
+                <div className="notification-content">
+                  <div className="notification-title">📧 Gmail</div>
+                  <div className="notification-message">Sync your emails</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }}>
+                <div className="notification-content">
+                  <div className="notification-title">📊 Google Sheets</div>
+                  <div className="notification-message">Import/Export data</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }}>
+                <div className="notification-content">
+                  <div className="notification-title">💼 Zoom</div>
+                  <div className="notification-message">Schedule meetings</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <button className="nav-btn">
+        {/* AI Assistant */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('ai');
+            setIsAIOpen(!isAIOpen);
+          }}
+        >
           <Bot size={20} />
         </button>
+        {isAIOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '400px' }}>
+            <div className="dropdown-header">
+              <h3 className="dropdown-title">🤖 AI Assistant</h3>
+              <button onClick={() => setIsAIOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '15px', fontSize: '14px', color: '#323338' }}>
+                How can I help you today?
+              </div>
+              <textarea
+                placeholder="Ask me anything about your work..."
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '10px',
+                  border: '1px solid #d0d4e4',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  resize: 'vertical'
+                }}
+              />
+              <button
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#0073ea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  marginTop: '10px'
+                }}
+              >
+                Ask AI
+              </button>
+            </div>
+          </div>
+        )}
 
-        <button className="nav-btn">
+        {/* Settings */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('settings');
+            setIsSettingsOpen(!isSettingsOpen);
+          }}
+        >
           <Settings size={20} />
         </button>
+        {isSettingsOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '300px' }}>
+            <div className="dropdown-header">
+              <h3 className="dropdown-title">Settings</h3>
+              <button onClick={() => setIsSettingsOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="notifications-list">
+              <div className="notification-item" style={{ cursor: 'pointer' }} onClick={() => navigate('/settings/profile')}>
+                <div className="notification-content">
+                  <div className="notification-title">👤 Profile Settings</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }} onClick={() => navigate('/settings/account')}>
+                <div className="notification-content">
+                  <div className="notification-title">🔐 Account & Security</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }} onClick={() => navigate('/settings/notifications')}>
+                <div className="notification-content">
+                  <div className="notification-title">🔔 Notification Preferences</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }} onClick={() => navigate('/settings/billing')}>
+                <div className="notification-content">
+                  <div className="notification-title">💳 Billing & Plans</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <button className="nav-btn">
+        {/* Search */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('search');
+            setIsSearchOpen(!isSearchOpen);
+            if (!isSearchOpen) {
+              setTimeout(() => searchInputRef.current?.focus(), 100);
+            }
+          }}
+        >
           <Search size={20} />
         </button>
+        {isSearchOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '500px' }}>
+            <div className="dropdown-header">
+              <div style={{ flex: 1 }}>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Search boards, tasks, people..."
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #d0d4e4',
+                    borderRadius: '4px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              <button onClick={() => setIsSearchOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="notifications-list">
+              {searchResults.length === 0 ? (
+                <div className="empty-state">
+                  <Search size={48} className="empty-icon" />
+                  <div className="empty-subtitle">
+                    {searchQuery ? 'No results found' : 'Start typing to search'}
+                  </div>
+                </div>
+              ) : (
+                searchResults.map(result => (
+                  <div key={result.id} className="notification-item" style={{ cursor: 'pointer' }}>
+                    <div className="notification-content">
+                      <div className="notification-title">{result.title}</div>
+                      <div className="notification-message">{result.subtitle}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
+        {/* Help */}
         <div className="nav-icon-wrapper">
-          <button className="nav-btn">
+          <button 
+            className="nav-btn"
+            onClick={() => {
+              closeAllDropdowns('help');
+              setIsHelpOpen(!isHelpOpen);
+            }}
+          >
             <HelpCircle size={20} />
           </button>
           <div className="badge-orange"></div>
+
+          {isHelpOpen && (
+            <div className="notification-dropdown" style={{ right: '0', width: '320px' }}>
+              <div className="dropdown-header">
+                <h3 className="dropdown-title">Help & Support</h3>
+                <button onClick={() => setIsHelpOpen(false)} className="action-btn">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="notifications-list">
+                <div className="notification-item" style={{ cursor: 'pointer' }}>
+                  <div className="notification-content">
+                    <div className="notification-title">📚 Help Center</div>
+                    <div className="notification-message">Browse articles and tutorials</div>
+                  </div>
+                </div>
+                <div className="notification-item" style={{ cursor: 'pointer' }}>
+                  <div className="notification-content">
+                    <div className="notification-title">🎥 Video Tutorials</div>
+                    <div className="notification-message">Watch how-to videos</div>
+                  </div>
+                </div>
+                <div className="notification-item" style={{ cursor: 'pointer' }}>
+                  <div className="notification-content">
+                    <div className="notification-title">💬 Contact Support</div>
+                    <div className="notification-message">Get help from our team</div>
+                  </div>
+                </div>
+                <div className="notification-item" style={{ cursor: 'pointer' }}>
+                  <div className="notification-content">
+                    <div className="notification-title">🆕 What's New</div>
+                    <div className="notification-message">Latest features and updates</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="navbar-divider"></div>
 
-        <button className="nav-btn">
+        {/* Favorites */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('favorites');
+            setIsFavoritesOpen(!isFavoritesOpen);
+          }}
+        >
           <Heart size={20} />
         </button>
+        {isFavoritesOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '300px' }}>
+            <div className="dropdown-header">
+              <h3 className="dropdown-title">Favorites</h3>
+              <button onClick={() => setIsFavoritesOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="notifications-list">
+              {favorites.length === 0 ? (
+                <div className="empty-state">
+                  <Heart size={48} className="empty-icon" />
+                  <div className="empty-subtitle">No favorites yet</div>
+                </div>
+              ) : (
+                favorites.map(fav => (
+                  <div key={fav.id} className="notification-item" style={{ cursor: 'pointer' }}>
+                    <div className="notification-content">
+                      <div className="notification-title">{fav.icon} {fav.name}</div>
+                      <div className="notification-message">{fav.type}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
-        <button className="nav-btn">
+        {/* Apps Launcher */}
+        <button 
+          className="nav-btn"
+          onClick={() => {
+            closeAllDropdowns('appsLauncher');
+            setIsAppsLauncherOpen(!isAppsLauncherOpen);
+          }}
+        >
           <Grid size={20} />
         </button>
+        {isAppsLauncherOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '300px' }}>
+            <div className="dropdown-header">
+              <h3 className="dropdown-title">Apps</h3>
+              <button onClick={() => setIsAppsLauncherOpen(false)} className="action-btn">
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ padding: '15px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+              <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/work-management')}>
+                <div style={{ fontSize: '32px', marginBottom: '5px' }}>📊</div>
+                <div style={{ fontSize: '12px', color: '#323338' }}>Work Management</div>
+              </div>
+              <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/crm')}>
+                <div style={{ fontSize: '32px', marginBottom: '5px' }}>👥</div>
+                <div style={{ fontSize: '12px', color: '#323338' }}>CRM</div>
+              </div>
+              <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/projects')}>
+                <div style={{ fontSize: '32px', marginBottom: '5px' }}>🎯</div>
+                <div style={{ fontSize: '12px', color: '#323338' }}>Projects</div>
+              </div>
+              <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/marketing')}>
+                <div style={{ fontSize: '32px', marginBottom: '5px' }}>📢</div>
+                <div style={{ fontSize: '12px', color: '#323338' }}>Marketing</div>
+              </div>
+              <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/dev')}>
+                <div style={{ fontSize: '32px', marginBottom: '5px' }}>💻</div>
+                <div style={{ fontSize: '12px', color: '#323338' }}>Dev</div>
+              </div>
+              <div style={{ textAlign: 'center', cursor: 'pointer' }}>
+                <div style={{ fontSize: '32px', marginBottom: '5px' }}>➕</div>
+                <div style={{ fontSize: '12px', color: '#323338' }}>More</div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <button className="nav-btn avatar-btn">
+        {/* User Profile */}
+        <button 
+          className="nav-btn avatar-btn"
+          onClick={() => {
+            closeAllDropdowns('profile');
+            setIsProfileOpen(!isProfileOpen);
+          }}
+        >
           <div className="avatar-container">
-            <img 
-              src="https://cdn1.monday.com/dapulse_default_photo.png"
-              alt="User"
-              className="avatar-img"
-            />
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#0073ea',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '600',
+              fontSize: '14px'
+            }}>
+              {userInfo.initials || 'U'}
+            </div>
             <div className="avatar-badge">
               <img
                 src="https://cdn.monday.com/images/logos/monday_logo_icon.png"
@@ -342,6 +916,56 @@ const MondayCRMNavbar = () => {
             </div>
           </div>
         </button>
+        {isProfileOpen && (
+          <div className="notification-dropdown" style={{ right: '0', width: '280px' }}>
+            <div style={{ padding: '15px', borderBottom: '1px solid #e6e9ef' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: '#0073ea',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: '18px'
+                }}>
+                  {userInfo.initials || 'U'}
+                </div>
+                <div>
+                  <div style={{ fontWeight: '600', fontSize: '14px', color: '#323338' }}>
+                    {userInfo.name}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#676879' }}>
+                    {userInfo.email}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="notifications-list">
+              <div className="notification-item" style={{ cursor: 'pointer' }} onClick={() => navigate('/profile')}>
+                <User size={16} style={{ marginRight: '10px' }} />
+                <div className="notification-content">
+                  <div className="notification-title">My Profile</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer' }} onClick={() => navigate('/settings')}>
+                <Settings size={16} style={{ marginRight: '10px' }} />
+                <div className="notification-content">
+                  <div className="notification-title">Settings</div>
+                </div>
+              </div>
+              <div className="notification-item" style={{ cursor: 'pointer', color: '#e44258' }} onClick={handleLogout}>
+                <LogOut size={16} style={{ marginRight: '10px' }} />
+                <div className="notification-content">
+                  <div className="notification-title" style={{ color: '#e44258' }}>Logout</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
