@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import TemplateCenterPage from './components/templates/TemplateCenterPage';
 import BoardPage from './pages/BoardPage';
 import WorkspacePage from './pages/WorkspacePage';
 import DashboardLayout from './pages/DashboardLayout';
@@ -29,6 +28,8 @@ import CreateAccountEleven from "./components/signup/signup11/CreateAccountElev"
 import CreateAccount12 from "./components/signup/signup12/CreateAccount12";
 import CreateAccount13 from "./components/signup/signup13/CreateAccount13";
 import CRMDashboard from "./pages/work-management/Dashboard/CRMDashboard";
+import TemplateCenterPage from './components/templates/TemplateCenterPage';
+
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
   const location = useLocation();
@@ -49,6 +50,7 @@ function AppContent() {
     "/twelve",
     "/thirteen",
     "/workspace",
+    "/templates"
   ];
 
   // Check if current path starts with /dashboard or /boards

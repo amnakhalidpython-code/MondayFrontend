@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 
+
 const TemplatePreviewModal = ({ template, onClose, onUseTemplate }) => {
   const [customName, setCustomName] = useState(template.boardStructure.name);
 
@@ -9,16 +10,18 @@ const TemplatePreviewModal = ({ template, onClose, onUseTemplate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-4">
-            <img
-              src={template.thumbnail}
-              alt={template.name}
-              className="w-16 h-16 rounded-lg object-cover"
-            />
+            <div className="w-16 h-16 rounded-lg overflow-hidden">
+              <img
+                src={template.thumbnail}
+                alt={template.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div>
               <h2 className="text-2xl font-bold">{template.name}</h2>
               <p className="text-sm text-gray-500">by {template.creator}</p>
@@ -72,13 +75,13 @@ const TemplatePreviewModal = ({ template, onClose, onUseTemplate }) => {
           {/* Integrations */}
           <div className="mb-6">
             <h3 className="font-semibold text-lg mb-3">Integrations</h3>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {template.integrations.map((integration, index) => (
                 <div key={index} className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
                   <img
                     src={integration.icon}
                     alt={integration.name}
-                    className="w-6 h-6"
+                    className="w-6 h-6 object-contain"
                   />
                   <span className="text-sm">{integration.name}</span>
                 </div>
@@ -120,5 +123,4 @@ const TemplatePreviewModal = ({ template, onClose, onUseTemplate }) => {
     </div>
   );
 };
-
 export default TemplatePreviewModal;
