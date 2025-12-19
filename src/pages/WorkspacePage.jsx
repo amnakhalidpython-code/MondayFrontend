@@ -60,7 +60,7 @@ const WorkspacePage = () => {
         return;
       }
 
-      const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${userId}`);
+    const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${encodeURIComponent(userId)}`);
       const data = await response.json();
 
       console.log('Boards response:', data);
