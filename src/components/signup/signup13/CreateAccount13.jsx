@@ -78,7 +78,7 @@ const CreateAccount13 = () => {
 
       console.log('Creating board with data:', boardPayload);
 
-      const response = await fetch('http://localhost:5000/api/boards', {
+      const response = await fetch('https://monday-clone-backend.vercel.app/api/boards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

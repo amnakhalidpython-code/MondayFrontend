@@ -44,7 +44,7 @@ const DashboardLayout = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/boards/user/${userId}`);
+      const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${userId}`);
       const data = await response.json();
       
       if (data.success) {

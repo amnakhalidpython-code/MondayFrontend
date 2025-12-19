@@ -1,6 +1,6 @@
 // frontend/src/services/notificationService.js
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://monday-clone-backend.vercel.app/api';
 
 // Get auth token from localStorage
 const getAuthHeader = () => {
