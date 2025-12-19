@@ -1,6 +1,7 @@
 // src/pages/DashboardHome.jsx - Main dashboard content (boards list)
 import React from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import './DashboardHome.css';
 
 const DashboardHome = () => {
   const navigate = useNavigate();
@@ -11,16 +12,15 @@ const DashboardHome = () => {
   };
 
   return (
-    <>
+    <div className="dashboard-home">
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg text-gray-600">Loading...</div>
+        <div className="dashboard-loading">
+          <div className="loading-text">Loading...</div>
         </div>
       ) : boards.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <div className="mb-4">
+        <div className="dashboard-empty">
+          <div className="empty-icon">
             <svg 
-              className="mx-auto h-12 w-12 text-gray-400"
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -33,49 +33,49 @@ const DashboardHome = () => {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="empty-title">
             Welcome to monday.com!
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="empty-description">
             You don't have any boards yet. Create your first board to get started.
           </p>
           <button 
             onClick={() => navigate('/one')}
-            className="px-6 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060b9] transition-colors font-medium"
+            className="create-board-btn"
           >
             Create your first board
           </button>
         </div>
       ) : (
         <div>
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <div className="boards-header">
+            <h2 className="boards-title">
               Your boards
             </h2>
-            <p className="text-gray-600">
+            <p className="boards-count">
               {boards.length} {boards.length === 1 ? 'board' : 'boards'} available
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="boards-grid">
             {boards.map((board) => (
               <div 
                 key={board._id}
                 onClick={() => handleBoardClick(board._id)}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer p-6 border border-gray-200"
+                className="board-card"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                <div className="board-card-header">
+                  <div className="board-card-info">
+                    <h3 className="board-card-title">
                       {board.name}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="board-card-items">
                       {board.items?.length || 0} items
                     </p>
                   </div>
-                  <div className="ml-3">
+                  <div>
                     <svg 
-                      className="w-8 h-8 text-blue-500"
+                      className="board-card-icon"
                       fill="currentColor" 
                       viewBox="0 0 20 20"
                     >
@@ -85,17 +85,17 @@ const DashboardHome = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                <div className="board-card-meta">
                   <span>Created {new Date(board.createdAt).toLocaleDateString()}</span>
                 </div>
 
                 {/* Views */}
                 {board.views && board.views.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="board-card-views">
                     {board.views.map((view) => (
                       <span 
                         key={view.id}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                        className="view-tag"
                       >
                         {view.icon === 'board' && '📋'}
                         {view.icon === 'chart' && '📊'}
@@ -108,19 +108,19 @@ const DashboardHome = () => {
 
                 {/* Columns Preview */}
                 {board.columns && (
-                  <div className="flex flex-wrap gap-1">
+                  <div className="board-card-columns">
                     {board.columns.owner && (
-                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                      <span className="column-tag owner">
                         Owner
                       </span>
                     )}
                     {board.columns.status && (
-                      <span className="px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">
+                      <span className="column-tag status">
                         Status
                       </span>
                     )}
                     {board.columns.dueDate && (
-                      <span className="px-2 py-1 bg-orange-50 text-orange-700 rounded-full text-xs">
+                      <span className="column-tag date">
                         Due Date
                       </span>
                     )}
@@ -131,7 +131,7 @@ const DashboardHome = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

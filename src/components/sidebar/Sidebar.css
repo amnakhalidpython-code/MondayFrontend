@@ -11,29 +11,30 @@
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
-/* Collapse Button */
+/* Collapse Button - Monday.com exact styling */
 .collapse-btn {
   position: absolute;
   top: 12px;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #e6e9ef;
+  background: rgb(225, 239, 242);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 50;
-  color: #676879;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.1s ease;
+  z-index: 10002;
+  color: #323338;
+  box-shadow: none;
+  opacity: 1;
+  visibility: visible;
 }
 
 .collapse-btn:hover {
-  background: #f5f6f8;
-  color: #323338;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  background: rgb(209, 228, 234);
+  transform: none;
 }
 
 .collapse-btn:active {
@@ -69,9 +70,10 @@
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  opacity: 1;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling - exact Monday.com */
 .sidebar-content::-webkit-scrollbar {
   width: 6px;
 }
@@ -89,13 +91,14 @@
   background: #b8bccf;
 }
 
-/* Sidebar Section - Top Features (Home, My work, etc) */
+/* Sidebar Section - Top Features */
 .sidebar-section {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 6px 16px 8px 16px;
   margin-top: 6px;
+  background-color: transparent; /* Removed red background */
 }
 
 .sidebar-section.collapsed {
@@ -104,7 +107,7 @@
   padding-right: 8px;
 }
 
-/* Sidebar Items - Monday.com Button Style */
+/* Sidebar Items - Monday.com exact button style */
 .sidebar-item {
   display: flex;
   align-items: center;
@@ -120,6 +123,8 @@
   font-size: 14px;
   font-weight: 400;
   text-decoration: none;
+  width: 100%;
+  text-align: left;
 }
 
 .sidebar-item:hover {
@@ -134,8 +139,7 @@
 }
 
 .sidebar-item:focus {
-  outline: 2px solid #1f76c2;
-  outline-offset: 2px;
+  outline: none;
 }
 
 .item-icon {
@@ -193,7 +197,7 @@
   color: #323338;
 }
 
-/* Workspace Section - Monday.com Style */
+/* Workspace Section - Monday.com exact style */
 .workspace-section {
   flex: 1;
   display: flex;
@@ -225,7 +229,7 @@
   align-items: center;
 }
 
-/* Icon Buttons - Monday.com Style */
+/* Icon Buttons - Monday.com exact style */
 .icon-btn {
   width: 24px;
   height: 24px;
@@ -251,8 +255,7 @@
 }
 
 .icon-btn:focus {
-  outline: 2px solid #1f76c2;
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Workspace Selector Row */
@@ -264,7 +267,7 @@
   padding: 0;
 }
 
-/* Workspace Card - Monday.com Dropdown Style */
+/* Workspace Card - Monday.com exact dropdown style */
 .workspace-card {
   flex: 1;
   display: flex;
@@ -289,17 +292,16 @@
 }
 
 .workspace-card:focus {
-  outline: 2px solid #1f76c2;
-  outline-offset: 2px;
+  outline: none;
 }
 
-/* Workspace Avatar - Monday.com Style */
+/* Workspace Avatar - Monday.com exact style */
 .workspace-avatar {
   position: relative;
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  background: #1f76c2;
+  background: rgb(3, 127, 76); /* Monday.com green */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,7 +350,7 @@
   color: #323338;
 }
 
-/* Add Button - Monday.com Primary Style */
+/* Add Button - Monday.com exact primary style */
 .add-btn {
   width: 32px;
   height: 32px;
@@ -375,11 +377,10 @@
 }
 
 .add-btn:focus {
-  outline: 2px solid #1f76c2;
-  outline-offset: 2px;
+  outline: none;
 }
 
-/* Workspace Items - Monday.com List Style */
+/* Workspace Items - Monday.com exact list style */
 .workspace-items {
   display: flex;
   flex-direction: column;
@@ -417,8 +418,7 @@
 }
 
 .workspace-item:focus {
-  outline: 2px solid #1f76c2;
-  outline-offset: 2px;
+  outline: none;
 }
 
 .workspace-item span {
@@ -437,7 +437,7 @@
   height: 16px;
 }
 
-/* Workspace Dropdown Menu - Monday.com Style */
+/* Workspace Dropdown Menu - Monday.com exact style */
 .workspace-dropdown {
   position: absolute;
   top: 120px;
@@ -527,7 +527,7 @@
   margin: 8px 0;
 }
 
-/* Submenus - Monday.com Style */
+/* Submenus - Monday.com exact style */
 .submenu {
   position: absolute;
   left: 100%;

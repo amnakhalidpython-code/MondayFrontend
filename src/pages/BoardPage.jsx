@@ -1,5 +1,6 @@
-// BoardPage.jsx - EXACT Monday.com Board UI from HTML
-import React, { useState } from 'react';
+// BoardPage.jsx - Updated with imported BoardHeader
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { 
   ChevronDown, 
   ChevronRight,
@@ -12,18 +13,22 @@ import {
   Info,
   MessageSquare,
   Star,
-  Bell,
-  Link2,
-  ArrowUpDown,
-  Eye,
-  Grid3x3,
-  Sparkles,
-  Shuffle,
-  Clock
+ 
 } from 'lucide-react';
 import './BoardPage.css';
+import ActionBar from '../components/board/components/ActionBar';
+import BoardHeader from '../components/board/components/BoardHeader'; // Import the separate component
 
 const BoardPage = () => {
+  const { boardId } = useParams();
+  const [boardName, setBoardName] = useState('Loading...');
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hiddenColumns, setHiddenColumns] = useState([]);
+  const [currentSort, setCurrentSort] = useState(null);
+  const [currentGroupBy, setCurrentGroupBy] = useState(null);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  
   const [groups, setGroups] = useState([
     {
       id: 'todo',
@@ -76,6 +81,153 @@ const BoardPage = () => {
     done: { label: 'Done', bg: '#00C875' },
     stuck: { label: 'Stuck', bg: '#DF2F4A' }
   };
+
+  // Define board columns
+  const boardColumns = [
+    { id: 'name', title: 'Task', type: 'text' },
+    { id: 'owner', title: 'Owner', type: 'person' },
+    { id: 'status', title: 'Status', type: 'status' },
+    { id: 'dueDate', title: 'Due Date', type: 'date' },
+    { id: 'priority', title: 'Priority', type: 'priority' },
+    { id: 'numbers', title: 'Numbers', type: 'number' }
+  ];
+
+  // Search functionality
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  // Filter groups based on search
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredGroups(groups);
+      return;
+    }
+
+    const filtered = groups.map(group => ({
+      ...group,
+      tasks: group.tasks.filter(task => 
+        task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.owner?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    })).filter(group => group.tasks.length > 0);
+
+    setFilteredGroups(filtered);
+  }, [searchQuery, groups]);
+
+  // Sort functionality
+  const handleSort = (columnId, order) => {
+    setCurrentSort({ column: columnId, order });
+    
+    const sortedGroups = groups.map(group => {
+      const sortedTasks = [...group.tasks].sort((a, b) => {
+        let aVal = a[columnId];
+        let bVal = b[columnId];
+        
+        if (columnId === 'owner') {
+          aVal = a.owner?.name || '';
+          bVal = b.owner?.name || '';
+        }
+        
+        if (order === 'asc') {
+          return aVal > bVal ? 1 : -1;
+        } else {
+          return aVal < bVal ? 1 : -1;
+        }
+      });
+      
+      return { ...group, tasks: sortedTasks };
+    });
+    
+    setGroups(sortedGroups);
+  };
+
+  // Hide columns functionality
+  const handleHideColumns = (columnId) => {
+    setHiddenColumns(prev => {
+      if (prev.includes(columnId)) {
+        return prev.filter(id => id !== columnId);
+      } else {
+        return [...prev, columnId];
+      }
+    });
+  };
+
+  // Group by functionality
+  const handleGroupBy = (columnId) => {
+    setCurrentGroupBy(columnId);
+    
+    if (!columnId) {
+      return;
+    }
+    
+    const allTasks = groups.flatMap(g => g.tasks);
+    const grouped = {};
+    
+    allTasks.forEach(task => {
+      let groupKey = task[columnId];
+      if (columnId === 'owner') {
+        groupKey = task.owner?.name || 'Unassigned';
+      } else if (columnId === 'status') {
+        groupKey = statusConfig[task.status]?.label || task.status;
+      }
+      
+      if (!grouped[groupKey]) {
+        grouped[groupKey] = [];
+      }
+      grouped[groupKey].push(task);
+    });
+    
+    const newGroups = Object.entries(grouped).map(([key, tasks], index) => ({
+      id: `group-${index}`,
+      name: key,
+      color: '#579BFC',
+      expanded: true,
+      tasks
+    }));
+    
+    setGroups(newGroups);
+  };
+
+  // Add new task
+  const handleAddTask = () => {
+    const firstGroup = groups[0];
+    if (firstGroup) {
+      setNewTaskInput({ groupId: firstGroup.id, value: '' });
+    }
+  };
+
+  // Fetch board data from API
+  useEffect(() => {
+    const fetchBoardData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:5000/api/boards/${boardId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch board');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.board) {
+          setBoardName(data.board.name || 'Untitled Board');
+        } else {
+          setBoardName('Untitled Board');
+        }
+        
+      } catch (error) {
+        console.error('Error fetching board:', error);
+        setBoardName('Board');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (boardId) {
+      fetchBoardData();
+    }
+  }, [boardId]);
 
   const toggleGroup = (groupId) => {
     setGroups(groups.map(g => 
@@ -151,118 +303,25 @@ const BoardPage = () => {
 
   return (
     <div className="board-page">
-      {/* TOP HEADER */}
-      <header className="board-header">
-        <div className="header-left">
-          <button className="board-title-btn">
-            <h2 className="board-title">work</h2>
-            <ChevronDown size={24} />
-          </button>
-        </div>
-
-        <div className="header-right">
-          <button className="header-btn sidekick-btn">
-            <Sparkles size={20} className="ai-icon" />
-            <span>Sidekick</span>
-            <span className="counter">0</span>
-          </button>
-          
-          <button className="header-btn integrate-btn">
-            <Shuffle size={18} />
-            <span>Integrate</span>
-            <div className="integration-badges">
-              <div className="integration-badge"></div>
-              <div className="integration-badge"></div>
-              <div className="integration-badge"></div>
-            </div>
-          </button>
-
-          <button className="header-btn">
-            <Clock size={20} />
-            <span>Automate</span>
-          </button>
-
-          <button className="header-icon-btn">
-            <MessageSquare size={20} />
-          </button>
-
-          <button className="header-icon-btn">
-            <Bell size={20} />
-          </button>
-
-          <div className="user-avatar">A</div>
-
-          <button className="invite-btn">Invite / 1</button>
-
-          <button className="header-icon-btn">
-            <Link2 size={20} />
-          </button>
-
-          <button className="header-icon-btn">
-            <MoreHorizontal size={24} />
-          </button>
-        </div>
-      </header>
-
-      {/* TABS SECTION */}
-      <div className="board-tabs">
-        <button className="tab active">Main table</button>
-        <button className="tab-icon-btn">
-          <MoreHorizontal size={16} />
-        </button>
-        <button className="tab-icon-btn">
-          <Plus size={16} />
-        </button>
-      </div>
+      {/* USE IMPORTED BOARD HEADER */}
+      <BoardHeader boardTitle={boardName} />
 
       {/* ACTION BAR */}
-      <div className="action-bar">
-        <div className="action-bar-left">
-          <button className="new-task-btn">
-            New task
-            <ChevronDown size={16} />
-          </button>
-
-          <div className="action-divider"></div>
-
-          <button className="action-btn">
-            <Search size={18} />
-            <span>Search</span>
-          </button>
-          <button className="action-btn">
-            <User size={18} />
-            <span>Person</span>
-          </button>
-          <button className="action-btn">
-            <Filter size={18} />
-            <span>Filter</span>
-            <ChevronDown size={14} />
-          </button>
-          <button className="action-btn">
-            <ArrowUpDown size={18} />
-            <span>Sort</span>
-          </button>
-          <button className="action-btn">
-            <Eye size={18} />
-            <span>Hide</span>
-          </button>
-          <button className="action-btn">
-            <Grid3x3 size={18} />
-            <span>Group by</span>
-          </button>
-          <button className="action-icon-btn">
-            <MoreHorizontal size={18} />
-          </button>
-        </div>
-
-        <button className="collapse-btn">
-          <ChevronUp size={18} />
-        </button>
-      </div>
+      <ActionBar 
+        columns={boardColumns}
+        onSearch={handleSearch}
+        onSort={handleSort}
+        onHideColumns={handleHideColumns}
+        onGroupBy={handleGroupBy}
+        onAddTask={handleAddTask}
+        hiddenColumns={hiddenColumns}
+        currentSort={currentSort}
+        currentGroupBy={currentGroupBy}
+      />
 
       {/* BOARD CONTENT */}
       <div className="board-content">
-        {groups.map(group => (
+        {(searchQuery ? filteredGroups : groups).map(group => (
           <div key={group.id} className="board-group">
             {/* GROUP HEADER */}
             <div className="group-header-row">
@@ -291,16 +350,24 @@ const BoardPage = () => {
                   <div className="table-header">
                     <div className="table-cell cell-checkbox"></div>
                     <div className="table-cell cell-task">Task</div>
-                    <div className="table-cell cell-owner">Owner</div>
-                    <div className="table-cell cell-status">
-                      Status
-                      <Info size={14} className="info-icon" />
-                    </div>
-                    <div className="table-cell cell-date">
-                      Due date
-                      <Info size={14} className="info-icon" />
-                    </div>
-                    <div className="table-cell cell-numbers">Numbers</div>
+                    {!hiddenColumns.includes('owner') && (
+                      <div className="table-cell cell-owner">Owner</div>
+                    )}
+                    {!hiddenColumns.includes('status') && (
+                      <div className="table-cell cell-status">
+                        Status
+                        <Info size={14} className="info-icon" />
+                      </div>
+                    )}
+                    {!hiddenColumns.includes('dueDate') && (
+                      <div className="table-cell cell-date">
+                        Due date
+                        <Info size={14} className="info-icon" />
+                      </div>
+                    )}
+                    {!hiddenColumns.includes('numbers') && (
+                      <div className="table-cell cell-numbers">Numbers</div>
+                    )}
                     <div className="table-cell cell-add">
                       <Plus size={16} />
                     </div>
@@ -315,6 +382,7 @@ const BoardPage = () => {
                       groupColor={group.color}
                       statusConfig={statusConfig}
                       updateTaskStatus={updateTaskStatus}
+                      hiddenColumns={hiddenColumns}
                     />
                   ))}
 
@@ -337,10 +405,10 @@ const BoardPage = () => {
                           autoFocus
                         />
                       </div>
-                      <div className="table-cell cell-owner"></div>
-                      <div className="table-cell cell-status"></div>
-                      <div className="table-cell cell-date"></div>
-                      <div className="table-cell cell-numbers"></div>
+                      {!hiddenColumns.includes('owner') && <div className="table-cell cell-owner"></div>}
+                      {!hiddenColumns.includes('status') && <div className="table-cell cell-status"></div>}
+                      {!hiddenColumns.includes('dueDate') && <div className="table-cell cell-date"></div>}
+                      {!hiddenColumns.includes('numbers') && <div className="table-cell cell-numbers"></div>}
                       <div className="table-cell cell-add"></div>
                     </div>
                   ) : (
@@ -407,7 +475,7 @@ const BoardPage = () => {
 };
 
 // TASK ROW COMPONENT
-const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus }) => {
+const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hiddenColumns = [] }) => {
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -438,43 +506,51 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus }) 
         )}
       </div>
 
-      <div className="table-cell cell-owner">
-        {task.owner ? (
-          <div 
-            className="owner-avatar"
-            style={{ backgroundColor: task.owner.color }}
-          >
-            {task.owner.initial}
-          </div>
-        ) : (
-          <button className="add-owner-btn">
-            <User size={16} />
-          </button>
-        )}
-      </div>
+      {!hiddenColumns.includes('owner') && (
+        <div className="table-cell cell-owner">
+          {task.owner ? (
+            <div 
+              className="owner-avatar"
+              style={{ backgroundColor: task.owner.color }}
+            >
+              {task.owner.initial}
+            </div>
+          ) : (
+            <button className="add-owner-btn">
+              <User size={16} />
+            </button>
+          )}
+        </div>
+      )}
 
-      <div className="table-cell cell-status">
-        <StatusCell 
-          currentStatus={task.status}
-          statusConfig={statusConfig}
-          onChange={(newStatus) => updateTaskStatus(groupId, task.id, newStatus)}
-        />
-      </div>
+      {!hiddenColumns.includes('status') && (
+        <div className="table-cell cell-status">
+          <StatusCell 
+            currentStatus={task.status}
+            statusConfig={statusConfig}
+            onChange={(newStatus) => updateTaskStatus(groupId, task.id, newStatus)}
+          />
+        </div>
+      )}
 
-      <div className="table-cell cell-date">
-        {task.dueDate ? (
-          <div className="date-cell">
-            {task.overdue && <div className="overdue-dot"></div>}
-            <span>{task.dueDate}</span>
-          </div>
-        ) : (
-          <span className="empty-date">-</span>
-        )}
-      </div>
+      {!hiddenColumns.includes('dueDate') && (
+        <div className="table-cell cell-date">
+          {task.dueDate ? (
+            <div className="date-cell">
+              {task.overdue && <div className="overdue-dot"></div>}
+              <span>{task.dueDate}</span>
+            </div>
+          ) : (
+            <span className="empty-date">-</span>
+          )}
+        </div>
+      )}
 
-      <div className="table-cell cell-numbers">
-        {task.numbers || ''}
-      </div>
+      {!hiddenColumns.includes('numbers') && (
+        <div className="table-cell cell-numbers">
+          {task.numbers || ''}
+        </div>
+      )}
 
       <div className="table-cell cell-add"></div>
     </div>

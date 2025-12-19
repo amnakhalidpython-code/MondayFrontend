@@ -95,24 +95,24 @@
 
 .nav-icon-wrapper {
   position: relative;
-  margin-left: 2px;
+  margin-left: 5px;
 }
 
 .nav-btn {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
-  color: #676879;
+  color: rgb(37, 37, 37);
   cursor: pointer;
   outline: none;
   padding: 0;
   transition: background-color 0.1s;
-  margin-left: 2px;
+  margin-left: 5px;
 }
 
 .nav-btn:hover {
@@ -144,13 +144,13 @@
 
 .badge-static {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 2px;
+  right: 2px;
   width: 16px;
   height: 16px;
-  background-color: #c3c6d4;
-  color: #ffffff;
-  font-size: 11px;
+  background-color: #fff;
+  color: #242424;
+  font-size: 10px;
   font-weight: 600;
   border-radius: 50%;
   display: flex;

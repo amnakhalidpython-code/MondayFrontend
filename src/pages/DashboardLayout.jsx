@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import MondayCRMNavbar from '../components/mondayCRM-navbar/MondayCRMNavbar';
 import Sidebar from '../components/sidebar/Sidebar';
 import MondayHeader from '../components/mondayCRM-navbar/MondayHeader';
+import './DashboardLayout.css';
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -62,24 +63,24 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#e1eff2]">
+    <div className="dashboard-layout">
       {/* Top Navbar - Full Width */}
       <MondayCRMNavbar />
       
       {/* Main Layout: Sidebar (Left) + Content (Right) */}
-      <div className="flex">
+      <div className="dashboard-container">
         {/* Left Sidebar - Fixed Width */}
-        <div className="flex-shrink-0">
+        <div className="dashboard-sidebar-wrapper">
           <Sidebar boards={boards} onBoardClick={handleBoardClick} />
         </div>
         
         {/* Right Side Content - Takes Remaining Space */}
-        <div className="flex-1">
+        <div className="dashboard-content-wrapper">
           {/* Header */}
           <MondayHeader />
           
           {/* Main Content Area - Outlet for nested routes */}
-          <div className="p-6">
+          <div className="dashboard-main-content">
             <Outlet context={{ boards, loading, onBoardClick: handleBoardClick }} />
           </div>
         </div>
