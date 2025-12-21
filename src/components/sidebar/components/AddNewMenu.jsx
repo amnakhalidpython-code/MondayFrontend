@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Eye,
   Layers,
@@ -10,26 +10,109 @@ import {
   Archive,
   Copy,
   ChevronRight,
+  FolderPlus,
 } from 'lucide-react';
 import TemplateCenterModal from '../../templates/TemplateCenterPage';
 
 const AddNewMenu = ({
   show,
+  onClose,
+  buttonRef,
   showBoardSubmenu,
   setShowBoardSubmenu,
   showDocSubmenu,
   setShowDocSubmenu,
+  showFormSubmenu,
+  setShowFormSubmenu,
 }) => {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const menuRef = useRef(null);
+  const boardButtonRef = useRef(null);
+  const docButtonRef = useRef(null);
+  const formButtonRef = useRef(null);
+
+  // ✅ Position main menu below button
+  useEffect(() => {
+    if (show && buttonRef?.current && menuRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      menuRef.current.style.top = `${buttonRect.bottom + 4}px`;
+      menuRef.current.style.left = `${buttonRect.right - 240}px`;
+    }
+  }, [show, buttonRef]);
+
+  // ✅ Position Board submenu
+  useEffect(() => {
+    if (showBoardSubmenu && boardButtonRef.current) {
+      const submenu = document.querySelector('.board-submenu');
+      if (submenu) {
+        const buttonRect = boardButtonRef.current.getBoundingClientRect();
+        submenu.style.top = `${buttonRect.top}px`;
+        submenu.style.left = `${buttonRect.right + 4}px`;
+      }
+    }
+  }, [showBoardSubmenu]);
+
+  // ✅ Position Doc submenu
+  useEffect(() => {
+    if (showDocSubmenu && docButtonRef.current) {
+      const submenu = document.querySelector('.doc-submenu');
+      if (submenu) {
+        const buttonRect = docButtonRef.current.getBoundingClientRect();
+        submenu.style.top = `${buttonRect.top}px`;
+        submenu.style.left = `${buttonRect.right + 4}px`;
+      }
+    }
+  }, [showDocSubmenu]);
+
+  // ✅ Position Form submenu
+  useEffect(() => {
+    if (showFormSubmenu && formButtonRef.current) {
+      const submenu = document.querySelector('.form-submenu');
+      if (submenu) {
+        const buttonRect = formButtonRef.current.getBoundingClientRect();
+        submenu.style.top = `${buttonRect.top}px`;
+        submenu.style.left = `${buttonRect.right + 4}px`;
+      }
+    }
+  }, [showFormSubmenu]);
+
+  // ✅ Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        buttonRef?.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        onClose();
+      }
+    };
+
+    if (show) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [show, onClose, buttonRef]);
 
   if (!show) return null;
 
+  const handleItemClick = () => {
+    onClose();
+  };
+
   return (
     <>
-      <div className="add-menu-dropdown">
+      <div className="add-menu-dropdown" ref={menuRef}>
         <div className="add-menu-title">Add new</div>
 
-        <button className="dropdown-item">
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
           <Eye size={16} style={{ color: '#00d2d2' }} />
           <span>CRM boards</span>
           <ChevronRight size={16} className="submenu-arrow" />
@@ -37,6 +120,7 @@ const AddNewMenu = ({
 
         {/* BOARD */}
         <button
+          ref={boardButtonRef}
           className="dropdown-item submenu-trigger"
           onMouseEnter={() => setShowBoardSubmenu(true)}
           onMouseLeave={() => setShowBoardSubmenu(false)}
@@ -46,28 +130,9 @@ const AddNewMenu = ({
           <ChevronRight size={16} className="submenu-arrow" />
         </button>
 
-        {showBoardSubmenu && (
-          <div
-            className="submenu board-submenu"
-            onMouseEnter={() => setShowBoardSubmenu(true)}
-            onMouseLeave={() => setShowBoardSubmenu(false)}
-          >
-            <button className="dropdown-item">
-              <Layers size={16} />
-              <span>New Board</span>
-            </button>
-            <button 
-              className="dropdown-item"
-              onClick={() => setIsTemplateModalOpen(true)}
-            >
-              <Copy size={16} />
-              <span>Start with template</span>
-            </button>
-          </div>
-        )}
-
         {/* DOC */}
         <button
+          ref={docButtonRef}
           className="dropdown-item submenu-trigger"
           onMouseEnter={() => setShowDocSubmenu(true)}
           onMouseLeave={() => setShowDocSubmenu(false)}
@@ -77,51 +142,151 @@ const AddNewMenu = ({
           <ChevronRight size={16} className="submenu-arrow" />
         </button>
 
-        {showDocSubmenu && (
-          <div
-            className="submenu doc-submenu"
-            onMouseEnter={() => setShowDocSubmenu(true)}
-            onMouseLeave={() => setShowDocSubmenu(false)}
-          >
-            <button className="dropdown-item">
-              <FileText size={16} />
-              <span>New Doc</span>
-            </button>
-            <button 
-              className="dropdown-item"
-              onClick={() => setIsTemplateModalOpen(true)}
-            >
-              <Copy size={16} />
-              <span>Start with template</span>
-            </button>
-          </div>
-        )}
-
-        <button className="dropdown-item">
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
           <Grid size={16} />
           <span>Dashboard</span>
         </button>
 
-        <button className="dropdown-item">
+        {/* FORM */}
+        <button
+          ref={formButtonRef}
+          className="dropdown-item submenu-trigger"
+          onMouseEnter={() => setShowFormSubmenu(true)}
+          onMouseLeave={() => setShowFormSubmenu(false)}
+        >
           <Edit size={16} />
           <span>Form</span>
+          <ChevronRight size={16} className="submenu-arrow" />
         </button>
 
-        <button className="dropdown-item">
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
           <Settings size={16} />
           <span>Workflow</span>
         </button>
 
-        <button className="dropdown-item">
-          <Puzzle size={16} />
-          <span>Installed apps</span>
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
+          <FolderPlus size={16} />
+          <span>Folder</span>
         </button>
 
-        <button className="dropdown-item">
+        <div className="dropdown-divider" />
+
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
+          <Puzzle size={16} />
+          <span>Installed apps</span>
+          <ChevronRight size={16} className="submenu-arrow" />
+        </button>
+
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
           <Archive size={16} />
           <span>Import data</span>
+          <ChevronRight size={16} className="submenu-arrow" />
+        </button>
+
+        <button 
+          className="dropdown-item"
+          onClick={handleItemClick}
+        >
+          <Copy size={16} />
+          <span>Template center</span>
         </button>
       </div>
+
+      {/* Board Submenu */}
+      {showBoardSubmenu && (
+        <div
+          className="submenu board-submenu"
+          onMouseEnter={() => setShowBoardSubmenu(true)}
+          onMouseLeave={() => setShowBoardSubmenu(false)}
+        >
+          <button 
+            className="dropdown-item"
+            onClick={handleItemClick}
+          >
+            <Layers size={16} />
+            <span>New Board</span>
+          </button>
+          <button 
+            className="dropdown-item"
+            onClick={() => {
+              setIsTemplateModalOpen(true);
+              onClose();
+            }}
+          >
+            <Copy size={16} />
+            <span>Start with template</span>
+          </button>
+        </div>
+      )}
+
+      {/* Doc Submenu */}
+      {showDocSubmenu && (
+        <div
+          className="submenu doc-submenu"
+          onMouseEnter={() => setShowDocSubmenu(true)}
+          onMouseLeave={() => setShowDocSubmenu(false)}
+        >
+          <button 
+            className="dropdown-item"
+            onClick={handleItemClick}
+          >
+            <FileText size={16} />
+            <span>New Doc</span>
+          </button>
+          <button 
+            className="dropdown-item"
+            onClick={() => {
+              setIsTemplateModalOpen(true);
+              onClose();
+            }}
+          >
+            <Copy size={16} />
+            <span>Start with template</span>
+          </button>
+        </div>
+      )}
+
+      {/* Form Submenu */}
+      {showFormSubmenu && (
+        <div
+          className="submenu form-submenu"
+          onMouseEnter={() => setShowFormSubmenu(true)}
+          onMouseLeave={() => setShowFormSubmenu(false)}
+        >
+          <button 
+            className="dropdown-item"
+            onClick={handleItemClick}
+          >
+            <Edit size={16} />
+            <span>New Form</span>
+          </button>
+          <button 
+            className="dropdown-item"
+            onClick={() => {
+              setIsTemplateModalOpen(true);
+              onClose();
+            }}
+          >
+            <Copy size={16} />
+            <span>Start with template</span>
+          </button>
+        </div>
+      )}
 
       {/* Template Center Modal */}
       <TemplateCenterModal 

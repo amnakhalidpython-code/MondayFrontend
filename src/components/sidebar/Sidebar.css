@@ -1,68 +1,17 @@
-/* Sidebar Container - Monday.com Style */
+/* Sidebar container - cyan background */
 .sidebar {
   position: relative;
   height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid #e6e9ef;
-  font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', 'Noto Kufi Arabic', 'Noto Sans JP', sans-serif;
+  background: #EAF4F6; /* ✅ Sidebar cyan */
+  border-right: 1px solid #c5d1d5;
+  font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', sans-serif;
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+  box-shadow: none; /* ✅ Remove shadow if any */
 }
 
-/* Collapse Button - Monday.com exact styling */
-.collapse-btn {
-  position: absolute;
-  top: 12px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: rgb(225, 239, 242);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.1s ease;
-  z-index: 10002;
-  color: #323338;
-  box-shadow: none;
-  opacity: 1;
-  visibility: visible;
-}
-
-.collapse-btn:hover {
-  background: rgb(209, 228, 234);
-  transform: none;
-}
-
-.collapse-btn:active {
-  transform: scale(0.95);
-}
-
-/* Resize Handle */
-.resize-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  cursor: col-resize;
-  background: transparent;
-  transition: background 0.2s;
-  z-index: 50;
-}
-
-.resize-handle:hover {
-  background: #1f76c2;
-}
-
-.resize-handle.resizing {
-  background: #1f76c2;
-}
-
-/* Content - Monday.com Style */
+/* Sidebar content */
 .sidebar-content {
   display: flex;
   flex-direction: column;
@@ -71,43 +20,20 @@
   overflow-x: hidden;
   overflow-y: auto;
   opacity: 1;
+  background: transparent; /* ✅ Let parent color show */
 }
 
-/* Scrollbar Styling - exact Monday.com */
-.sidebar-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: #d0d4e4;
-  border-radius: 3px;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: #b8bccf;
-}
-
-/* Sidebar Section - Top Features */
+/* Sidebar section (top items) */
 .sidebar-section {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 6px 16px 8px 16px;
   margin-top: 6px;
-  background-color: transparent; /* Removed red background */
+  background-color: transparent; /* ✅ Transparent */
 }
 
-.sidebar-section.collapsed {
-  align-items: center;
-  padding-left: 8px;
-  padding-right: 8px;
-}
-
-/* Sidebar Items - Monday.com exact button style */
+/* Sidebar items - buttons */
 .sidebar-item {
   display: flex;
   align-items: center;
@@ -128,18 +54,262 @@
 }
 
 .sidebar-item:hover {
-  background: #f5f6f8;
+  background: rgba(255, 255, 255, 0.5); /* ✅ Semi-transparent white on hover */
   color: #323338;
 }
 
 .sidebar-item.active {
-  background: #dcdfec;
+  background: rgba(255, 255, 255, 0.7); /* ✅ More opaque white for active */
   color: #323338;
   font-weight: 500;
 }
 
-.sidebar-item:focus {
+/* Workspace section */
+.workspace-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 16px 16px;
+  overflow-y: auto;
+  background: transparent; /* ✅ Let parent cyan show */
+}
+
+/* Workspace items */
+.workspace-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #676879;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: left;
+  width: 100%;
+}
+
+
+/* ========================================
+   COLLAPSE BUTTON - Monday.com Style
+   ======================================== */
+.collapse-btn {
+  position: absolute;
+  top: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+  color: #323338;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.collapse-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.collapse-btn:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   WORKSPACE HEADER - Monday.com Style
+   ======================================== */
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0 8px 0;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #323338;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Icon Buttons - Monday.com exact style */
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #676879;
+  padding: 0;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #323338;
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn:focus {
   outline: none;
+}
+
+/* ========================================
+   WORKSPACE SELECTOR ROW
+   ======================================== */
+.workspace-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 0;
+}
+
+/* Workspace Card - Monday.com exact dropdown style */
+.workspace-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 32px;
+}
+
+.workspace-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.workspace-card:active {
+  transform: scale(0.99);
+}
+
+.workspace-card:focus {
+  outline: none;
+}
+
+/* Workspace Avatar - Monday.com exact style */
+.workspace-avatar {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.workspace-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #323338;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Workspace Name */
+.workspace-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #323338;
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.workspace-chevron {
+  color: #676879;
+  opacity: 1;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.workspace-card:hover .workspace-chevron {
+  color: #323338;
+}
+
+/* Add Button - Monday.com exact primary style */
+.add-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: #007F9B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.add-btn:hover {
+  background: #007F9B;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.add-btn:active {
+  transform: scale(0.96);
+}
+
+.add-btn:focus {
+  outline: none;
+}
+
+/* ========================================
+   WORKSPACE ITEMS LIST
+   ======================================== */
+.workspace-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
 }
 
 .item-icon {
@@ -172,247 +342,13 @@
   opacity: 1;
 }
 
-/* Collapsed Items */
-.sidebar-item-collapsed {
-  width: 40px;
-  height: 32px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  color: #676879;
-}
-
-.sidebar-item-collapsed:hover {
-  background: #f5f6f8;
-  color: #323338;
-}
-
-.sidebar-item-collapsed.active {
-  background: #dcdfec;
-  color: #323338;
-}
-
-/* Workspace Section - Monday.com exact style */
-.workspace-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0 16px 16px 16px;
-  overflow-y: auto;
-}
-
-/* Workspace Header */
-.workspace-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  margin-bottom: 12px;
-}
-
-.section-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: #676879;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-/* Icon Buttons - Monday.com exact style */
-.icon-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  color: #676879;
-  padding: 0;
-}
-
-.icon-btn:hover {
-  background: #f5f6f8;
-  color: #323338;
-}
-
-.icon-btn:active {
-  transform: scale(0.95);
-}
-
-.icon-btn:focus {
-  outline: none;
-}
-
-/* Workspace Selector Row */
-.workspace-selector-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 0;
-}
-
-/* Workspace Card - Monday.com exact dropdown style */
-.workspace-card {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 4px;
-  background: #ffffff;
-  border: 1px solid #e6e9ef;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-height: 32px;
-}
-
-.workspace-card:hover {
-  background: #f5f6f8;
-  border-color: #c5c7d0;
-}
-
-.workspace-card:active {
-  transform: scale(0.99);
-}
-
-.workspace-card:focus {
-  outline: none;
-}
-
-/* Workspace Avatar - Monday.com exact style */
-.workspace-avatar {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  background: rgb(3, 127, 76); /* Monday.com green */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.workspace-badge {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 14px;
-  height: 14px;
-  background: #ffffff;
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #323338;
-  box-shadow: 0 0 0 1px #ffffff;
-}
-
-/* Workspace Name */
-.workspace-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #323338;
-  flex: 1;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.4;
-}
-
-.workspace-chevron {
-  color: #676879;
-  opacity: 1;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.workspace-card:hover .workspace-chevron {
-  color: #323338;
-}
-
-/* Add Button - Monday.com exact primary style */
-.add-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  background: #1f76c2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  color: #ffffff;
-  flex-shrink: 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.add-btn:hover {
-  background: #1a65a8;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-.add-btn:active {
-  transform: scale(0.96);
-}
-
-.add-btn:focus {
-  outline: none;
-}
-
-/* Workspace Items - Monday.com exact list style */
-.workspace-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 0;
-}
-
-.workspace-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 8px;
-  border-radius: 4px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  color: #676879;
-  font-size: 14px;
-  font-weight: 400;
-  text-align: left;
-  width: 100%;
-}
-
 .workspace-item:hover {
-  background: #f5f6f8;
+  background: rgba(255, 255, 255, 0.5); /* ✅ Semi-transparent white */
   color: #323338;
 }
 
 .workspace-item.active {
-  background: #dcdfec;
+  background: rgba(255, 255, 255, 0.7); /* ✅ More opaque white */
   color: #323338;
   font-weight: 500;
 }
@@ -439,16 +375,16 @@
 
 /* Workspace Dropdown Menu - Monday.com exact style */
 .workspace-dropdown {
-  position: absolute;
-  top: 120px;
-  left: 240px;
+  position: fixed;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 8px;
   min-width: 240px;
-  z-index: 100;
+  max-width: 280px;
+  z-index: 10000;
   animation: fadeInSlideDown 0.2s ease;
+  /* Position will be set via JS */
 }
 
 @keyframes fadeInSlideDown {
@@ -529,16 +465,30 @@
 
 /* Submenus - Monday.com exact style */
 .submenu {
-  position: absolute;
-  left: 100%;
-  top: 0;
+  position: fixed;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 8px;
   min-width: 220px;
-  margin-left: 4px;
-  z-index: 101;
+  z-index: 10001;
+  animation: fadeInSlideRight 0.2s ease;
+  /* Position will be set via JS */
+}
+.edit-submenu,
+.board-submenu,
+.doc-submenu,
+.form-submenu {
+  /* Position will be set dynamically via JavaScript */
+
+
+    position: fixed; /* ✅ Changed to fixed for proper positioning */
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  min-width: 220px;
+  z-index: 10001; /* ✅ Higher than parent */
   animation: fadeInSlideRight 0.2s ease;
 }
 
@@ -663,18 +613,17 @@
 
 /* Add New Menu */
 .add-menu-dropdown {
-  position: absolute;
-  top: 160px;
-  left: 250px;
+  position: fixed;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 8px;
   min-width: 240px;
-  z-index: 100;
+  max-width: 280px;
+  z-index: 10000;
   animation: fadeInSlideDown 0.2s ease;
+  /* Position will be set via JS */
 }
-
 .add-menu-title {
   font-size: 12px;
   font-weight: 600;

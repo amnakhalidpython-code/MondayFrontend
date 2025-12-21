@@ -297,6 +297,7 @@ const MondayCRMNavbar = () => {
   };
 
   return (
+    
     <header className="navbar-header">
       <div className="navbar-left">
         <a href="/" className="navbar-logo">
@@ -897,12 +898,12 @@ const MondayCRMNavbar = () => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#0073ea',
+              backgroundColor: '#007F9B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontWeight: '600',
+              fontWeight: '500',
               fontSize: '14px'
             }}>
               {userInfo.initials || 'U'}

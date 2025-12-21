@@ -1,4 +1,4 @@
-// src/pages/DashboardLayout.jsx - Layout wrapper for Dashboard with Sidebar
+// src/pages/DashboardLayout.jsx
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import MondayCRMNavbar from '../components/mondayCRM-navbar/MondayCRMNavbar';
@@ -17,7 +17,6 @@ const DashboardLayout = () => {
 
   const fetchBoards = async () => {
     try {
-      // Get user ID from multiple sources
       const storedUser = sessionStorage.getItem('mondayUser');
       const storedEmail = sessionStorage.getItem('mondaySignupEmail') || localStorage.getItem('userEmail');
       
@@ -36,20 +35,17 @@ const DashboardLayout = () => {
         userId = storedEmail;
       }
 
-      console.log('DashboardLayout fetching boards for userId:', userId);
-
       if (!userId) {
         console.warn('No user ID found');
         setLoading(false);
         return;
       }
 
-     const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${encodeURIComponent(userId)}`);
+      const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${encodeURIComponent(userId)}`);
       const data = await response.json();
       
       if (data.success) {
         setBoards(data.boards);
-        console.log('✅ DashboardLayout - Boards loaded:', data.boards);
       }
     } catch (error) {
       console.error('❌ Error fetching boards:', error);
@@ -64,22 +60,23 @@ const DashboardLayout = () => {
 
   return (
     <div className="dashboard-layout">
-      {/* Top Navbar - Full Width */}
+      {/* ✅ Top Navbar - Full Width */}
       <MondayCRMNavbar />
       
-      {/* Main Layout: Sidebar (Left) + Content (Right) */}
+      {/* ✅ Main Container: Sidebar + Content */}
       <div className="dashboard-container">
-        {/* Left Sidebar - Fixed Width */}
+        
+        {/* ✅ Left Sidebar - NO MARGIN/PADDING */}
         <div className="dashboard-sidebar-wrapper">
           <Sidebar boards={boards} onBoardClick={handleBoardClick} />
         </div>
         
-        {/* Right Side Content - Takes Remaining Space */}
+        {/* ✅ Right Content Area */}
         <div className="dashboard-content-wrapper">
-          {/* Header */}
+          {/* Optional Header */}
           <MondayHeader />
           
-          {/* Main Content Area - Outlet for nested routes */}
+          {/* Main Content */}
           <div className="dashboard-main-content">
             <Outlet context={{ boards, loading, onBoardClick: handleBoardClick }} />
           </div>
