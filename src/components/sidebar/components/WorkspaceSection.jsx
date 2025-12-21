@@ -1,18 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoreVertical, Search, Plus, ChevronDown, Home } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext'; // 🆕 IMPORT
-import { getWorkspaceItems } from '../data/workspaceItems'; // 🆕 IMPORT
+import { MoreVertical, Search, Plus, ChevronDown, ChevronRight, Home } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import { getWorkspaceItems } from '../data/workspaceItems';
 import WorkspaceMenu from './WorkspaceMenu';
 import AddNewMenu from './AddNewMenu';
+import WorkspaceDropdown from './WorkspaceDropdown';
 
 const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick }) => {
   const navigate = useNavigate();
-  const { userCategory } = useAuth(); // 🆕 GET CATEGORY
+  const { userCategory } = useAuth();
   
   // ✅ Button refs for positioning
   const workspaceMenuButtonRef = useRef(null);
   const addMenuButtonRef = useRef(null);
+  const workspaceCardRef = useRef(null);
   
   // Menu states
   const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false);
@@ -21,6 +23,10 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
   const [showBoardSubmenu, setShowBoardSubmenu] = useState(false);
   const [showDocSubmenu, setShowDocSubmenu] = useState(false);
   const [showFormSubmenu, setShowFormSubmenu] = useState(false);
+  const [showWorkspaceDropdown, setShowWorkspaceDropdown] = useState(false);
+
+  // 🆕 CURRENT WORKSPACE - Track which main workspace is selected
+  const [currentWorkspace, setCurrentWorkspace] = useState(null);
 
   // 🆕 GET WORKSPACE ITEMS BASED ON CATEGORY
   const category = userCategory || sessionStorage.getItem('userCategory');
@@ -28,6 +34,16 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
   
   console.log('🔍 WorkspaceSection - Category:', category);
   console.log('📋 WorkspaceSection - Items:', staticWorkspaceItems);
+
+  // 🆕 SET DEFAULT WORKSPACE ON LOAD (First item with sub-items for non-profit)
+  useEffect(() => {
+    if ((category === 'ngo' || category === 'nonprofit') && staticWorkspaceItems.length > 0) {
+      const firstItemWithSubItems = staticWorkspaceItems.find(item => item.subItems && item.subItems.length > 0);
+      if (firstItemWithSubItems) {
+        setCurrentWorkspace(firstItemWithSubItems);
+      }
+    }
+  }, [category, staticWorkspaceItems]);
 
   const handleBoardClick = (boardId, boardName) => {
     setActiveItem(boardName);
@@ -38,10 +54,62 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     }
   };
 
-  // 🆕 STATIC ITEM CLICK HANDLER
-  const handleStaticItemClick = (itemLabel) => {
-    setActiveItem(itemLabel);
-    console.log('Clicked:', itemLabel);
+  // 🆕 WORKSPACE DROPDOWN CLICK - Change current workspace
+  const handleWorkspaceChange = (item) => {
+    setCurrentWorkspace(item);
+    console.log('🔄 Workspace changed to:', item.label);
+  };
+
+  // 🆕 SUB-ITEM CLICK HANDLER
+  const handleSubItemClick = (subItemLabel) => {
+    setActiveItem(subItemLabel);
+    console.log('✅ Selected sub-item:', subItemLabel);
+  };
+
+  // 🆕 GET WORKSPACE DISPLAY NAME
+  const getWorkspaceName = () => {
+    if (currentWorkspace) {
+      return currentWorkspace.label;
+    }
+    return category === 'ngo' || category === 'nonprofit' ? 'Non-Profit Workspace' : 'MainWorkSpace';
+  };
+
+  // 🆕 GET WORKSPACE AVATAR COLOR
+  const getWorkspaceColor = (workspaceLabel) => {
+    const colorMap = {
+      'Grants Management': '#067B4B',
+      'Donor Management': '#FB275D',
+      'monday Fundraising': '#FDAB3D',
+      'Volunteer Registration Management': '#9cd326'
+    };
+    return colorMap[workspaceLabel] || '#666';
+  };
+
+  // 🆕 GET WORKSPACE FIRST LETTER
+  const getWorkspaceInitial = (workspaceLabel) => {
+    const initialMap = {
+      'Grants Management': 'G',
+      'Donor Management': 'D',
+      'monday Fundraising': 'F',
+      'Volunteer Registration Management': 'V'
+    };
+    return initialMap[workspaceLabel] || workspaceLabel.charAt(0).toUpperCase();
+  };
+
+  // 🆕 GET WORKSPACE ICON/LETTER FOR DROPDOWN
+  const getWorkspaceIcon = () => {
+    if (currentWorkspace) {
+      return getWorkspaceInitial(currentWorkspace.label);
+    }
+    return category === 'ngo' || category === 'nonprofit' ? '❤️' : 'M';
+  };
+
+  // 🆕 GET WORKSPACE AVATAR BACKGROUND COLOR
+  const getWorkspaceAvatarColor = () => {
+    if (currentWorkspace) {
+      return getWorkspaceColor(currentWorkspace.label);
+    }
+    return category === 'ngo' || category === 'nonprofit' ? '#FB275D' : '#666';
   };
 
   return (
@@ -84,15 +152,24 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
 
       {/* CURRENT WORKSPACE DROPDOWN */}
       <div className="workspace-selector-row">
-        <button className="workspace-card">
-          <div className="workspace-avatar">
-            {category === 'ngo' || category === 'nonprofit' ? '❤️' : 'M'}
+        <button 
+          ref={workspaceCardRef}
+          className="workspace-card"
+          onClick={() => setShowWorkspaceDropdown(!showWorkspaceDropdown)}
+        >
+          <div 
+            className="workspace-avatar"
+            style={{ background: getWorkspaceAvatarColor() }}
+          >
+            <span style={{ color: '#ffffff', fontWeight: 600, fontSize: '12px' }}>
+              {getWorkspaceIcon()}
+            </span>
             <div className="workspace-badge">
               <Home size={8} />
             </div>
           </div>
           <span className="workspace-name">
-            {category === 'ngo' || category === 'nonprofit' ? 'Non-Profit Workspace' : 'MainWorkSpace'}
+            {getWorkspaceName()}
           </span>
           <ChevronDown size={18} className="workspace-chevron" />
         </button>
@@ -106,6 +183,16 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
           <Plus size={20} />
         </button>
       </div>
+
+      {/* 🆕 WORKSPACE DROPDOWN MENU */}
+      <WorkspaceDropdown
+        show={showWorkspaceDropdown}
+        onClose={() => setShowWorkspaceDropdown(false)}
+        buttonRef={workspaceCardRef}
+        workspaceItems={staticWorkspaceItems.filter(item => item.subItems && item.subItems.length > 0)}
+        currentWorkspace={currentWorkspace}
+        onWorkspaceSelect={handleWorkspaceChange}
+      />
 
       {/* ADD NEW MENU */}
       <AddNewMenu
@@ -125,22 +212,77 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         setShowFormSubmenu={setShowFormSubmenu}
       />
 
-      {/* 🆕 WORKSPACE ITEMS */}
+      {/* 🆕 WORKSPACE ITEMS - Show sub-items of current workspace */}
       <div className="workspace-items">
-        {/* 🆕 STATIC ITEMS (CATEGORY-BASED) */}
-        {staticWorkspaceItems.map((item, index) => {
-          const IconComponent = item.icon;
-          return (
-            <button
-              key={index}
-              onClick={() => handleStaticItemClick(item.label)}
-              className={`workspace-item ${activeItem === item.label ? 'active' : ''}`}
-            >
-              <IconComponent size={16} className="item-icon" />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
+        
+        {/* 🆕 SHOW SUB-ITEMS IF CURRENT WORKSPACE HAS THEM */}
+        {currentWorkspace && currentWorkspace.subItems && currentWorkspace.subItems.length > 0 ? (
+          <>
+            {currentWorkspace.subItems.map((subItem, index) => {
+              // Check if subItem is an object with icon or just a string
+              const subItemLabel = typeof subItem === 'object' ? subItem.label : subItem;
+              const SubItemIcon = typeof subItem === 'object' && subItem.icon ? subItem.icon : null;
+              
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleSubItemClick(subItemLabel)}
+                  className={`workspace-item ${activeItem === subItemLabel ? 'active' : ''}`}
+                >
+                  {SubItemIcon ? (
+                    <SubItemIcon size={16} className="item-icon" style={{ color: '#676879' }} />
+                  ) : (
+                    // Fallback - show simple icon placeholder
+                    <svg 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 16 16" 
+                      fill="none"
+                      className="item-icon"
+                      style={{ color: '#676879' }}
+                    >
+                      <circle cx="8" cy="8" r="2" fill="currentColor" />
+                    </svg>
+                  )}
+                  <span>{subItemLabel}</span>
+                </button>
+              );
+            })}
+          </>
+        ) : (
+          // 🆕 SHOW ALL MAIN ITEMS IF NO CURRENT WORKSPACE (DEFAULT VIEW)
+          staticWorkspaceItems.map((item, index) => {
+            const IconComponent = item.icon;
+            const hasValidIcon = IconComponent && typeof IconComponent === 'function';
+            
+            return (
+              <button
+                key={index}
+                onClick={() => item.subItems ? handleWorkspaceChange(item) : setActiveItem(item.label)}
+                className={`workspace-item ${activeItem === item.label ? 'active' : ''}`}
+              >
+                {hasValidIcon ? (
+                  <IconComponent size={16} className="item-icon" />
+                ) : (
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 16 16" 
+                    fill="none"
+                    className="item-icon"
+                    style={{ color: '#676879' }}
+                  >
+                    <rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                  </svg>
+                )}
+                <span>{item.label}</span>
+                {item.subItems && item.subItems.length > 0 && (
+                  <ChevronRight size={16} className="chevron-icon" style={{ marginLeft: 'auto' }} />
+                )}
+              </button>
+            );
+          })
+        )}
 
         {/* 🆕 DIVIDER - Only if there are dynamic boards */}
         {boards.length > 0 && (

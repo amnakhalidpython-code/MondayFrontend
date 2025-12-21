@@ -494,6 +494,17 @@
   animation: fadeInSlideRight 0.2s ease;
 }
 
+
+.workspace-subitem {
+  padding-left: 40px; /* Indent for sub-items */
+  font-size: 13px;
+  height: 32px;
+}
+
+.chevron-rotate {
+  transform: rotate(90deg);
+}
+
 @keyframes fadeInSlideRight {
   from {
     opacity: 0;
@@ -583,6 +594,8 @@
   font-size: 18px;
   font-weight: bold;
 }
+
+
 
 .icon-grid {
   display: grid;

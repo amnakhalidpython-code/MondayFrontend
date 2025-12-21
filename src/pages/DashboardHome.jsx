@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import Lottie from 'lottie-react';
+import handclap from '../animation/Hand clap 2.json'
 import './DashboardHome.css';
 
 const DashboardHome = () => {
@@ -60,7 +62,7 @@ const DashboardHome = () => {
                         You don't have any boards yet. Create your first board to get started.
                       </p>
                       <button 
-                        onClick={() => navigate('/one')} 
+                        onClick={() => navigate('/nine')} 
                         className="primary-button"
                       >
                         Create your first board
@@ -147,11 +149,15 @@ const DashboardHome = () => {
                 <div className="collapsible-content">
                   <div className="update-feed-empty">
                     <div className="empty-animation">
-                      <img 
-                        src="https://cdn.monday.com/images/quick_search_recent_board2.svg" 
-                        alt="No updates"
-                        style={{ width: '320px', height: '320px' }}
-                      />
+                       <Lottie
+            animationData={handclap}
+            loop={true}
+            autoplay={true}
+            style={{
+              width: '140%',
+              height: '100%'
+            }}
+          />
                     </div>
                     <p className="empty-feed-title">No unread updates</p>
                     <p className="empty-feed-text">
