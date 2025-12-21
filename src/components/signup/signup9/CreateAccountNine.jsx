@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // 🆕 useNavigate add kiya
 import { useBoardContext } from '../../../context/BoardContext';
+import { useAuth } from '../../../context/AuthContext'; // 🆕 IMPORT
 
 const CreateAccountNine = () => {
+  const navigate = useNavigate(); // 🆕
+  const { userCategory } = useAuth(); // 🆕 GET CATEGORY
   const { boardData, setBoardData } = useBoardContext();
-  const [boardName, setBoardName] = useState(boardData.boardName || ''); // Update this line
-  const [isNextEnabled, setIsNextEnabled] = useState(boardData.boardName?.trim().length > 0); // Update this line
+  const [boardName, setBoardName] = useState(boardData.boardName || '');
+  const [isNextEnabled, setIsNextEnabled] = useState(boardData.boardName?.trim().length > 0);
 
- const handleNext = () => {
-    // Save to context
+  // 🆕 CHECK CATEGORY - Agar non-profit hai to skip karo
+  useEffect(() => {
+    if (userCategory === 'nonprofit') {
+      console.log('Non-profit user detected, skipping to step 10');
+      navigate('/ten'); // Directly go to step 10
+    }
+  }, [userCategory, navigate]);
+
+  const handleNext = () => {
     setBoardData(prev => ({
       ...prev,
       boardName: boardName.trim()
@@ -21,6 +31,11 @@ const CreateAccountNine = () => {
     setBoardName(value);
     setIsNextEnabled(value.trim().length > 0);
   };
+
+  // Agar non-profit hai to null return karo (component render hi nahi hoga)
+  if (userCategory === 'nonprofit') {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-[rgba(41,47,76,0.7)] flex items-center justify-center">

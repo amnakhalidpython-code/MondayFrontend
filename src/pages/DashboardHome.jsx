@@ -1,14 +1,23 @@
-// src/pages/DashboardHome.jsx - Complete Styled Version
-import React from 'react';
+import React, { useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import './DashboardHome.css';
 
 const DashboardHome = () => {
   const navigate = useNavigate();
   const { boards, loading } = useOutletContext();
+  const [isRecentlyVisitedOpen, setIsRecentlyVisitedOpen] = useState(true);
+  const [isUpdateFeedOpen, setIsUpdateFeedOpen] = useState(false);
 
   const handleBoardClick = (boardId) => {
     navigate(`/boards/${boardId}`);
+  };
+
+  const toggleRecentlyVisited = () => {
+    setIsRecentlyVisitedOpen(!isRecentlyVisitedOpen);
+  };
+
+  const toggleUpdateFeed = () => {
+    setIsUpdateFeedOpen(!isUpdateFeedOpen);
   };
 
   return (
@@ -26,8 +35,8 @@ const DashboardHome = () => {
             
             {/* Recently Visited Section */}
             <section className="section-container">
-              <div className="collapsible-section">
-                <div className="collapsible-header">
+              <div className={`collapsible-section ${!isRecentlyVisitedOpen ? 'collapsed' : ''}`}>
+                <div className="collapsible-header" onClick={toggleRecentlyVisited}>
                   <button className="collapse-toggle" aria-label="Toggle section">
                     <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M9.442 12.76a.77.77 0 0 0 1.116 0l4.21-4.363a.84.84 0 0 0 0-1.157.77.77 0 0 0-1.116 0L10 11.025 6.348 7.24a.77.77 0 0 0-1.117 0 .84.84 0 0 0 0 1.157l4.21 4.363Z"/>
@@ -121,14 +130,12 @@ const DashboardHome = () => {
                   )}
                 </div>
               </div>
-
-
-   <section className="section-container update-feed-section">
-              <div className="collapsible-section collapsed">
-                <div className="collapsible-header">
+  <section className="section-container update-feed-section">
+              <div className={`collapsible-section ${!isUpdateFeedOpen ? 'collapsed' : ''}`}>
+                <div className="collapsible-header" onClick={toggleUpdateFeed}>
                   <button className="collapse-toggle" aria-label="Toggle section">
-                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor" className="collapsed-icon">
-                      <path d="M12.76 10.56a.77.77 0 0 0 0-1.116L8.397 5.233a.84.84 0 0 0-1.157 0 .77.77 0 0 0 0 1.116l3.785 3.653-3.785 3.652a.77.77 0 0 0 0 1.117.84.84 0 0 0 1.157 0l4.363-4.211Z"/>
+                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.442 12.76a.77.77 0 0 0 1.116 0l4.21-4.363a.84.84 0 0 0 0-1.157.77.77 0 0 0-1.116 0L10 11.025 6.348 7.24a.77.77 0 0 0-1.117 0 .84.84 0 0 0 0 1.157l4.21 4.363Z"/>
                     </svg>
                   </button>
                   <h2 className="section-title">Update feed (Inbox)</h2>
@@ -136,14 +143,28 @@ const DashboardHome = () => {
                     <span>0</span>
                   </div>
                 </div>
+
+                <div className="collapsible-content">
+                  <div className="update-feed-empty">
+                    <div className="empty-animation">
+                      <img 
+                        src="https://cdn.monday.com/images/quick_search_recent_board2.svg" 
+                        alt="No updates"
+                        style={{ width: '320px', height: '320px' }}
+                      />
+                    </div>
+                    <p className="empty-feed-title">No unread updates</p>
+                    <p className="empty-feed-text">
+                      To revisit updates you've already read, change the filter at the top left corner of your feed.
+                    </p>
+                  </div>
+                </div>
               </div>
             </section>
 
-
             </section>
 
-            {/* Update Feed Section */}
-         
+          
 
           </div>
 

@@ -1,13 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoreVertical, Search, Plus, ChevronDown, Home } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext'; // 🆕 IMPORT
+import { getWorkspaceItems } from '../data/workspaceItems'; // 🆕 IMPORT
 import WorkspaceMenu from './WorkspaceMenu';
 import AddNewMenu from './AddNewMenu';
 
 const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick }) => {
   const navigate = useNavigate();
+  const { userCategory } = useAuth(); // 🆕 GET CATEGORY
   
-  // ✅ Button refs for positioning - YE ZAROORI HAI MENUS KE LIYE
+  // ✅ Button refs for positioning
   const workspaceMenuButtonRef = useRef(null);
   const addMenuButtonRef = useRef(null);
   
@@ -19,6 +22,13 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
   const [showDocSubmenu, setShowDocSubmenu] = useState(false);
   const [showFormSubmenu, setShowFormSubmenu] = useState(false);
 
+  // 🆕 GET WORKSPACE ITEMS BASED ON CATEGORY
+  const category = userCategory || sessionStorage.getItem('userCategory');
+  const staticWorkspaceItems = getWorkspaceItems(category);
+  
+  console.log('🔍 WorkspaceSection - Category:', category);
+  console.log('📋 WorkspaceSection - Items:', staticWorkspaceItems);
+
   const handleBoardClick = (boardId, boardName) => {
     setActiveItem(boardName);
     if (onBoardClick) {
@@ -26,6 +36,12 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     } else {
       navigate(`/boards/${boardId}`);
     }
+  };
+
+  // 🆕 STATIC ITEM CLICK HANDLER
+  const handleStaticItemClick = (itemLabel) => {
+    setActiveItem(itemLabel);
+    console.log('Clicked:', itemLabel);
   };
 
   return (
@@ -70,12 +86,14 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
       <div className="workspace-selector-row">
         <button className="workspace-card">
           <div className="workspace-avatar">
-            M
+            {category === 'ngo' || category === 'nonprofit' ? '❤️' : 'M'}
             <div className="workspace-badge">
               <Home size={8} />
             </div>
           </div>
-          <span className="workspace-name">MainWorkSpace</span>
+          <span className="workspace-name">
+            {category === 'ngo' || category === 'nonprofit' ? 'Non-Profit Workspace' : 'MainWorkSpace'}
+          </span>
           <ChevronDown size={18} className="workspace-chevron" />
         </button>
 
@@ -107,8 +125,33 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         setShowFormSubmenu={setShowFormSubmenu}
       />
 
-      {/* WORKSPACE ITEMS */}
+      {/* 🆕 WORKSPACE ITEMS */}
       <div className="workspace-items">
+        {/* 🆕 STATIC ITEMS (CATEGORY-BASED) */}
+        {staticWorkspaceItems.map((item, index) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={index}
+              onClick={() => handleStaticItemClick(item.label)}
+              className={`workspace-item ${activeItem === item.label ? 'active' : ''}`}
+            >
+              <IconComponent size={16} className="item-icon" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+
+        {/* 🆕 DIVIDER - Only if there are dynamic boards */}
+        {boards.length > 0 && (
+          <div style={{ 
+            height: '1px', 
+            backgroundColor: '#e6e9ef', 
+            margin: '8px 12px' 
+          }} />
+        )}
+
+        {/* DYNAMIC BOARDS FROM BACKEND */}
         {boards.length === 0 ? (
           <div 
             className="workspace-item" 
@@ -121,7 +164,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
               justifyContent: 'center'
             }}
           >
-            <span>No boards yet</span>
+            <span>No custom boards yet</span>
           </div>
         ) : (
           boards.map((board) => (

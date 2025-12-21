@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext'; // 🆕 Import useAuth
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import './createaccounteight.css';
@@ -47,7 +47,7 @@ const Toast = ({ message, type, onClose }) => {
 };
 
 const CreateAccountEight = () => {
-  const { user } = useAuth();
+  const { user, userCategory } = useAuth(); // 🆕 Get userCategory
   const navigate = useNavigate();
 
   const [invites, setInvites] = useState([
@@ -61,13 +61,19 @@ const CreateAccountEight = () => {
     accountName: ''
   });
 
-  const [loading, setLoading] = useState(false);        // only for invite button
+  const [loading, setLoading] = useState(false);
   const [accountUrl, setAccountUrl] = useState('');
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
+
+  // 🆕 CHECK CATEGORY - Log it for debugging
+  useEffect(() => {
+    const category = userCategory || sessionStorage.getItem('userCategory');
+    console.log('🔍 Step 8 - User Category:', category);
+  }, [userCategory]);
 
   // Fetch user/account data on mount
   useEffect(() => {
@@ -166,7 +172,16 @@ const CreateAccountEight = () => {
 
       if (response.ok) {
         showToast(`Successfully sent ${data.sentCount} invitation(s)!`, 'success');
-        setTimeout(() => navigate('/nine'), 1500);
+        
+        // 🆕 CHECK CATEGORY AND NAVIGATE ACCORDINGLY
+        const category = userCategory || sessionStorage.getItem('userCategory');
+        console.log('✅ Invites sent! Navigating based on category:', category);
+        
+        if (category === 'ngo' || category === 'nonprofit') {
+          setTimeout(() => navigate('/dashboard'), 1500);// 🆕 Skip to Step 10
+        } else {
+          setTimeout(() => navigate('/nine'), 1500); // Normal flow to Step 9
+        }
       } else {
         showToast(`Failed: ${data.message}`, 'error');
       }
@@ -177,11 +192,18 @@ const CreateAccountEight = () => {
     }
   };
 
+  // 🆕 UPDATED handleRemindLater - Check category
   const handleRemindLater = () => {
-    navigate('/nine');
+    const category = userCategory || sessionStorage.getItem('userCategory');
+    console.log('⏭️ Remind Later clicked! Category:', category);
+    
+    if (category === 'ngo' || category === 'nonprofit') {
+     navigate('/dashboard'); // 🆕 Skip to Step 10 for non-profit
+    } else {
+      navigate('/nine'); // Normal flow to Step 9
+    }
   };
 
-  // No more dataLoading / isReady checks → global loader will handle it
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.4, staggerChildren: 0.1 } }

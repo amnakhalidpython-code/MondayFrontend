@@ -2,8 +2,6 @@
    DASHBOARD HOME - Monday.com Exact Style (Updated for Exact Match)
    ======================================== */
 
-/* Main Container - Two Column Grid Layout */
-/* src/pages/DashboardHome.css - UPDATED */
 
 /* Main Container */
 .dashboard-home {
@@ -15,9 +13,9 @@
   margin: 0 auto;
   padding: 20px;
   font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', sans-serif;
-  background: transparent; /* ✅ TRANSPARENT - parent color show hoga */
+  background: transparent; 
   align-items: start;
-  min-height: 100%; /* ✅ Full height coverage */
+  min-height: 100%; 
 }
 /* ===== LEFT PANEL (Main Content) ===== */
 .main-panel-container {
@@ -81,8 +79,52 @@
 }
 
 
+/* ========================================
+   UPDATE FEED SECTION (NEW)
+   ======================================== */
 .update-feed-section {
   box-shadow: none;
+  /* border: 0.8px solid rgb(208, 212, 228); */
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.update-feed-section .collapsible-header {
+  padding: 20px;
+  margin-bottom: 0;
+}
+
+.update-feed-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.empty-animation {
+  width: 320px;
+  height: 320px;
+  margin-bottom: 0;
+}
+
+.empty-feed-title {
+  font-size: 15px;
+  font-weight: 400;
+  color: #323338;
+  margin: 0 0 4px 0;
+  line-height: 22.5px;
+}
+
+.empty-feed-text {
+  font-size: 15px;
+  font-weight: 400;
+  color: #323338;
+  margin: 0;
+  line-height: 22.5px;
+  max-width: 600px;
 }
 
 /* ========================================
@@ -199,7 +241,7 @@
   padding: 12px 24px;
   background: #007F9B;
   color: white;
-  border: none;
+  border: #007F9B;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
@@ -336,7 +378,7 @@
 .show-more-button {
   padding: 8px 16px;
   background: transparent;
-  
+  border: none;
   color: #323338;
   font-size: 14px;
   font-weight: 400;
@@ -422,14 +464,13 @@
 /* ========================================
    RIGHT PANEL - LEARN SECTION (Exact Match from Dump)
    ======================================== */
-/* Right Panel Container */
 .right-panel-container {
   width: 300px; /* Exact from dump */
   position: sticky;
   top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px; /* From inspection: banner margin-bottom + section margin-top */
+  gap: 16px; 
   align-self: start;
   flex-shrink: 0;
 }

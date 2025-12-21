@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 import { X, ChevronLeft, ChevronRight,  } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBoardContext } from '../../../context/BoardContext'; // Add this import
@@ -6,9 +9,11 @@ import { useBoardContext } from '../../../context/BoardContext'; // Add this imp
 import { OwnerIcon, StatusIcon, DueDateIcon, BudgetIcon, FilesIcon, TimelineIcon, LastUpdatedIcon, PriorityIcon, NotesIcon } from '../../icons/BoardIcons'
 
 const CreateAccountTen = () => {
-    const { boardData, setBoardData } = useBoardContext(); // Add this line
+  const navigate = useNavigate(); // 🆕 ADD THIS
+  const { userCategory } = useAuth(); // 🆕 GET userCategory from context
+  const { boardData, setBoardData } = useBoardContext();
 
-  const [boardName] = useState(boardData.boardName || 'My first project'); // Update this - context se name lega
+  const [boardName] = useState(boardData.boardName || 'First Board'); // Update this - context se name lega
   
  const [selectedColumns, setSelectedColumns] = useState(
     boardData.selectedColumns || {  // Update this - context se columns lega
@@ -23,6 +28,18 @@ const CreateAccountTen = () => {
       files: false
     }
   );
+
+  useEffect(() => {
+    const category = userCategory || sessionStorage.getItem('userCategory');
+    if (category === 'ngo' || category === 'nonprofit') {
+      console.log('⏭️ Non-profit user detected, skipping Step 10');
+      navigate('/dashboard');
+    }
+  }, [userCategory, navigate]);
+
+   if (userCategory === 'ngo' || userCategory === 'nonprofit') {
+    return null;
+  }
 
     const toggleColumn = (column) => {
     const updated = { ...selectedColumns, [column]: !selectedColumns[column] };
@@ -100,13 +117,17 @@ const CreateAccountTen = () => {
             </div>
           </div>
 
-          <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white ">
-          <Link to='/nine'>
-            <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
-              <ChevronLeft className="w-5 h-5" />
-              Back
-            </button>
-            </Link>
+      <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white ">
+      <Link to={
+          userCategory === 'ngo' || userCategory === 'nonprofit' 
+            ? '/eight'  // Non-profit goes back to Step 8
+            : '/nine'   // Normal flow goes back to Step 9
+        }>
+        <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
+          <ChevronLeft className="w-5 h-5" />
+          Back
+        </button>
+        </Link>
             <Link to='/eleven'>
             <button className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1">
               Next

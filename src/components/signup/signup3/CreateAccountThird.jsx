@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { goalOptions, roleOptions } from '../data/categoryData';
+import { useAuth } from '../../../context/AuthContext'; // 🆕 IMPORT
 import './createaccountthird.css';
 
 export default function CreateAccountThird() {
   const navigate = useNavigate();
+  const { saveUserCategory } = useAuth(); // 🆕 GET FUNCTION
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
 
-  // Animation variants
+  // ✅ Animation variants - YE DEFINE KARNA ZAROORI HAI
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -39,8 +41,6 @@ export default function CreateAccountThird() {
     }
   };
 
- 
-
   const handleGoalSelect = (goalId) => {
     setSelectedGoal(goalId);
     
@@ -67,6 +67,10 @@ export default function CreateAccountThird() {
   const handleContinue = () => {
     if (selectedRole) {
       console.log('Goal:', selectedGoal, 'Role:', selectedRole);
+      
+      // 🆕 SAVE CATEGORY AND ROLE
+      saveUserCategory(selectedGoal, selectedRole);
+      
       navigate('/four');
     }
   };

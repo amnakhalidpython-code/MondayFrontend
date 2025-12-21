@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { TasksOverviewIcon, TasksByStatusIcon, TasksByOwnerIcon, OverdueTasksIcon, TasksByDueDateIcon } from '../../icons/BoardIcons'
 
 
 
 const CreateAccountEleven = () => {
+   const navigate = useNavigate();
+  const { userCategory } = useAuth();
+
+   useEffect(() => {
+    const category = userCategory || sessionStorage.getItem('userCategory');
+    if (category === 'ngo' || category === 'nonprofit') {
+      console.log('⏭️ Skipping this step for non-profit');
+      navigate('/dashboard');
+    }
+  }, [userCategory, navigate]);
+  
+  if (userCategory === 'ngo' || userCategory === 'nonprofit') {
+    return null;
+  }
   const [selectedWidgets, setSelectedWidgets] = useState({
     tasksOverview: true,
     tasksByStatus: true,
@@ -73,7 +90,11 @@ const CreateAccountEleven = () => {
           </div>
 
           <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white ">
-           <Link to='/ten'>
+          <Link to={
+  userCategory === 'ngo' || userCategory === 'nonprofit' 
+    ? '/eight' 
+    : '/ten'
+}>
             <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
               <ChevronLeft className="w-5 h-5" />
               Back

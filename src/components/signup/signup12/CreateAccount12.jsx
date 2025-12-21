@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
 import {
   TableIcon,
   TimelineIcon,
@@ -10,13 +11,29 @@ import {
 } from '../../icons/BoardIcons';
 import { Link } from 'react-router-dom';
 import { useBoardContext } from '../../../context/BoardContext';
+import { useNavigate } from 'react-router-dom';
+
 
 
 const CreateAccount12 = () => {
+     const navigate = useNavigate();
+    const { userCategory } = useAuth();
   const { boardData } = useBoardContext();
   const [selectedView, setSelectedView] = useState('table');
-    const boardName = boardData.boardName || 'first'; // Default 'first' rakho agar empty ho
+    const boardName = boardData.boardName || 'first'; 
 
+
+      useEffect(() => {
+        const category = userCategory || sessionStorage.getItem('userCategory');
+        if (category === 'ngo' || category === 'nonprofit') {
+          console.log('⏭️ Skipping this step for non-profit');
+          navigate('/dashboard');
+        }
+      }, [userCategory, navigate]);
+      
+      if (userCategory === 'ngo' || userCategory === 'nonprofit') {
+        return null;
+      }
 
 const views = [
     {
@@ -122,7 +139,11 @@ const views = [
           </div>
 
          <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white ">
-            <Link to='/eleven '>
+           <Link to={
+  userCategory === 'ngo' || userCategory === 'nonprofit' 
+    ? '/eight' 
+    : '/eleven'
+}>
                      <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
                        <ChevronLeft className="w-5 h-5" />
                        Back

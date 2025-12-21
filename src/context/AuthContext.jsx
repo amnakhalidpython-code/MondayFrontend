@@ -1,3 +1,4 @@
+// src/context/AuthContext.jsx
 import { createContext, useState, useContext, useEffect } from 'react';
 import { auth, onAuthStateChanged } from '../utils/firebase';
 
@@ -14,14 +15,17 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [emailForSignup, setEmailForSignup] = useState(null);
+  const [userCategory, setUserCategory] = useState(null); // 🆕 NEW STATE
+  const [userRole, setUserRole] = useState(null); // 🆕 NEW STATE
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let unsubscribe;
     
-    // Check if user data exists in sessionStorage
     const storedUser = sessionStorage.getItem('mondayUser');
     const storedEmail = sessionStorage.getItem('mondaySignupEmail');
+    const storedCategory = sessionStorage.getItem('userCategory'); // 🆕
+    const storedRole = sessionStorage.getItem('userRole'); // 🆕
     
     if (storedUser) {
       try {
@@ -33,14 +37,12 @@ export const AuthProvider = ({ children }) => {
       }
     }
     
-    if (storedEmail) {
-      setEmailForSignup(storedEmail);
-    }
+    if (storedEmail) setEmailForSignup(storedEmail);
+    if (storedCategory) setUserCategory(storedCategory); // 🆕
+    if (storedRole) setUserRole(storedRole); // 🆕
     
-    // Also listen to Firebase auth state changes
     unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser && !storedUser) {
-        // If Firebase has a user but sessionStorage doesn't, sync them
         const userData = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
@@ -53,10 +55,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    // If no Firebase auth state change, just set loading to false after a brief moment
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    const timeout = setTimeout(() => setLoading(false), 500);
 
     return () => {
       if (unsubscribe) unsubscribe();
@@ -64,36 +63,47 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  // Save email after first step
   const saveEmailForSignup = (email) => {
     setEmailForSignup(email);
     sessionStorage.setItem('mondaySignupEmail', email);
   };
 
-  // Clear email (after complete signup)
+  // 🆕 Save category aur role
+  const saveUserCategory = (category, role) => {
+    setUserCategory(category);
+    setUserRole(role);
+    sessionStorage.setItem('userCategory', category);
+    sessionStorage.setItem('userRole', role);
+  };
+
   const clearEmailForSignup = () => {
     setEmailForSignup(null);
     sessionStorage.removeItem('mondaySignupEmail');
   };
 
-  // Login/Register user
   const login = (userData) => {
     setUser(userData);
     sessionStorage.setItem('mondayUser', JSON.stringify(userData));
   };
 
-  // Logout
   const logout = () => {
     setUser(null);
     setEmailForSignup(null);
+    setUserCategory(null); // 🆕
+    setUserRole(null); // 🆕
     sessionStorage.removeItem('mondayUser');
     sessionStorage.removeItem('mondaySignupEmail');
+    sessionStorage.removeItem('userCategory'); // 🆕
+    sessionStorage.removeItem('userRole'); // 🆕
   };
 
   const value = {
     user,
     emailForSignup,
+    userCategory, // 🆕
+    userRole, // 🆕
     saveEmailForSignup,
+    saveUserCategory, // 🆕
     clearEmailForSignup,
     login,
     logout,
