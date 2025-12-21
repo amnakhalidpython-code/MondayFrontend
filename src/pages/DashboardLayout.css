@@ -12,14 +12,14 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: #E1EFF2; /* ✅ Outermost layer - light gray-cyan */
+  /* background: #E1EFF2;  */
   font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', sans-serif;
 }
 
 /* Container below navbar */
 .dashboard-container {
   display: flex;
-  height: calc(100vh - 64px); 
+  /* height: calc(100vh - 64px);  */
   overflow: hidden;
   background: #E1EFF2; /* ✅ Keep same as outer */
   position: relative;
@@ -76,7 +76,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f6f7fb; /* ✅ CONTENT BACKGROUND */
+  background: #ffffff; /* ✅ CONTENT BACKGROUND */
 }
 
 /* Header (if you have MondayHeader) */
@@ -93,7 +93,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #f6f7fb; /* ✅ SCROLLABLE AREA BACKGROUND */
+  background: #ffffff; /* ✅ SCROLLABLE AREA BACKGROUND */
   padding: 0; /* ❌ Remove padding if you want full width */
 }
 

@@ -110,8 +110,8 @@
 }
 
 .account-forth-option-button.selected {
-  border: 0.8px solid #007F9B;
-  box-shadow: #007F9B 0px 0px 0px 1px inset;
+  border: 0.8px solid rgb(0, 115, 234);
+  box-shadow: rgb(0, 115, 234) 0px 0px 0px 1px inset;
   background-color: rgba(0, 0, 0, 0);
 }
 

@@ -43,14 +43,15 @@ export default function MondayHeader() {
           display: 'flex',
           height: '75px',
           width: '100%',
-          backgroundColor: '#ffffff',
+            backgroundColor:"#ffffff",
           boxShadow: '0px 3px 12px rgba(230, 233, 239, 1)',
           paddingLeft: '20px',
           paddingRight: '20px',
           boxSizing: 'border-box',
           alignItems: 'center',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          borderRadius: '10px'
         }}
       >
         {/* Left side - Text Container */}
@@ -68,7 +69,7 @@ export default function MondayHeader() {
             color: 'rgb(50, 51, 56)',
             boxSizing: 'border-box',
             zIndex: 10,
-            position: 'relative'
+            position: 'relative',
           }}
         >
           <div 
@@ -125,7 +126,7 @@ export default function MondayHeader() {
             loop={true}
             autoplay={true}
             style={{
-              width: '100%',
+              width: '140%',
               height: '100%'
             }}
           />

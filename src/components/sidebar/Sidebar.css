@@ -1,14 +1,14 @@
 /* Sidebar container - cyan background */
 .sidebar {
-  position: relative;
+  /* position: relative; */
   height: 100vh;
-  background: #EAF4F6; /* ✅ Sidebar cyan */
-  border-right: 1px solid #c5d1d5;
+  background: #E1EFF2; /* ✅ Sidebar cyan */
   font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', sans-serif;
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: none; /* ✅ Remove shadow if any */
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; 
+  border-top: 1px solid #d0d4e4; /* ✅ Top border to match Monday.com */
 }
 
 /* Sidebar content */
@@ -20,7 +20,8 @@
   overflow-x: hidden;
   overflow-y: auto;
   opacity: 1;
-  background: transparent; /* ✅ Let parent color show */
+  background: transparent;
+  
 }
 
 /* Sidebar section (top items) */
@@ -31,6 +32,7 @@
   padding: 6px 16px 8px 16px;
   margin-top: 6px;
   background-color: transparent; /* ✅ Transparent */
+  
 }
 
 /* Sidebar items - buttons */

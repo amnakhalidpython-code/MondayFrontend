@@ -96,7 +96,7 @@
 .collapsible-header {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   margin-bottom: 24px;
   cursor: pointer;
   user-select: none;
