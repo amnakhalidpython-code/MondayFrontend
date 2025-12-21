@@ -2,11 +2,8 @@
 import { 
   Layers, 
   FileText, 
-  Heart, 
-  Users, 
-  DollarSign, 
   Package, 
-  TrendingUp,
+  Calendar,
   BarChart3,
   BookOpen,
   Building2,
@@ -14,24 +11,21 @@ import {
   Activity,
   PieChart,
   UserPlus,
-  Calendar,
-  Target,
   Briefcase,
-  Phone
+  Phone,
+  DollarSign
 } from 'lucide-react';
 
-// 🆕 DEFAULT OPTIONS (for work/business users)
+// 🆕 DEFAULT OPTIONS (for work/business users) - EMPTY for now
 export const defaultWorkspaceItems = [
-  { label: 'Main Workspace', icon: Layers },
-  { label: 'Projects', icon: Package },
-  { label: 'Tasks', icon: FileText },
-  { label: 'Calendar', icon: Calendar },
+  // No items - will only show boards from backend
 ];
 
 // 🆕 NON-PROFIT SPECIFIC OPTIONS WITH SUB-ITEMS AND THEIR ICONS
 export const nonprofitWorkspaceItems = [
   { 
     label: 'Grants Management',
+    icon: null, // No icon for main workspace
     subItems: [
       { label: 'Grants Pipeline', icon: GitBranch },
       { label: 'Getting Started', icon: BookOpen },
@@ -41,6 +35,7 @@ export const nonprofitWorkspaceItems = [
   },
   { 
     label: 'Donor Management',
+    icon: null, // No icon for main workspace
     subItems: [
       { label: 'Donor Donations', icon: DollarSign },
       { label: 'Donor Activities', icon: Activity },
@@ -50,6 +45,7 @@ export const nonprofitWorkspaceItems = [
   },
   { 
     label: 'monday Fundraising',
+    icon: null, // No icon for main workspace
     subItems: [
       { label: 'Project Management', icon: Briefcase },
       { label: 'Contacts', icon: Phone },
@@ -58,6 +54,7 @@ export const nonprofitWorkspaceItems = [
   },
   { 
     label: 'Volunteer Registration Management',
+    icon: null, // No icon for main workspace
     subItems: [
       { label: 'Volunteer Registration', icon: UserPlus },
       { label: 'Volunteer Activities', icon: Activity },
@@ -75,7 +72,7 @@ export const getWorkspaceItems = (category) => {
     return nonprofitWorkspaceItems;
   }
   
-  console.log('✅ Returning DEFAULT items');
+  console.log('✅ Returning DEFAULT items (empty - only boards)');
   return defaultWorkspaceItems;
 };
 
