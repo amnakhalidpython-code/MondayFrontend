@@ -17,7 +17,9 @@ const WorkspaceDropdown = ({
       'Grants Management': '#067B4B',
       'Donor Management': '#FB275D',
       'monday Fundraising': '#FDAB3D',
-      'Volunteer Registration Management': '#9cd326'
+      'Volunteer Registration Management': '#9cd326',
+      'Project Management': '#579bfc'
+      
     };
     return colorMap[workspaceLabel] || '#666';
   };
@@ -28,7 +30,8 @@ const WorkspaceDropdown = ({
       'Grants Management': 'G',
       'Donor Management': 'D',
       'monday Fundraising': 'F',
-      'Volunteer Registration Management': 'V'
+      'Volunteer Registration Management': 'V',
+      'Project Management': 'P'
     };
     return initialMap[workspaceLabel] || workspaceLabel.charAt(0).toUpperCase();
   };

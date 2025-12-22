@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MoreVertical, Search, Plus, ChevronDown, ChevronRight, Home } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { getWorkspaceItems } from '../data/workspaceItems';
@@ -9,6 +9,7 @@ import WorkspaceDropdown from './WorkspaceDropdown';
 
 const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { userCategory } = useAuth();
   
   // ✅ Button refs for positioning
@@ -35,15 +36,54 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
   console.log('🔍 WorkspaceSection - Category:', category);
   console.log('📋 WorkspaceSection - Items:', staticWorkspaceItems);
 
-  // 🆕 SET DEFAULT WORKSPACE ON LOAD (First item with sub-items for non-profit)
+  // 🆕 SUB-ITEM TO TEMPLATE MAPPING
+  const subItemToTemplate = {
+    // Grants Management
+    'Grants Pipeline': 'grants-pipeline',
+    'Getting Started': 'getting-started',
+    'Grant Providers': 'grant-providers',
+    'Grants Dashboard': 'grants-dashboard',
+    
+    // Donor Management
+    'Donors': 'donors',
+    'Donor Donations': 'donors',
+    'Donor Activities': 'donors',
+    'Donors Dashboard': 'donors',
+    
+    // Fundraising
+    'Project Management': 'project-management',
+    'Contacts': 'donors',
+    'Learning Center': 'getting-started',
+    
+    // Volunteer
+    'Volunteer registration management': 'volunteer-registration',
+    'Volunteer Registration': 'volunteer-registration',
+    'Volunteer Activities': 'volunteer-registration',
+    'Learning Center Volunteer': 'getting-started'
+  };
+
+  // 🆕 SET DEFAULT WORKSPACE ON LOAD
   useEffect(() => {
     if ((category === 'ngo' || category === 'nonprofit') && staticWorkspaceItems.length > 0) {
+      // Check if we're on a workspace route
+      const pathParts = location.pathname.split('/');
+      if (pathParts[1] === 'workspaces' && pathParts[3]) {
+        // Find workspace by ID from URL
+        const workspaceId = pathParts[3];
+        const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
+        if (workspace) {
+          setCurrentWorkspace(workspace);
+          return;
+        }
+      }
+      
+      // Default to first workspace
       const firstItemWithSubItems = staticWorkspaceItems.find(item => item.subItems && item.subItems.length > 0);
       if (firstItemWithSubItems) {
         setCurrentWorkspace(firstItemWithSubItems);
       }
     }
-  }, [category, staticWorkspaceItems]);
+  }, [category, staticWorkspaceItems, location.pathname]);
 
   const handleBoardClick = (boardId, boardName) => {
     setActiveItem(boardName);
@@ -54,16 +94,28 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     }
   };
 
-  // 🆕 WORKSPACE DROPDOWN CLICK - Change current workspace
+  // 🆕 WORKSPACE DROPDOWN CLICK - Change current workspace and navigate
   const handleWorkspaceChange = (item) => {
     setCurrentWorkspace(item);
+    // Navigate to workspace page
+    navigate(`/workspaces/${item.workspaceNumber}/${item.id}`);
     console.log('🔄 Workspace changed to:', item.label);
   };
 
-  // 🆕 SUB-ITEM CLICK HANDLER
+  // 🆕 SUB-ITEM CLICK HANDLER - Navigate to Template Board
   const handleSubItemClick = (subItemLabel) => {
     setActiveItem(subItemLabel);
-    console.log('✅ Selected sub-item:', subItemLabel);
+    
+    // Get template ID from mapping
+    const templateId = subItemToTemplate[subItemLabel];
+    
+    if (templateId) {
+      console.log('✅ Opening template board:', templateId);
+      // Navigate to template board
+      navigate(`/boards/template/${templateId}`);
+    } else {
+      console.warn('⚠️ No template found for:', subItemLabel);
+    }
   };
 
   // 🆕 GET WORKSPACE DISPLAY NAME
@@ -232,16 +284,16 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
                   {SubItemIcon ? (
                     <SubItemIcon size={16} className="item-icon" style={{ color: '#676879' }} />
                   ) : (
-                    // Fallback - show simple icon placeholder
+                    // Fallback - show board icon
                     <svg 
                       width="16" 
                       height="16" 
-                      viewBox="0 0 16 16" 
-                      fill="none"
+                      viewBox="0 0 20 20" 
+                      fill="currentColor"
                       className="item-icon"
                       style={{ color: '#676879' }}
                     >
-                      <circle cx="8" cy="8" r="2" fill="currentColor" />
+                      <path d="M7.5 4.5H16C16.2761 4.5 16.5 4.72386 16.5 5V15C16.5 15.2761 16.2761 15.5 16 15.5H7.5L7.5 4.5ZM6 4.5H4C3.72386 4.5 3.5 4.72386 3.5 5V15C3.5 15.2761 3.72386 15.5 4 15.5H6L6 4.5ZM2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" fillRule="evenodd" clipRule="evenodd"/>
                     </svg>
                   )}
                   <span>{subItemLabel}</span>

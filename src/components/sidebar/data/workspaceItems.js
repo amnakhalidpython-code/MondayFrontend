@@ -17,15 +17,15 @@ import {
 } from 'lucide-react';
 
 // 🆕 DEFAULT OPTIONS (for work/business users) - EMPTY for now
-export const defaultWorkspaceItems = [
-  // No items - will only show boards from backend
-];
+export const defaultWorkspaceItems = [];
 
 // 🆕 NON-PROFIT SPECIFIC OPTIONS WITH SUB-ITEMS AND THEIR ICONS
 export const nonprofitWorkspaceItems = [
   { 
+    id: 'grants-management',
     label: 'Grants Management',
-    icon: null, // No icon for main workspace
+    workspaceNumber: '2565135',
+    icon: null,
     subItems: [
       { label: 'Grants Pipeline', icon: GitBranch },
       { label: 'Getting Started', icon: BookOpen },
@@ -34,31 +34,42 @@ export const nonprofitWorkspaceItems = [
     ]
   },
   { 
+    id: 'donor-management',
     label: 'Donor Management',
-    icon: null, // No icon for main workspace
+    workspaceNumber: '2580941',
+    icon: null,
     subItems: [
-      { label: 'Donor Donations', icon: DollarSign },
+      { label: 'Donors', icon: UserPlus },
+      { label: 'Donations', icon: DollarSign },
       { label: 'Donor Activities', icon: Activity },
-      { label: 'Donor Dashboard', icon: PieChart },
-      { label: 'Getting Started', icon: BookOpen }
+      { label: 'Donors Dashboard', icon: PieChart }
     ]
   },
   { 
+    id: 'fundraising',
     label: 'monday Fundraising',
-    icon: null, // No icon for main workspace
+    workspaceNumber: '2580945',
+    icon: null,
     subItems: [
-      { label: 'Project Management', icon: Briefcase },
-      { label: 'Contacts', icon: Phone },
-      { label: 'Learning Center', icon: BookOpen }
+      { label: 'Donors', icon: UserPlus }
     ]
   },
   { 
-    label: 'Volunteer Registration Management',
-    icon: null, // No icon for main workspace
+    id: 'project-management', // 🆕 NEW WORKSPACE
+    label: 'Project Management',
+    workspaceNumber: '2580926',
+    icon: null,
     subItems: [
-      { label: 'Volunteer Registration', icon: UserPlus },
-      { label: 'Volunteer Activities', icon: Activity },
-      { label: 'Learning Center', icon: BookOpen }
+      { label: 'Project Management', icon: Briefcase }
+    ]
+  },
+  { 
+    id: 'volunteer',
+    label: 'Volunteer Registration Management',
+    workspaceNumber: '2580952',
+    icon: null,
+    subItems: [
+      { label: 'Volunteer registration management', icon: UserPlus }
     ]
   },
 ];

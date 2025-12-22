@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import BoardPage from './pages/BoardPage';
+import TemplateBoardPage from './pages/TemplateBoardPage'; // 🆕 NEW
 import WorkspacePage from './pages/WorkspacePage';
 import DashboardLayout from './pages/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
+
+// 🆕 WORKSPACE PAGES
+import GrantsManagementPage from './pages/workspace/GrantsManagementPage';
+import DonorManagementPage from './pages/workspace/DonorManagementPage';
+import FundraisingPage from './pages/workspace/FundraisingPage';
+import ProjectManagementPage from './pages/workspace/ProjectManagementPage';
+import VolunteerPage from './pages/workspace/VolunteerPage';
 
 import { AuthProvider } from "./context/AuthContext";
 import { BoardProvider } from "./context/BoardContext";
@@ -53,8 +61,12 @@ function AppContent() {
     "/templates"
   ];
 
-  // Check if current path starts with /dashboard or /boards
-  const isDashboardRoute = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/boards');
+  // Check if current path starts with /dashboard, /boards, or /workspaces
+  const isDashboardRoute = 
+    location.pathname.startsWith('/dashboard') || 
+    location.pathname.startsWith('/boards') ||
+    location.pathname.startsWith('/workspaces');
+  
   const hideNavbar = hideNavbarRoutes.includes(location.pathname) || isDashboardRoute;
 
   return (
@@ -183,28 +195,35 @@ function AppContent() {
           <Route index element={<DashboardHome />} />
         </Route>
 
-        {/* Board Page with Sidebar */}
+        {/* 🆕 WORKSPACE ROUTES - Each workspace has its own page */}
+        <Route path="/workspaces/:workspaceId" element={<DashboardLayout />}>
+          <Route path="grants-management" element={<GrantsManagementPage />} />
+          <Route path="donor-management" element={<DonorManagementPage />} />
+          <Route path="fundraising" element={<FundraisingPage />} />
+          <Route path="project-management" element={<ProjectManagementPage />} />
+          <Route path="volunteer" element={<VolunteerPage />} />
+        </Route>
+
+        {/* 🆕 TEMPLATE BOARD ROUTE - For predefined templates */}
+        <Route path="/boards/template/:templateId" element={<DashboardLayout />}>
+          <Route index element={<TemplateBoardPage />} />
+        </Route>
+
+        {/* Board Page with Sidebar - For custom user boards */}
         <Route path="/boards/:boardId" element={<DashboardLayout />}>
           <Route index element={<BoardPage />} />
         </Route>
 
-        
         <Route
           path="/templates"
           element={
-           
-              <TemplateCenterPage />
-           
+            <TemplateCenterPage />
           }
         />
 
         <Route path="/workspace" element={<WorkspacePage />} />
 
-        
-
       </Routes>
-      
-
     </>
   );
 }
@@ -227,9 +246,9 @@ function App() {
   return (
     <AuthProvider>
       <BoardProvider>
-      <Router>
-        <AppContent />
-      </Router>
+        <Router>
+          <AppContent />
+        </Router>
       </BoardProvider>
     </AuthProvider>
   );

@@ -1,0 +1,577 @@
+/* ==========================================
+   BOARD PAGE LAYOUT
+   ========================================== */
+.board-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f6f7fb;
+  overflow: hidden;
+}
+
+/* ==========================================
+   BOARD HEADER
+   ========================================== */
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e6e9ef;
+  min-height: 60px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.board-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #323338;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid #c5c7d0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #323338;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-btn:hover {
+  background-color: #f6f7fb;
+  border-color: #676879;
+}
+
+.sidekick-btn {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  color: #ffffff;
+  border: none;
+}
+
+.sidekick-btn:hover {
+  background: linear-gradient(135deg, #5f4ed1 0%, #8b84e8 100%);
+}
+
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #ffffff;
+  border: 1px solid #c5c7d0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #676879;
+}
+
+.header-icon-btn:hover {
+  background-color: #f6f7fb;
+  border-color: #676879;
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0073ea 0%, #0060b9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.invite-btn {
+  padding: 8px 16px;
+  background-color: #0073ea;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.invite-btn:hover {
+  background-color: #0060b9;
+}
+
+/* ==========================================
+   BOARD TABS
+   ========================================== */
+.board-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e6e9ef;
+  min-height: 48px;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 400;
+  color: #676879;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  color: #0073ea;
+  border-bottom-color: #0073ea;
+  font-weight: 500;
+}
+
+.tab:hover:not(.active) {
+  color: #323338;
+  background-color: #f6f7fb;
+}
+
+.tab-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #676879;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-icon-btn:hover {
+  background-color: #f6f7fb;
+  color: #323338;
+}
+
+/* ==========================================
+   BOARD CONTAINER & TABLE
+   ========================================== */
+.board-container {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 24px;
+}
+
+.board-table {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* ==========================================
+   TABLE HEADER
+   ========================================== */
+.table-header {
+  display: flex;
+  background-color: #f6f7fb;
+  border-bottom: 2px solid #e6e9ef;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #676879;
+  border-right: 1px solid #e6e9ef;
+  flex-shrink: 0;
+}
+
+.header-cell:last-child {
+  border-right: none;
+}
+
+.group-header {
+  background-color: #f6f7fb;
+  font-weight: 600;
+  color: #323338;
+}
+
+/* ==========================================
+   GROUP SECTION
+   ========================================== */
+.group-section {
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.group-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #fafbfc;
+  border-bottom: 1px solid #e6e9ef;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.group-header-row:hover {
+  background-color: #f6f7fb;
+}
+
+.group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  color: #676879;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.group-toggle:hover {
+  background-color: #e6e9ef;
+  border-radius: 4px;
+}
+
+.group-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #323338;
+  flex: 1;
+}
+
+.group-count {
+  font-size: 13px;
+  font-weight: 400;
+  color: #676879;
+  margin-left: auto;
+}
+
+/* ==========================================
+   TABLE ROWS
+   ========================================== */
+.table-row {
+  display: flex;
+  border-bottom: 1px solid #e6e9ef;
+  transition: background-color 0.1s ease;
+}
+
+.table-row:hover {
+  background-color: #fafbfc;
+}
+
+.table-row.add-row {
+  background-color: transparent;
+  border-bottom: none;
+  padding: 8px 0;
+}
+
+.table-row.add-row:hover {
+  background-color: #fafbfc;
+}
+
+.table-cell {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-right: 1px solid #e6e9ef;
+  flex-shrink: 0;
+  min-height: 48px;
+}
+
+.table-cell:last-child {
+  border-right: none;
+}
+
+/* ==========================================
+   INPUT FIELDS
+   ========================================== */
+.item-name-input,
+.text-input,
+.date-input,
+.number-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #323338;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.item-name-input:hover,
+.text-input:hover,
+.date-input:hover,
+.number-input:hover {
+  background-color: #f6f7fb;
+  border-color: #e6e9ef;
+}
+
+.item-name-input:focus,
+.text-input:focus,
+.date-input:focus,
+.number-input:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: #0073ea;
+  box-shadow: 0 0 0 2px rgba(0, 115, 234, 0.1);
+}
+
+.item-name-input {
+  font-weight: 500;
+}
+
+/* ==========================================
+   ADD ITEM BUTTON
+   ========================================== */
+.add-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  margin-left: 16px;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #676879;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-item-btn:hover {
+  background-color: #f6f7fb;
+  color: #323338;
+}
+
+/* ==========================================
+   STATUS DROPDOWN
+   ========================================== */
+.status-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.status-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.status-btn:hover {
+  opacity: 0.9;
+}
+
+.status-btn.empty {
+  background-color: #c5c7d0;
+  color: #676879;
+}
+
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+}
+
+.status-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background-color: #ffffff;
+  border: 1px solid #e6e9ef;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  min-width: 160px;
+  padding: 4px 0;
+}
+
+.status-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #323338;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.status-menu-item:hover {
+  background-color: #f6f7fb;
+}
+
+.status-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   PERSON DROPDOWN
+   ========================================== */
+.person-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.person-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: #e6e9ef;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.person-btn:hover {
+  background-color: #d0d4e4;
+}
+
+.person-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0073ea 0%, #0060b9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.person-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background-color: #ffffff;
+  border: 1px solid #e6e9ef;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  padding: 8px;
+  min-width: 200px;
+}
+
+.person-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e6e9ef;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #323338;
+}
+
+.person-input:focus {
+  outline: none;
+  border-color: #0073ea;
+  box-shadow: 0 0 0 2px rgba(0, 115, 234, 0.1);
+}
+
+/* ==========================================
+   SCROLLBAR STYLING
+   ========================================== */
+.board-container::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.board-container::-webkit-scrollbar-track {
+  background-color: #f6f7fb;
+}
+
+.board-container::-webkit-scrollbar-thumb {
+  background-color: #c5c7d0;
+  border-radius: 6px;
+  border: 2px solid #f6f7fb;
+}
+
+.board-container::-webkit-scrollbar-thumb:hover {
+  background-color: #9699a6;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 1024px) {
+  .board-header {
+    padding: 8px 16px;
+  }
+  
+  .board-container {
+    padding: 12px 16px;
+  }
+  
+  .header-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .board-title {
+    font-size: 18px;
+  }
+  
+  .header-actions {
+    gap: 4px;
+  }
+  
+  .header-btn {
+    padding: 6px 8px;
+  }
+}

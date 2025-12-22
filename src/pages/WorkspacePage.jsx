@@ -1,4 +1,4 @@
-// src/pages/WorkspacePage.jsx - Main Workspace Board Listing
+// src/pages/WorkspacePage.jsx - FINAL UPDATED VERSION
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -14,12 +14,12 @@ import {
   Users
 } from 'lucide-react';
 
-const WorkspacePage = () => {
+const WorkspacePage = ({ workspace }) => {  // ← Yeh prop add kiya (App.jsx se aayega)
   const navigate = useNavigate();
   const { user } = useAuth();
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid');
 
   useEffect(() => {
     fetchUserBoards();
@@ -27,7 +27,6 @@ const WorkspacePage = () => {
 
   const fetchUserBoards = async () => {
     try {
-      // Get user ID from multiple sources
       const storedUser = sessionStorage.getItem('mondayUser');
       const storedEmail = sessionStorage.getItem('mondaySignupEmail') || localStorage.getItem('userEmail');
       
@@ -42,28 +41,22 @@ const WorkspacePage = () => {
         }
       }
 
-      // Fallback to email
       if (!userId && storedEmail) {
         userId = storedEmail;
       }
 
-      // Fallback to context user
       if (!userId && user?.uid) {
         userId = user.uid;
       }
 
-      console.log('Fetching boards for userId:', userId);
-
       if (!userId) {
-        console.warn('No user ID found, showing empty workspace');
+        console.warn('No user ID found');
         setLoading(false);
         return;
       }
 
-    const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${encodeURIComponent(userId)}`);
+      const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${encodeURIComponent(userId)}`);
       const data = await response.json();
-
-      console.log('Boards response:', data);
 
       if (data.success) {
         setBoards(data.boards);
@@ -76,11 +69,34 @@ const WorkspacePage = () => {
   };
 
   const handleCreateBoard = () => {
-    navigate('/signup');
+    navigate('/nine'); // Ya jo aapka board create page hai
   };
 
   const handleBoardClick = (boardId) => {
     navigate(`/boards/${boardId}`);
+  };
+
+  // ← Workspace ke liye color match (sidebar jaisa)
+  const getWorkspaceColor = () => {
+    const colorMap = {
+      'Grants Management': '#067B4B',
+      'Donor Management': '#FB275D',
+      'monday Fundraising': '#FDAB3D',
+      'Volunteer Registration Management': '#9cd326',
+    };
+    return colorMap[workspace] || '#579bfc'; // fallback blue
+  };
+
+  // ← First letter for avatar
+  const getInitial = () => {
+    if (!workspace) return 'M';
+    const map = {
+      'Grants Management': 'G',
+      'Donor Management': 'D',
+      'monday Fundraising': 'F',
+      'Volunteer Registration Management': 'V'
+    };
+    return map[workspace] || workspace.charAt(0).toUpperCase();
   };
 
   if (loading) {
@@ -93,15 +109,27 @@ const WorkspacePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Header with Dynamic Workspace Name & Avatar */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Main workspace</h1>
-              <p className="text-gray-500 mt-1">
-                {boards.length} {boards.length === 1 ? 'board' : 'boards'}
-              </p>
+            <div className="flex items-center gap-4">
+              {/* Workspace Avatar */}
+              <div 
+                className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl"
+                style={{ backgroundColor: getWorkspaceColor() }}
+              >
+                {getInitial()}
+              </div>
+              
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {workspace || 'Main workspace'}
+                </h1>
+                <p className="text-gray-500 mt-1">
+                  {boards.length} {boards.length === 1 ? 'board' : 'boards'}
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -146,7 +174,7 @@ const WorkspacePage = () => {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content Area */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         {boards.length === 0 ? (
           <EmptyState onCreateBoard={handleCreateBoard} />
@@ -164,7 +192,8 @@ const WorkspacePage = () => {
   );
 };
 
-// Empty State Component
+// Baaki components same hi rahenge (EmptyState, GridView, BoardCard, ListView, BoardRow)
+
 const EmptyState = ({ onCreateBoard }) => {
   return (
     <div className="flex flex-col items-center justify-center py-20">
@@ -186,10 +215,11 @@ const EmptyState = ({ onCreateBoard }) => {
   );
 };
 
-// Grid View Component
+// GridView, BoardCard, ListView, BoardRow – bilkul same rakho jo pehle the
+
 const GridView = ({ boards, onBoardClick }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {boards.map(board => (
         <BoardCard key={board._id} board={board} onClick={() => onBoardClick(board._id)} />
       ))}
@@ -197,7 +227,6 @@ const GridView = ({ boards, onBoardClick }) => {
   );
 };
 
-// Board Card Component
 const BoardCard = ({ board, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const itemCount = board.items?.length || 0;
@@ -223,24 +252,20 @@ const BoardCard = ({ board, onClick }) => {
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="bg-white rounded-lg border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer overflow-hidden"
+      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer overflow-hidden"
     >
-      {/* Board Header */}
-      <div className="p-5 border-b bg-gray-50">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+      <div className="p-6 border-b bg-gray-50">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">
             {board.name}
           </h3>
           <button 
-            onClick={(e) => { e.stopPropagation(); }}
-            className={`p-1 rounded hover:bg-gray-200 transition-opacity ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            onClick={(e) => e.stopPropagation()}
+            className={`p-2 rounded-lg hover:bg-gray-200 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}
           >
             <MoreHorizontal className="w-5 h-5 text-gray-600" />
           </button>
         </div>
-
         <div className="flex items-center gap-4 text-sm text-gray-500">
           <div className="flex items-center gap-1">
             <List className="w-4 h-4" />
@@ -253,13 +278,11 @@ const BoardCard = ({ board, onClick }) => {
         </div>
       </div>
 
-      {/* Board Preview */}
-      <div className="p-5">
+      <div className="p-6">
         {itemCount > 0 ? (
           <>
-            {/* Status Distribution */}
-            <div className="mb-4">
-              <div className="flex gap-1 h-2 rounded-full overflow-hidden bg-gray-100">
+            <div className="mb-5">
+              <div className="flex gap-1 h-3 rounded-full overflow-hidden bg-gray-100">
                 {Object.entries(statusCounts || {}).map(([status, count]) => (
                   <div
                     key={status}
@@ -272,56 +295,47 @@ const BoardCard = ({ board, onClick }) => {
               </div>
             </div>
 
-            {/* Recent Items */}
-            <div className="space-y-2">
-              {board.items.slice(0, 3).map((item, idx) => (
-                <div
-                  key={item._id || idx}
-                  className="flex items-center gap-2 text-sm"
-                >
+            <div className="space-y-3">
+              {board.items.slice(0, 4).map((item, idx) => (
+                <div key={item._id || idx} className="flex items-center gap-3">
                   <div
-                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: getStatusColor(item.data?.status) }}
                   />
-                  <span className="text-gray-700 truncate">{item.title}</span>
+                  <span className="text-gray-700 text-sm truncate">{item.title || 'Untitled item'}</span>
                 </div>
               ))}
-              {itemCount > 3 && (
-                <div className="text-xs text-gray-500 pl-4">
-                  +{itemCount - 3} more items
+              {itemCount > 4 && (
+                <div className="text-sm text-gray-500 pl-6">
+                  +{itemCount - 4} more items
                 </div>
               )}
             </div>
           </>
         ) : (
-          <div className="text-center py-4 text-gray-400 text-sm">
+          <div className="text-center py-8 text-gray-400">
             No items yet
           </div>
         )}
       </div>
 
-      {/* Board Footer */}
-      <div className="px-5 py-3 bg-gray-50 border-t flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <Users className="w-4 h-4 text-gray-400" />
-          <span className="text-xs text-gray-500">Only me</span>
+      <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Users className="w-4 h-4" />
+          <span>Only me</span>
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); }}
-          className="text-yellow-500 hover:text-yellow-600 transition-colors"
-        >
-          <Star className="w-4 h-4" />
+        <button onClick={(e) => e.stopPropagation()} className="text-yellow-500 hover:text-yellow-600">
+          <Star className="w-5 h-5" />
         </button>
       </div>
     </div>
   );
 };
 
-// List View Component
 const ListView = ({ boards, onBoardClick }) => {
+  // Same as before – no change needed
   return (
     <div className="bg-white rounded-lg border">
-      {/* Table Header */}
       <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b bg-gray-50 text-sm font-medium text-gray-700">
         <div className="col-span-5">Board Name</div>
         <div className="col-span-2">Items</div>
@@ -329,8 +343,6 @@ const ListView = ({ boards, onBoardClick }) => {
         <div className="col-span-2">Created</div>
         <div className="col-span-1"></div>
       </div>
-
-      {/* Table Rows */}
       {boards.map(board => (
         <BoardRow key={board._id} board={board} onClick={() => onBoardClick(board._id)} />
       ))}
@@ -338,11 +350,9 @@ const ListView = ({ boards, onBoardClick }) => {
   );
 };
 
-// Board Row Component for List View
 const BoardRow = ({ board, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const itemCount = board.items?.length || 0;
-
   const doneCount = board.items?.filter(item => item.data?.status === 'Done').length || 0;
   const progress = itemCount > 0 ? (doneCount / itemCount) * 100 : 0;
 
@@ -357,33 +367,22 @@ const BoardRow = ({ board, onClick }) => {
         <Grid3x3 className="w-5 h-5 text-blue-600" />
         <span className="font-medium text-gray-900">{board.name}</span>
       </div>
-
-      <div className="col-span-2 text-gray-600">
-        {itemCount} items
-      </div>
-
+      <div className="col-span-2 text-gray-600">{itemCount} items</div>
       <div className="col-span-2">
         <div className="flex items-center gap-2">
           <div className="flex-1 bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-green-500 h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="bg-green-500 h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
           <span className="text-sm text-gray-600">{Math.round(progress)}%</span>
         </div>
       </div>
-
       <div className="col-span-2 text-gray-600 text-sm">
         {new Date(board.createdAt).toLocaleDateString()}
       </div>
-
       <div className="col-span-1 flex justify-end">
         <button
-          onClick={(e) => { e.stopPropagation(); }}
-          className={`p-1 rounded hover:bg-gray-200 transition-opacity ${
-            isHovered ? 'opacity-100' : 'opacity-0'
-          }`}
+          onClick={(e) => e.stopPropagation()}
+          className={`p-1 rounded hover:bg-gray-200 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}
         >
           <MoreHorizontal className="w-5 h-5 text-gray-600" />
         </button>
