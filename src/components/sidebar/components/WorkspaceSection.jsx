@@ -12,12 +12,10 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
   const location = useLocation();
   const { userCategory } = useAuth();
   
-  // ✅ Button refs for positioning
   const workspaceMenuButtonRef = useRef(null);
   const addMenuButtonRef = useRef(null);
   const workspaceCardRef = useRef(null);
   
-  // Menu states
   const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false);
   const [showEditSubmenu, setShowEditSubmenu] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
@@ -26,61 +24,77 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
   const [showFormSubmenu, setShowFormSubmenu] = useState(false);
   const [showWorkspaceDropdown, setShowWorkspaceDropdown] = useState(false);
 
-  // 🆕 CURRENT WORKSPACE - Track which main workspace is selected
   const [currentWorkspace, setCurrentWorkspace] = useState(null);
 
-  // 🆕 GET WORKSPACE ITEMS BASED ON CATEGORY
   const category = userCategory || sessionStorage.getItem('userCategory');
   const staticWorkspaceItems = getWorkspaceItems(category);
-  
-  console.log('🔍 WorkspaceSection - Category:', category);
-  console.log('📋 WorkspaceSection - Items:', staticWorkspaceItems);
+
+  // 🆕 TEMPLATE ID TO WORKSPACE MAPPING
+  const templateToWorkspace = {
+    'grants-pipeline': 'grants-management',
+    'getting-started': 'grants-management',
+    'grant-providers': 'grants-management',
+    'grants-dashboard': 'grants-management',
+    'donors': 'donor-management',
+    'project-management': 'project-management',
+    'volunteer-registration': 'volunteer'
+  };
 
   // 🆕 SUB-ITEM TO TEMPLATE MAPPING
   const subItemToTemplate = {
-    // Grants Management
     'Grants Pipeline': 'grants-pipeline',
     'Getting Started': 'getting-started',
     'Grant Providers': 'grant-providers',
     'Grants Dashboard': 'grants-dashboard',
-    
-    // Donor Management
     'Donors': 'donors',
     'Donor Donations': 'donors',
     'Donor Activities': 'donors',
     'Donors Dashboard': 'donors',
-    
-    // Fundraising
     'Project Management': 'project-management',
     'Contacts': 'donors',
     'Learning Center': 'getting-started',
-    
-    // Volunteer
     'Volunteer registration management': 'volunteer-registration',
     'Volunteer Registration': 'volunteer-registration',
     'Volunteer Activities': 'volunteer-registration',
     'Learning Center Volunteer': 'getting-started'
   };
 
-  // 🆕 SET DEFAULT WORKSPACE ON LOAD
+  // ✅ FIXED: SET WORKSPACE BASED ON CURRENT ROUTE
   useEffect(() => {
     if ((category === 'ngo' || category === 'nonprofit') && staticWorkspaceItems.length > 0) {
-      // Check if we're on a workspace route
       const pathParts = location.pathname.split('/');
+      
+      // ✅ CHECK IF ON WORKSPACE PAGE: /workspaces/2565135/grants-management
       if (pathParts[1] === 'workspaces' && pathParts[3]) {
-        // Find workspace by ID from URL
         const workspaceId = pathParts[3];
         const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
         if (workspace) {
           setCurrentWorkspace(workspace);
+          console.log('✅ Set workspace from /workspaces route:', workspace.label);
           return;
         }
       }
       
-      // Default to first workspace
-      const firstItemWithSubItems = staticWorkspaceItems.find(item => item.subItems && item.subItems.length > 0);
-      if (firstItemWithSubItems) {
-        setCurrentWorkspace(firstItemWithSubItems);
+      // ✅ CHECK IF ON TEMPLATE BOARD: /boards/template/volunteer-registration
+      if (pathParts[1] === 'boards' && pathParts[2] === 'template' && pathParts[3]) {
+        const templateId = pathParts[3];
+        const workspaceId = templateToWorkspace[templateId];
+        
+        if (workspaceId) {
+          const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
+          if (workspace) {
+            setCurrentWorkspace(workspace);
+            console.log('✅ Set workspace from template route:', workspace.label, 'for template:', templateId);
+            return;
+          }
+        }
+      }
+      
+      // ✅ DEFAULT: No workspace selected (don't auto-select first one)
+      // This prevents auto-selection when not on a workspace/template route
+      if (pathParts[1] !== 'workspaces' && pathParts[1] !== 'boards') {
+        setCurrentWorkspace(null);
+        console.log('✅ Not on workspace/board route - clearing workspace selection');
       }
     }
   }, [category, staticWorkspaceItems, location.pathname]);
@@ -94,31 +108,25 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     }
   };
 
-  // 🆕 WORKSPACE DROPDOWN CLICK - Change current workspace and navigate
   const handleWorkspaceChange = (item) => {
     setCurrentWorkspace(item);
-    // Navigate to workspace page
     navigate(`/workspaces/${item.workspaceNumber}/${item.id}`);
     console.log('🔄 Workspace changed to:', item.label);
   };
 
-  // 🆕 SUB-ITEM CLICK HANDLER - Navigate to Template Board
   const handleSubItemClick = (subItemLabel) => {
     setActiveItem(subItemLabel);
     
-    // Get template ID from mapping
     const templateId = subItemToTemplate[subItemLabel];
     
     if (templateId) {
       console.log('✅ Opening template board:', templateId);
-      // Navigate to template board
       navigate(`/boards/template/${templateId}`);
     } else {
       console.warn('⚠️ No template found for:', subItemLabel);
     }
   };
 
-  // 🆕 GET WORKSPACE DISPLAY NAME
   const getWorkspaceName = () => {
     if (currentWorkspace) {
       return currentWorkspace.label;
@@ -126,29 +134,28 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     return category === 'ngo' || category === 'nonprofit' ? 'Non-Profit Workspace' : 'MainWorkSpace';
   };
 
-  // 🆕 GET WORKSPACE AVATAR COLOR
   const getWorkspaceColor = (workspaceLabel) => {
     const colorMap = {
       'Grants Management': '#067B4B',
       'Donor Management': '#FB275D',
-      'monday Fundraising': '#FDAB3D',
-      'Volunteer Registration Management': '#9cd326'
+      'monday Fundraising': '#9CD326',
+      'Volunteer Registration Management': '#FFCB00',
+      'Project Management': '#0073EA'
     };
     return colorMap[workspaceLabel] || '#666';
   };
 
-  // 🆕 GET WORKSPACE FIRST LETTER
   const getWorkspaceInitial = (workspaceLabel) => {
     const initialMap = {
       'Grants Management': 'G',
       'Donor Management': 'D',
       'monday Fundraising': 'F',
-      'Volunteer Registration Management': 'V'
+      'Volunteer Registration Management': 'V',
+      'Project Management': 'P'
     };
     return initialMap[workspaceLabel] || workspaceLabel.charAt(0).toUpperCase();
   };
 
-  // 🆕 GET WORKSPACE ICON/LETTER FOR DROPDOWN
   const getWorkspaceIcon = () => {
     if (currentWorkspace) {
       return getWorkspaceInitial(currentWorkspace.label);
@@ -156,7 +163,6 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     return category === 'ngo' || category === 'nonprofit' ? '❤️' : 'M';
   };
 
-  // 🆕 GET WORKSPACE AVATAR BACKGROUND COLOR
   const getWorkspaceAvatarColor = () => {
     if (currentWorkspace) {
       return getWorkspaceColor(currentWorkspace.label);
@@ -236,7 +242,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         </button>
       </div>
 
-      {/* 🆕 WORKSPACE DROPDOWN MENU */}
+      {/* WORKSPACE DROPDOWN MENU */}
       <WorkspaceDropdown
         show={showWorkspaceDropdown}
         onClose={() => setShowWorkspaceDropdown(false)}
@@ -264,14 +270,13 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         setShowFormSubmenu={setShowFormSubmenu}
       />
 
-      {/* 🆕 WORKSPACE ITEMS - Show sub-items of current workspace */}
+      {/* WORKSPACE ITEMS */}
       <div className="workspace-items">
         
-        {/* 🆕 SHOW SUB-ITEMS IF CURRENT WORKSPACE HAS THEM */}
+        {/* SHOW SUB-ITEMS IF CURRENT WORKSPACE EXISTS */}
         {currentWorkspace && currentWorkspace.subItems && currentWorkspace.subItems.length > 0 ? (
           <>
             {currentWorkspace.subItems.map((subItem, index) => {
-              // Check if subItem is an object with icon or just a string
               const subItemLabel = typeof subItem === 'object' ? subItem.label : subItem;
               const SubItemIcon = typeof subItem === 'object' && subItem.icon ? subItem.icon : null;
               
@@ -284,7 +289,6 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
                   {SubItemIcon ? (
                     <SubItemIcon size={16} className="item-icon" style={{ color: '#676879' }} />
                   ) : (
-                    // Fallback - show board icon
                     <svg 
                       width="16" 
                       height="16" 
@@ -302,7 +306,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
             })}
           </>
         ) : (
-          // 🆕 SHOW ALL MAIN ITEMS IF NO CURRENT WORKSPACE (DEFAULT VIEW)
+          // SHOW ALL MAIN WORKSPACES IF NO CURRENT WORKSPACE
           staticWorkspaceItems.map((item, index) => {
             const IconComponent = item.icon;
             const hasValidIcon = IconComponent && typeof IconComponent === 'function';
@@ -336,7 +340,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
           })
         )}
 
-        {/* 🆕 DIVIDER - Only if there are dynamic boards */}
+        {/* DIVIDER */}
         {boards.length > 0 && (
           <div style={{ 
             height: '1px', 

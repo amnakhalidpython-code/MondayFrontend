@@ -1,116 +1,239 @@
+// src/pages/TemplateBoardPage.jsx - Template-Based Board Page
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { 
-  MoreHorizontal, 
+  ChevronDown, 
+  ChevronRight,
   Plus, 
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  Shuffle,
-  Clock,
+  Info,
   MessageSquare,
-  Link2,
+  Star,
   User
 } from 'lucide-react';
+import './BoardPage.css';
+import ActionBar from '../components/board/components/ActionBar';
+import BoardHeader from '../components/board/components/BoardHeader';
+import StatusCell from '../components/board/components/StatusCell';
+import StatusBar from '../components/board/components/StatusBar';
 import { getTemplateById } from '../config/boardTemplates';
-import './TemplateBoardPage.css';
 
-// ==========================================
-// MAIN COMPONENT
-// ==========================================
 const TemplateBoardPage = () => {
   const { templateId } = useParams();
-  const navigate = useNavigate();
-  
   const [template, setTemplate] = useState(null);
   const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [boardColumns, setBoardColumns] = useState([]);
+  const [statusConfig, setStatusConfig] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hiddenColumns, setHiddenColumns] = useState([]);
+  const [currentSort, setCurrentSort] = useState(null);
+  const [currentGroupBy, setCurrentGroupBy] = useState(null);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  const [newTaskInput, setNewTaskInput] = useState({ groupId: null, value: '' });
 
   // Load template data
   useEffect(() => {
-    const loadTemplate = () => {
+    if (templateId) {
       const templateData = getTemplateById(templateId);
       
-      if (!templateData) {
-        console.error('Template not found:', templateId);
-        navigate('/dashboard');
-        return;
+      if (templateData) {
+        console.log('✅ Template loaded:', templateData);
+        setTemplate(templateData);
+        setGroups(templateData.groups);
+        setBoardColumns(templateData.columns);
+        setStatusConfig(templateData.statusConfig);
+      } else {
+        console.error('❌ Template not found:', templateId);
       }
+    }
+  }, [templateId]);
 
-      setTemplate(templateData);
-      setGroups(templateData.groups || []);
-      setLoading(false);
-    };
+  // Search functionality
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
 
-    loadTemplate();
-  }, [templateId, navigate]);
+  // Filter groups based on search
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredGroups(groups);
+      return;
+    }
 
-  // Toggle group expansion
+    const filtered = groups.map(group => ({
+      ...group,
+      tasks: group.tasks.filter(task => 
+        task.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.owner?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    })).filter(group => group.tasks.length > 0);
+
+    setFilteredGroups(filtered);
+  }, [searchQuery, groups]);
+
+  // Sort functionality
+  const handleSort = (columnId, order) => {
+    setCurrentSort({ column: columnId, order });
+    
+    const sortedGroups = groups.map(group => {
+      const sortedTasks = [...group.tasks].sort((a, b) => {
+        let aVal = a[columnId];
+        let bVal = b[columnId];
+        
+        if (columnId === 'owner') {
+          aVal = a.owner?.name || '';
+          bVal = b.owner?.name || '';
+        }
+        
+        if (order === 'asc') {
+          return aVal > bVal ? 1 : -1;
+        } else {
+          return aVal < bVal ? 1 : -1;
+        }
+      });
+      
+      return { ...group, tasks: sortedTasks };
+    });
+    
+    setGroups(sortedGroups);
+  };
+
+  // Hide columns functionality
+  const handleHideColumns = (columnId) => {
+    setHiddenColumns(prev => {
+      if (prev.includes(columnId)) {
+        return prev.filter(id => id !== columnId);
+      } else {
+        return [...prev, columnId];
+      }
+    });
+  };
+
+  // Group by functionality
+  const handleGroupBy = (columnId) => {
+    setCurrentGroupBy(columnId);
+    
+    if (!columnId) {
+      // Reset to template default groups
+      if (template) {
+        setGroups(template.groups);
+      }
+      return;
+    }
+    
+    const allTasks = groups.flatMap(g => g.tasks);
+    const grouped = {};
+    
+    allTasks.forEach(task => {
+      let groupKey = task[columnId];
+      if (columnId === 'owner') {
+        groupKey = task.owner?.name || 'Unassigned';
+      } else if (columnId === 'status') {
+        groupKey = statusConfig[task.status]?.label || task.status;
+      }
+      
+      if (!grouped[groupKey]) {
+        grouped[groupKey] = [];
+      }
+      grouped[groupKey].push(task);
+    });
+    
+    const newGroups = Object.entries(grouped).map(([key, tasks], index) => ({
+      id: `group-${index}`,
+      name: key,
+      color: '#579BFC',
+      expanded: true,
+      tasks
+    }));
+    
+    setGroups(newGroups);
+  };
+
+  // Add new task
+  const handleAddTask = () => {
+    const firstGroup = groups[0];
+    if (firstGroup) {
+      setNewTaskInput({ groupId: firstGroup.id, value: '' });
+    }
+  };
+
   const toggleGroup = (groupId) => {
-    setGroups(prev => prev.map(group => 
-      group.id === groupId 
-        ? { ...group, expanded: !group.expanded }
-        : group
+    setGroups(groups.map(g => 
+      g.id === groupId ? { ...g, expanded: !g.expanded } : g
     ));
   };
 
-  // Add new item to group
-  const addItem = (groupId) => {
-    const newItem = {
-      id: `item-${Date.now()}`,
-      name: template.newItemText || 'New Item',
-      data: {}
-    };
-
-    setGroups(prev => prev.map(group =>
-      group.id === groupId
-        ? { ...group, tasks: [...(group.tasks || []), newItem] }
-        : group
-    ));
+  const startAddTask = (groupId) => {
+    setNewTaskInput({ groupId, value: '' });
   };
 
-  // Update item data
-  const updateItemData = (groupId, itemId, field, value) => {
-    setGroups(prev => prev.map(group =>
-      group.id === groupId
+  const saveTask = (groupId) => {
+    if (!newTaskInput.value.trim()) {
+      setNewTaskInput({ groupId: null, value: '' });
+      return;
+    }
+
+    setGroups(groups.map(g => 
+      g.id === groupId 
+        ? { 
+            ...g, 
+            tasks: [...g.tasks, {
+              id: Date.now().toString(),
+              name: newTaskInput.value,
+              owner: null,
+              status: null,
+              dueDate: '',
+              overdue: false,
+              numbers: ''
+            }]
+          }
+        : g
+    ));
+
+    setNewTaskInput({ groupId: null, value: '' });
+  };
+
+  const updateTaskStatus = (groupId, taskId, newStatus) => {
+    setGroups(groups.map(g => 
+      g.id === groupId
         ? {
-            ...group,
-            tasks: group.tasks.map(task =>
-              task.id === itemId
-                ? { ...task, data: { ...task.data, [field]: value } }
-                : task
+            ...g,
+            tasks: g.tasks.map(t => 
+              t.id === taskId ? { ...t, status: newStatus } : t
             )
           }
-        : group
+        : g
     ));
   };
 
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '18px',
-        color: '#666'
-      }}>
-        Loading template...
-      </div>
-    );
-  }
+  const getStatusSummary = (tasks) => {
+    const total = tasks.length;
+    if (total === 0) return { done: 0, working: 0, stuck: 0 };
+
+    const counts = { done: 0, working: 0, stuck: 0 };
+    tasks.forEach(t => {
+      if (counts[t.status] !== undefined) counts[t.status]++;
+    });
+
+    return {
+      done: (counts.done / total) * 100,
+      working: (counts.working / total) * 100,
+      stuck: (counts.stuck / total) * 100
+    };
+  };
+
+  const getDateRange = (tasks) => {
+    const dates = tasks.filter(t => t.dueDate).map(t => t.dueDate);
+    if (dates.length === 0) return '-';
+    if (dates.length === 1) return dates[0];
+    return `${dates[0]} - ${dates[dates.length - 1]}`;
+  };
 
   if (!template) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '18px',
-        color: '#e74c3c'
-      }}>
-        Template not found
+      <div className="board-page">
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <h2>Loading template...</h2>
+        </div>
       </div>
     );
   }
@@ -120,379 +243,266 @@ const TemplateBoardPage = () => {
       {/* BOARD HEADER */}
       <BoardHeader boardTitle={template.title} />
 
-      {/* BOARD TABS */}
-      <div className="board-tabs">
-        <button className="tab active">Main Table</button>
-        <button className="tab-icon-btn">
-          <MoreHorizontal size={16} />
-        </button>
-        <button className="tab-icon-btn">
-          <Plus size={16} />
-        </button>
-      </div>
+      {/* ACTION BAR */}
+      <ActionBar 
+        columns={boardColumns}
+        onSearch={handleSearch}
+        onSort={handleSort}
+        onHideColumns={handleHideColumns}
+        onGroupBy={handleGroupBy}
+        onAddTask={handleAddTask}
+        hiddenColumns={hiddenColumns}
+        currentSort={currentSort}
+        currentGroupBy={currentGroupBy}
+        newItemText={template.newItemText}
+      />
 
-      {/* BOARD TABLE */}
-      <div className="board-container">
-        <div className="board-table">
-          {/* TABLE HEADER */}
-          <div className="table-header">
-            <div className="header-cell group-header" style={{ width: '300px' }}>
-              Group
+      {/* BOARD CONTENT */}
+      <div className="board-content">
+        {(searchQuery ? filteredGroups : groups).map(group => (
+          <div key={group.id} className="board-group">
+            {/* GROUP HEADER */}
+            <div className="group-header-row">
+              <button 
+                onClick={() => toggleGroup(group.id)}
+                className="group-toggle"
+              >
+                {group.expanded ? (
+                  <ChevronDown size={16} style={{ color: group.color }} />
+                ) : (
+                  <ChevronRight size={16} style={{ color: group.color }} />
+                )}
+              </button>
+              <h3 className="group-title" style={{ color: group.color }}>
+                {group.name}
+              </h3>
+              <span className="group-count">
+                {group.tasks.length === 0 ? 'No Items' : `${group.tasks.length} Items`}
+              </span>
             </div>
-            {template.columns.map((col) => (
-              <div 
-                key={col.id} 
-                className="header-cell"
-                style={{ width: `${col.width}px` }}
-              >
-                {col.title}
-              </div>
-            ))}
-          </div>
 
-          {/* GROUPS */}
-          {groups.map((group) => (
-            <div key={group.id} className="group-section">
-              {/* GROUP HEADER */}
-              <div 
-                className="group-header-row"
-                style={{ borderLeft: `4px solid ${group.color}` }}
-              >
-                <button 
-                  className="group-toggle"
-                  onClick={() => toggleGroup(group.id)}
-                >
-                  {group.expanded ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-                </button>
-                <span className="group-name">{group.name}</span>
-                <span className="group-count">
-                  {group.tasks?.length || 0} Items
-                </span>
-              </div>
-
-              {/* GROUP ITEMS */}
-              {group.expanded && (
-                <>
-                  {group.tasks?.map((item) => (
-                    <div key={item.id} className="table-row">
-                      {/* ITEM NAME */}
-                      <div className="table-cell" style={{ width: '300px' }}>
-                        <input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => {
-                            setGroups(prev => prev.map(g =>
-                              g.id === group.id
-                                ? {
-                                    ...g,
-                                    tasks: g.tasks.map(t =>
-                                      t.id === item.id
-                                        ? { ...t, name: e.target.value }
-                                        : t
-                                    )
-                                  }
-                                : g
-                            ));
-                          }}
-                          className="item-name-input"
-                        />
-                      </div>
-
-                      {/* DYNAMIC COLUMNS */}
-                      {template.columns.map((col) => (
-                        <div 
-                          key={col.id}
-                          className="table-cell"
-                          style={{ width: `${col.width}px` }}
-                        >
-                          <CellRenderer
-                            type={col.type}
-                            value={item.data?.[col.id]}
-                            onChange={(value) => 
-                              updateItemData(group.id, item.id, col.id, value)
-                            }
-                            statusConfig={template.statusConfig}
-                          />
+            {group.expanded && (
+              <div className="group-content" style={{ borderLeftColor: group.color }}>
+                <div className="board-table">
+                  {/* TABLE HEADER */}
+                  <div className="table-header">
+                    <div className="table-cell cell-checkbox"></div>
+                    
+                    {/* Dynamic Column Headers based on template */}
+                    {boardColumns.map(col => (
+                      !hiddenColumns.includes(col.id) && (
+                        <div key={col.id} className={`table-cell cell-${col.id}`}>
+                          {col.title}
+                          {col.type !== 'text' && <Info size={14} className="info-icon" />}
                         </div>
-                      ))}
+                      )
+                    ))}
+                    
+                    <div className="table-cell cell-add">
+                      <Plus size={16} />
                     </div>
+                  </div>
+
+                  {/* TABLE ROWS */}
+                  {group.tasks.map(task => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      groupId={group.id}
+                      groupColor={group.color}
+                      columns={boardColumns}
+                      statusConfig={statusConfig}
+                      updateTaskStatus={updateTaskStatus}
+                      hiddenColumns={hiddenColumns}
+                    />
                   ))}
 
-                  {/* ADD NEW ITEM */}
-                  <div className="table-row add-row">
-                    <button 
-                      className="add-item-btn"
-                      onClick={() => addItem(group.id)}
-                    >
-                      <Plus size={16} />
-                      <span>{template.addItemText || '+ Add item'}</span>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                  {/* ADD TASK ROW */}
+                  {newTaskInput.groupId === group.id ? (
+                    <div className="table-row add-row">
+                      <div className="table-cell cell-checkbox"></div>
+                      <div className="table-cell cell-task">
+                        <input
+                          type="text"
+                          value={newTaskInput.value}
+                          onChange={(e) => setNewTaskInput({ ...newTaskInput, value: e.target.value })}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveTask(group.id);
+                            if (e.key === 'Escape') setNewTaskInput({ groupId: null, value: '' });
+                          }}
+                          onBlur={() => saveTask(group.id)}
+                          className="add-task-input"
+                          placeholder={`Item name`}
+                          autoFocus
+                        />
+                      </div>
+                      {boardColumns.slice(1).map(col => (
+                        !hiddenColumns.includes(col.id) && (
+                          <div key={col.id} className={`table-cell cell-${col.id}`}></div>
+                        )
+                      ))}
+                      <div className="table-cell cell-add"></div>
+                    </div>
+                  ) : (
+                    <div className="table-row add-row-btn">
+                      <div className="table-cell cell-checkbox"></div>
+                      <div className="table-cell cell-task">
+                        <button 
+                          onClick={() => startAddTask(group.id)}
+                          className="add-task-btn"
+                        >
+                          <Plus size={14} />
+                          {template.addItemText}
+                        </button>
+                      </div>
+                      {boardColumns.slice(1).map(col => (
+                        !hiddenColumns.includes(col.id) && (
+                          <div key={col.id} className={`table-cell cell-${col.id}`}></div>
+                        )
+                      ))}
+                      <div className="table-cell cell-add"></div>
+                    </div>
+                  )}
+
+                  {/* SUMMARY ROW */}
+                  {group.tasks.length > 0 && (
+                    <div className="table-row summary-row">
+                      <div className="table-cell cell-checkbox"></div>
+                      {boardColumns.map(col => {
+                        if (hiddenColumns.includes(col.id)) return null;
+                        
+                        if (col.type === 'status') {
+                          return (
+                            <div key={col.id} className={`table-cell cell-${col.id}`}>
+                              <StatusBar summary={getStatusSummary(group.tasks)} statusConfig={statusConfig} />
+                            </div>
+                          );
+                        }
+                        
+                        return <div key={col.id} className={`table-cell cell-${col.id}`}></div>;
+                      })}
+                      <div className="table-cell cell-add"></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        <div className="add-group-section">
+          <button className="add-group-btn">
+            <Plus size={20} />
+            Add new group
+          </button>
         </div>
       </div>
+
+      {/* HELP BUTTON */}
+      <button className="help-btn">Help</button>
     </div>
   );
 };
 
-// ==========================================
-// BOARD HEADER COMPONENT
-// ==========================================
-const BoardHeader = ({ boardTitle }) => {
-  return (
-    <header className="board-header">
-      <div className="header-left">
-        <h2 className="board-title">{boardTitle}</h2>
-      </div>
-
-      <div className="header-actions">
-        <button className="header-btn sidekick-btn">
-          <Sparkles size={20} />
-          <span>Sidekick</span>
-        </button>
-
-        <button className="header-btn">
-          <Shuffle size={18} />
-          <span>Integrate</span>
-        </button>
-
-        <button className="header-btn">
-          <Clock size={20} />
-          <span>Automate</span>
-        </button>
-
-        <button className="header-icon-btn">
-          <MessageSquare size={20} />
-        </button>
-
-        <button className="header-icon-btn">
-          <div className="user-avatar">A</div>
-        </button>
-
-        <button className="invite-btn">Invite / 1</button>
-
-        <button className="header-icon-btn">
-          <Link2 size={20} />
-        </button>
-
-        <button className="header-icon-btn">
-          <MoreHorizontal size={24} />
-        </button>
-      </div>
-    </header>
-  );
-};
-
-// ==========================================
-// CELL RENDERER - Different cell types
-// ==========================================
-const CellRenderer = ({ type, value, onChange, statusConfig }) => {
-  switch (type) {
-    case 'status':
-      return (
-        <StatusCell 
-          currentStatus={value}
-          statusConfig={statusConfig}
-          onChange={onChange}
-        />
-      );
-    
-    case 'person':
-      return (
-        <PersonCell 
-          value={value}
-          onChange={onChange}
-        />
-      );
-    
-    case 'date':
-      return (
-        <input
-          type="date"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="date-input"
-        />
-      );
-    
-    case 'number':
-      return (
-        <input
-          type="number"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="number-input"
-        />
-      );
-    
-    case 'email':
-      return (
-        <input
-          type="email"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="text-input"
-          placeholder="email@example.com"
-        />
-      );
-    
-    case 'phone':
-      return (
-        <input
-          type="tel"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="text-input"
-          placeholder="+1234567890"
-        />
-      );
-    
-    case 'link':
-      return (
-        <input
-          type="url"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="text-input"
-          placeholder="https://"
-        />
-      );
-    
-    case 'text':
-    default:
-      return (
-        <input
-          type="text"
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          className="text-input"
-        />
-      );
-  }
-};
-
-// ==========================================
-// STATUS CELL
-// ==========================================
-const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!currentStatus) {
-    return (
-      <div className="status-dropdown">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="status-btn empty"
-        >
-          -
-        </button>
-        {isOpen && (
-          <>
-            <div 
-              className="dropdown-overlay" 
-              onClick={() => setIsOpen(false)}
-            />
-            <StatusMenu 
-              statusConfig={statusConfig}
-              onChange={(status) => {
-                onChange(status);
-                setIsOpen(false);
-              }}
-            />
-          </>
-        )}
-      </div>
-    );
-  }
-
-  const config = statusConfig[currentStatus];
+// TASK ROW COMPONENT
+const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskStatus, hiddenColumns = [] }) => {
+  const [showActions, setShowActions] = useState(false);
 
   return (
-    <div className="status-dropdown">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="status-btn"
-        style={{ backgroundColor: config.bg }}
-      >
-        {config.label}
-      </button>
+    <div 
+      className="table-row task-row"
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      <div className="table-cell cell-checkbox">
+        <div className="left-indicator" style={{ backgroundColor: groupColor }}></div>
+        <input type="checkbox" className="task-checkbox" />
+      </div>
 
-      {isOpen && (
-        <>
-          <div 
-            className="dropdown-overlay" 
-            onClick={() => setIsOpen(false)}
-          />
-          <StatusMenu 
-            statusConfig={statusConfig}
-            onChange={(status) => {
-              onChange(status);
-              setIsOpen(false);
-            }}
-          />
-        </>
-      )}
-    </div>
-  );
-};
+      {/* Dynamic Columns based on template */}
+      {columns.map(col => {
+        if (hiddenColumns.includes(col.id)) return null;
 
-const StatusMenu = ({ statusConfig, onChange }) => (
-  <div className="status-menu">
-    {Object.entries(statusConfig).map(([key, config]) => (
-      <button
-        key={key}
-        onClick={() => onChange(key)}
-        className="status-menu-item"
-      >
-        <div 
-          className="status-color"
-          style={{ backgroundColor: config.bg }}
-        />
-        <span>{config.label}</span>
-      </button>
-    ))}
-  </div>
-);
+        // First column (name) - special handling
+        if (col.id === 'name') {
+          return (
+            <div key={col.id} className="table-cell cell-task">
+              <button className="expand-btn">
+                <ChevronRight size={16} />
+              </button>
+              <span className="task-name">{task[col.id] || task.name}</span>
+              {showActions && (
+                <div className="task-actions">
+                  <button className="task-action-btn">
+                    <Star size={16} />
+                  </button>
+                  <button className="task-action-btn">
+                    <MessageSquare size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        }
 
-// ==========================================
-// PERSON CELL
-// ==========================================
-const PersonCell = ({ value, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
+        // Owner column
+        if (col.type === 'person') {
+          return (
+            <div key={col.id} className="table-cell cell-owner">
+              {task.owner ? (
+                <div 
+                  className="owner-avatar"
+                  style={{ backgroundColor: task.owner.color }}
+                >
+                  {task.owner.initial}
+                </div>
+              ) : (
+                <button className="add-owner-btn">
+                  <User size={16} />
+                </button>
+              )}
+            </div>
+          );
+        }
 
-  return (
-    <div className="person-dropdown">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="person-btn"
-      >
-        {value ? (
-          <div className="person-avatar">{value.charAt(0).toUpperCase()}</div>
-        ) : (
-          <User size={16} style={{ color: '#999' }} />
-        )}
-      </button>
+        // Status column
+        if (col.type === 'status') {
+          return (
+            <div key={col.id} className="table-cell cell-status">
+              <StatusCell 
+                currentStatus={task.status}
+                statusConfig={statusConfig}
+                onChange={(newStatus) => updateTaskStatus(groupId, task.id, newStatus)}
+              />
+            </div>
+          );
+        }
 
-      {isOpen && (
-        <>
-          <div 
-            className="dropdown-overlay" 
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="person-menu">
-            <input
-              type="text"
-              placeholder="Enter name..."
-              value={value || ''}
-              onChange={(e) => onChange(e.target.value)}
-              className="person-input"
-            />
+        // Date columns
+        if (col.type === 'date') {
+          return (
+            <div key={col.id} className="table-cell cell-date">
+              {task[col.id] ? (
+                <div className="date-cell">
+                  {task.overdue && <div className="overdue-dot"></div>}
+                  <span>{task[col.id]}</span>
+                </div>
+              ) : (
+                <span className="empty-date">-</span>
+              )}
+            </div>
+          );
+        }
+
+        // Default - text/number columns
+        return (
+          <div key={col.id} className={`table-cell cell-${col.id}`}>
+            {task[col.id] || '-'}
           </div>
-        </>
-      )}
+        );
+      })}
+
+      <div className="table-cell cell-add"></div>
     </div>
   );
 };
