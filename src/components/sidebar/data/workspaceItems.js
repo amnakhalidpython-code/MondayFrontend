@@ -1,4 +1,3 @@
-// src/components/sidebar/data/workspaceItems.js
 import { 
   Layers, 
   FileText, 
@@ -15,9 +14,6 @@ import {
   Phone,
   DollarSign
 } from 'lucide-react';
-
-// 🆕 DEFAULT OPTIONS (for work/business users) - EMPTY for now
-export const defaultWorkspaceItems = [];
 
 // 🆕 NON-PROFIT SPECIFIC OPTIONS WITH SUB-ITEMS AND THEIR ICONS
 export const nonprofitWorkspaceItems = [
@@ -55,7 +51,7 @@ export const nonprofitWorkspaceItems = [
     ]
   },
   { 
-    id: 'project-management', // 🆕 NEW WORKSPACE
+    id: 'project-management',
     label: 'Project Management',
     workspaceNumber: '2580926',
     icon: null,
@@ -74,6 +70,9 @@ export const nonprofitWorkspaceItems = [
   },
 ];
 
+// 🆕 DEFAULT OPTIONS (for work/business users) - Now includes all workspaces for dropdown
+export const defaultWorkspaceItems = nonprofitWorkspaceItems;
+
 // 🆕 MAIN FUNCTION - Returns items based on category
 export const getWorkspaceItems = (category) => {
   console.log('🔍 getWorkspaceItems called with category:', category);
@@ -83,7 +82,7 @@ export const getWorkspaceItems = (category) => {
     return nonprofitWorkspaceItems;
   }
   
-  console.log('✅ Returning DEFAULT items (empty - only boards)');
+  console.log('✅ Returning DEFAULT items (all workspaces available in dropdown)');
   return defaultWorkspaceItems;
 };
 

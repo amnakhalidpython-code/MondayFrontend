@@ -59,9 +59,9 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     'Learning Center Volunteer': 'getting-started'
   };
 
-  // ✅ FIXED: SET WORKSPACE BASED ON CURRENT ROUTE
+  // ✅ FIXED: SET WORKSPACE BASED ON CURRENT ROUTE + DEFAULT HANDLING
   useEffect(() => {
-    if ((category === 'ngo' || category === 'nonprofit') && staticWorkspaceItems.length > 0) {
+    if (staticWorkspaceItems.length > 0) {
       const pathParts = location.pathname.split('/');
       
       // ✅ CHECK IF ON WORKSPACE PAGE: /workspaces/2565135/grants-management
@@ -90,11 +90,22 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         }
       }
       
-      // ✅ DEFAULT: No workspace selected (don't auto-select first one)
-      // This prevents auto-selection when not on a workspace/template route
+      // ✅ DEFAULT HANDLING
       if (pathParts[1] !== 'workspaces' && pathParts[1] !== 'boards') {
-        setCurrentWorkspace(null);
-        console.log('✅ Not on workspace/board route - clearing workspace selection');
+        // For non-profit users: Default to Grants Management
+        if (category === 'ngo' || category === 'nonprofit') {
+          const grantsWorkspace = staticWorkspaceItems.find(item => item.id === 'grants-management');
+          if (grantsWorkspace && !currentWorkspace) {
+            setCurrentWorkspace(grantsWorkspace);
+            console.log('✅ Non-profit user: Default workspace set to Grants Management');
+          }
+        } else {
+          // For other users: No default workspace (shows MainWorkSpace with all options in dropdown)
+          if (currentWorkspace) {
+            setCurrentWorkspace(null);
+            console.log('✅ Other user: Showing MainWorkSpace with all workspace options');
+          }
+        }
       }
     }
   }, [category, staticWorkspaceItems, location.pathname]);
@@ -250,6 +261,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         workspaceItems={staticWorkspaceItems.filter(item => item.subItems && item.subItems.length > 0)}
         currentWorkspace={currentWorkspace}
         onWorkspaceSelect={handleWorkspaceChange}
+        userCategory={category}
       />
 
       {/* ADD NEW MENU */}
@@ -305,47 +317,13 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
               );
             })}
           </>
-        ) : (
-          // SHOW ALL MAIN WORKSPACES IF NO CURRENT WORKSPACE
-          staticWorkspaceItems.map((item, index) => {
-            const IconComponent = item.icon;
-            const hasValidIcon = IconComponent && typeof IconComponent === 'function';
-            
-            return (
-              <button
-                key={index}
-                onClick={() => item.subItems ? handleWorkspaceChange(item) : setActiveItem(item.label)}
-                className={`workspace-item ${activeItem === item.label ? 'active' : ''}`}
-              >
-                {hasValidIcon ? (
-                  <IconComponent size={16} className="item-icon" />
-                ) : (
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 16 16" 
-                    fill="none"
-                    className="item-icon"
-                    style={{ color: '#676879' }}
-                  >
-                    <rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                  </svg>
-                )}
-                <span>{item.label}</span>
-                {item.subItems && item.subItems.length > 0 && (
-                  <ChevronRight size={16} className="chevron-icon" style={{ marginLeft: 'auto' }} />
-                )}
-              </button>
-            );
-          })
-        )}
+        ) : null}
 
-        {/* DIVIDER */}
+        {/* DIVIDER - Only show if there are boards */}
         {boards.length > 0 && (
           <div style={{ 
-            height: '1px', 
-            backgroundColor: '#e6e9ef', 
-            margin: '8px 12px' 
+            
+            margin: '2px 12px' 
           }} />
         )}
 

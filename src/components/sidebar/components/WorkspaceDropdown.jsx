@@ -7,7 +7,8 @@ const WorkspaceDropdown = ({
   buttonRef, 
   workspaceItems, 
   currentWorkspace, 
-  onWorkspaceSelect 
+  onWorkspaceSelect,
+  userCategory
 }) => {
   const dropdownRef = useRef(null);
 
@@ -19,7 +20,6 @@ const WorkspaceDropdown = ({
       'monday Fundraising': '#FDAB3D',
       'Volunteer Registration Management': '#9cd326',
       'Project Management': '#579bfc'
-      
     };
     return colorMap[workspaceLabel] || '#007f9b';
   };
@@ -69,45 +69,62 @@ const WorkspaceDropdown = ({
 
   if (!show) return null;
 
+  // ✅ Show message if no workspaces available
+  const hasWorkspaces = workspaceItems && workspaceItems.length > 0;
+
   return (
     <div ref={dropdownRef} className="workspace-dropdown">
       
       <div className="add-menu-title">My Workspaces</div>
 
-      {workspaceItems.map((item, index) => {
-        const isSelected = currentWorkspace && currentWorkspace.label === item.label;
-        const bgColor = getWorkspaceColor(item.label);
-        const initial = getWorkspaceInitial(item.label);
+      {hasWorkspaces ? (
+        <>
+          {workspaceItems.map((item, index) => {
+            const isSelected = currentWorkspace && currentWorkspace.label === item.label;
+            const bgColor = getWorkspaceColor(item.label);
+            const initial = getWorkspaceInitial(item.label);
 
-        return (
-          <button
-            key={index}
-            onClick={() => {
-              onWorkspaceSelect(item);
-              onClose();
-            }}
-            className="dropdown-item"
-          >
-            <div 
-              className="workspace-avatar" 
-              style={{ 
-                width: '24px', 
-                height: '24px', 
-                fontSize: '12px',
-                fontWeight: 600,
-                background: bgColor,
-                color: '#ffffff'
-              }}
-            >
-              {initial}
-            </div>
-            <span>{item.label}</span>
-            {isSelected && (
-              <Check size={16} style={{ marginLeft: 'auto', color: '#007F9B' }} />
-            )}
-          </button>
-        );
-      })}
+            return (
+              <button
+                key={index}
+                onClick={() => {
+                  onWorkspaceSelect(item);
+                  onClose();
+                }}
+                className="dropdown-item"
+              >
+                <div 
+                  className="workspace-avatar" 
+                  style={{ 
+                    width: '24px', 
+                    height: '24px', 
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    background: bgColor,
+                    color: '#ffffff'
+                  }}
+                >
+                  {initial}
+                </div>
+                <span>{item.label}</span>
+                {isSelected && (
+                  <Check size={16} style={{ marginLeft: 'auto', color: '#007F9B' }} />
+                )}
+              </button>
+            );
+          })}
+        </>
+      ) : (
+        <div style={{ 
+          padding: '12px', 
+          fontSize: '13px', 
+          color: '#9699a6',
+          textAlign: 'center',
+          fontStyle: 'italic'
+        }}>
+          No workspaces available
+        </div>
+      )}
 
       <div className="dropdown-divider" />
 
