@@ -332,7 +332,7 @@ const BoardPage = () => {
                 )}
               </button>
               <div className="w-1 h-5 rounded" style={{ backgroundColor: group.color }}></div>
-              <h3 className="text-base font-medium text-gray-800" style={{ color: group.color }}>
+              <h3 className="text-base font-normal text-gray-800" style={{ color: group.color }}>
                 {group.name}
               </h3>
               <span className="text-sm text-gray-500">
@@ -343,33 +343,33 @@ const BoardPage = () => {
             {group.expanded && (
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
                 {/* TABLE HEADER */}
-                <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] bg-gray-50 border-b border-gray-200 text-xs min-h-[36px]">
+                <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] bg-white border-b border-gray-200 text-xs min-h-[36px]">
                   <div className="p-3 flex items-center justify-center border-r border-gray-200">
                     <div className="w-4 h-4 border border-gray-300 rounded"></div>
                   </div>
-                  <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                  <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-normal text-gray-600">
                     <span>Task</span>
                   </div>
                   {!hiddenColumns.includes('owner') && (
-                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-normal text-gray-600">
                       <User size={14} />
                       <span>Owner</span>
                     </div>
                   )}
                   {!hiddenColumns.includes('status') && (
-                    <div className="p-9 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-normal text-gray-600">
                       <span>Status</span>
                       <Info size={12} className="text-gray-400" />
                     </div>
                   )}
                   {!hiddenColumns.includes('dueDate') && (
-                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-normal text-gray-600">
                       <span>Due date</span>
                       <Info size={12} className="text-gray-400" />
                     </div>
                   )}
                   {!hiddenColumns.includes('numbers') && (
-                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-normal text-gray-600">
                       <span>Numbers</span>
                     </div>
                   )}
@@ -393,9 +393,9 @@ const BoardPage = () => {
 
                 {/* ADD TASK ROW */}
                 {newTaskInput.groupId === group.id ? (
-                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <div className="p-3 border-r border-gray-100"></div>
-                    <div className="p-3 border-r border-gray-100">
+                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-[rgb(50, 51, 56)] hover:bg-gray-50 transition-colors">
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)">
                       <input
                         type="text"
                         value={newTaskInput.value}
@@ -410,16 +410,16 @@ const BoardPage = () => {
                         autoFocus
                       />
                     </div>
-                    {!hiddenColumns.includes('owner') && <div className="p-3 border-r border-gray-100"></div>}
-                    {!hiddenColumns.includes('status') && <div className="p-3 border-r border-gray-100"></div>}
-                    {!hiddenColumns.includes('dueDate') && <div className="p-3 border-r border-gray-100"></div>}
-                    {!hiddenColumns.includes('numbers') && <div className="p-3 border-r border-gray-100"></div>}
+                    {!hiddenColumns.includes('owner') && <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>}
+                    {!hiddenColumns.includes('status') && <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>}
+                    {!hiddenColumns.includes('dueDate') && <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>}
+                    {!hiddenColumns.includes('numbers') && <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>}
                     <div className="p-3"></div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <div className="p-3 border-r border-gray-100"></div>
-                    <div className="p-3 border-r border-gray-100">
+                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-[rgb(50, 51, 56) hover:bg-gray-50 transition-colors">
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)">
                       <button 
                         onClick={() => startAddTask(group.id)}
                         className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2"
@@ -428,17 +428,17 @@ const BoardPage = () => {
                         <span>Add task</span>
                       </button>
                     </div>
-                    <div className="p-3 border-r border-gray-100"></div>
-                    <div className="p-3 border-r border-gray-100"></div>
-                    <div className="p-3 border-r border-gray-100"></div>
-                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>
+                    <div className="p-3 border-r border-[rgb(50, 51, 56)"></div>
                     <div className="p-3"></div>
                   </div>
                 )}
 
                 {/* SUMMARY ROW */}
                 {group.tasks.length > 0 && (
-                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] bg-gray-50">
+                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] bg-white">
                     <div className="p-3 border-r border-gray-200"></div>
                     <div className="p-3 border-r border-gray-200"></div>
                     {!hiddenColumns.includes('owner') && <div className="p-3 border-r border-gray-200"></div>}
@@ -460,7 +460,7 @@ const BoardPage = () => {
                     {!hiddenColumns.includes('dueDate') && (
                       <div className="p-3 border-r border-gray-200">
                         {getDateRange(group.tasks) !== '-' && (
-                          <div className="inline-flex px-3 py-1 bg-blue-500 text-white text-xs rounded-full font-medium">
+                          <div className="inline-flex px-3 py-1 bg-blue-500 text-white text-xs rounded-full font-normal">
                             {getDateRange(group.tasks)}
                           </div>
                         )}
@@ -497,17 +497,16 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
 
   return (
     <div 
-      className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-gray-100 hover:bg-gray-50 transition-colors relative"
+      className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-[rgb(50, 51, 56) hover:bg-gray-50 transition-colors relative"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div className="p-3 flex items-center justify-center border-r border-gray-100 relative">
+      <div className="p-3 flex items-center justify-center border-r border-[rgb(50, 51, 56) relative">
         <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r" style={{ backgroundColor: groupColor }}></div>
         <input type="checkbox" className="w-4 h-4 border-2 border-gray-300 rounded cursor-pointer" />
       </div>
 
-      <div className="p-3 flex items-center gap-2 border-r border-gray-100">
-        <ChevronRight size={16} className="text-gray-500" />
+      <div className="p-1 flex items-center gap-2 border-r border-[rgb(50, 51, 56)">
         <span className="text-sm text-gray-800">{task.name}</span>
         {showActions && (
           <div className="ml-auto flex items-center gap-1">
@@ -522,7 +521,7 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
       </div>
 
       {!hiddenColumns.includes('owner') && (
-        <div className="p-3 flex items-center border-r border-gray-100">
+        <div className="p-1 flex items-center border-r border-[rgb(50, 51, 56)">
           {task.owner ? (
             <div 
               className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"
@@ -539,7 +538,7 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
       )}
 
       {!hiddenColumns.includes('status') && (
-        <div className="p-2 flex items-center border-r border-gray-100">
+        <div className="p-1 flex items-center border-r border-[rgb(50, 51, 56)">
           <StatusCell 
             currentStatus={task.status}
             statusConfig={statusConfig}
@@ -549,7 +548,7 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
       )}
 
       {!hiddenColumns.includes('dueDate') && (
-        <div className="p-3 flex items-center gap-2 border-r border-gray-100">
+        <div className="p-1 flex items-center gap-2 border-r border-[rgb(50, 51, 56)">
           {task.dueDate ? (
             <>
               {task.overdue && task.status !== 'done' && (
@@ -567,12 +566,12 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
       )}
 
       {!hiddenColumns.includes('numbers') && (
-        <div className="p-3 flex items-center border-r border-gray-100">
+        <div className="p-1 flex items-center border-r border-[rgb(50, 51, 56)">
           <span className="text-sm text-gray-600">{task.numbers || '-'}</span>
         </div>
       )}
 
-      <div className="p-3 flex items-center justify-center">
+      <div className="p-1 flex items-center justify-center">
         <button className="text-gray-400 hover:text-gray-600">
           <MoreHorizontal size={16} />
         </button>
@@ -590,7 +589,7 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
       <div className="relative w-full">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full py-2 px-3 rounded text-xs font-medium bg-gray-300 text-gray-600 hover:opacity-90 transition-all"
+          className="w-full py-2 px-3 rounded text-xs font-normal bg-gray-300 text-gray-600 hover:opacity-90 transition-all"
         >
           -
         </button>
@@ -616,7 +615,7 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
     <div className="relative w-full">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-2 px-3 rounded text-xs font-medium text-white hover:opacity-90 transition-all"
+        className="w-full py-2 px-3 rounded text-xs font-normal text-white hover:opacity-90 transition-all"
         style={{ backgroundColor: config.bg }}
       >
         {config.label}

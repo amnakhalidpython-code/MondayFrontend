@@ -3,9 +3,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 40px;
+  padding: 10px 40px;
   height: 72px;
-  border-bottom: 1px solid #e6e9ef;
+  /* border-bottom: 1px solid #e6e9ef; */
   background: white;
   position: relative;
 }
@@ -102,13 +102,7 @@
   border-color: #d0d4e4;
 }
 
-/* Divider */
-.action-divider {
-  width: 1px;
-  height: 24px;
-  background: #d0d4e4;
-  margin: 0 4px;
-}
+
 
 /* Search */
 .search-wrapper {
