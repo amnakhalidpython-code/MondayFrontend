@@ -59,13 +59,13 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     'Learning Center Volunteer': 'getting-started'
   };
 
-  // 🆕 WORKSPACE TO GETTING STARTED DOCUMENTATION MAPPING
+  // WORKSPACE TO GETTING STARTED DOCUMENTATION MAPPING
   const workspaceToGettingStarted = {
     'grants-management': '/docs/grants-getting-started',
     'donor-management': '/docs/donor-getting-started',
     'fundraising': '/docs/fundraising-getting-started',
-    'project-management': null, // No doc yet
-    'volunteer': null // No doc yet
+    'project-management': null,
+    'volunteer': null
   };
 
   // SET WORKSPACE BASED ON CURRENT ROUTE + DEFAULT TO GRANTS MANAGEMENT
@@ -98,9 +98,25 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
           }
         }
       }
+
+      // CHECK IF ON DOCS PAGE: /docs/grants-getting-started
+      if (pathParts[1] === 'docs' && pathParts[2]) {
+        const docName = pathParts[2];
+        // Find workspace by matching doc path
+        for (const [workspaceId, docPath] of Object.entries(workspaceToGettingStarted)) {
+          if (docPath === `/docs/${docName}`) {
+            const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
+            if (workspace) {
+              setCurrentWorkspace(workspace);
+              console.log('✅ Set workspace from docs route:', workspace.label);
+              return;
+            }
+          }
+        }
+      }
       
       // DEFAULT: Set to Grants Management for non-profit users
-      if (pathParts[1] !== 'workspaces' && pathParts[1] !== 'boards') {
+      if (pathParts[1] !== 'workspaces' && pathParts[1] !== 'boards' && pathParts[1] !== 'docs') {
         const grantsWorkspace = staticWorkspaceItems.find(item => item.id === 'grants-management');
         if (grantsWorkspace && !currentWorkspace) {
           setCurrentWorkspace(grantsWorkspace);
@@ -108,7 +124,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         }
       }
     }
-  }, [category, staticWorkspaceItems, location.pathname]);
+  }, [category, staticWorkspaceItems, location.pathname, currentWorkspace]);
 
   const handleBoardClick = (boardId, boardName) => {
     setActiveItem(boardName);
@@ -125,7 +141,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     console.log('🔄 Workspace changed to:', item.label);
   };
 
-  // 🆕 UPDATED: Handle sub-item clicks with Getting Started doc routing
+  // UPDATED: Handle sub-item clicks with Getting Started doc routing
   const handleSubItemClick = (subItemLabel) => {
     setActiveItem(subItemLabel);
     
@@ -296,8 +312,8 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
       {/* WORKSPACE ITEMS */}
       <div className="workspace-items">
         
-        {/* SHOW SUB-ITEMS IF CURRENT WORKSPACE EXISTS */}
-        {currentWorkspace && currentWorkspace.subItems && currentWorkspace.subItems.length > 0 ? (
+        {/* ✅ ALWAYS SHOW ONLY CURRENT WORKSPACE SUB-ITEMS (For non-profit users) */}
+        {currentWorkspace && currentWorkspace.subItems && currentWorkspace.subItems.length > 0 && (
           <>
             {currentWorkspace.subItems.map((subItem, index) => {
               const subItemLabel = typeof subItem === 'object' ? subItem.label : subItem;
@@ -328,39 +344,6 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
               );
             })}
           </>
-        ) : (
-          // SHOW ALL MAIN WORKSPACES IF NO CURRENT WORKSPACE
-          staticWorkspaceItems.map((item, index) => {
-            const IconComponent = item.icon;
-            const hasValidIcon = IconComponent && typeof IconComponent === 'function';
-            
-            return (
-              <button
-                key={index}
-                onClick={() => item.subItems ? handleWorkspaceChange(item) : setActiveItem(item.label)}
-                className={`workspace-item ${activeItem === item.label ? 'active' : ''}`}
-              >
-                {hasValidIcon ? (
-                  <IconComponent size={16} className="item-icon" />
-                ) : (
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 16 16" 
-                    fill="none"
-                    className="item-icon"
-                    style={{ color: '#676879' }}
-                  >
-                    <rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                  </svg>
-                )}
-                <span>{item.label}</span>
-                {item.subItems && item.subItems.length > 0 && (
-                  <ChevronRight size={16} className="chevron-icon" style={{ marginLeft: 'auto' }} />
-                )}
-              </button>
-            );
-          })
         )}
 
         {/* DIVIDER */}
