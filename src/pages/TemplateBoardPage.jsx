@@ -245,7 +245,7 @@ const TemplateBoardPage = () => {
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
                 {/* TABLE HEADER - Dynamic columns */}
                 <div 
-                  className="bg-gray-50 border-b border-gray-200 text-xs min-h-[32px] "
+                  className="bg-white border-b border-gray-200 text-xs min-h-[32px] "
                   style={{
                     display: 'grid',
                     gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
@@ -382,7 +382,7 @@ const TemplateBoardPage = () => {
                         const summary = getStatusSummary(group.tasks);
                         return (
                           <div key={col.id} className="p-2 border-r border-gray-200">
-                            <div className="flex h-2 rounded-full overflow-hidden bg-gray-200">
+                            <div className="flex h-2 rounded-full overflow-hidden bg-white">
                               {Object.entries(statusConfig).map(([key, config]) => (
                                 summary[key] > 0 && (
                                   <div 
@@ -568,7 +568,7 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
       <div className="relative w-full">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full py-2 px-3 rounded text-xs font-medium bg-gray-300 text-gray-600 hover:opacity-90 transition-all"
+          className="w-full py-2 px-3 rounded text-xs font-medium bg-white text-gray-600 hover:opacity-90 transition-all"
         >
           -
         </button>

@@ -38,7 +38,8 @@ export const nonprofitWorkspaceItems = [
       { label: 'Donors', icon: UserPlus },
       { label: 'Donations', icon: DollarSign },
       { label: 'Donor Activities', icon: Activity },
-      { label: 'Donors Dashboard', icon: PieChart }
+      { label: 'Donors Dashboard', icon: PieChart },
+      { label: 'Getting Started', icon: BookOpen }
     ]
   },
   { 

@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import BoardPage from './pages/BoardPage';
-import TemplateBoardPage from './pages/TemplateBoardPage'; // 🆕 NEW
+import TemplateBoardPage from './pages/TemplateBoardPage';
 import WorkspacePage from './pages/WorkspacePage';
 import DashboardLayout from './pages/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
 
-// 🆕 WORKSPACE PAGES
+// WORKSPACE PAGES
 import GrantsManagementPage from './pages/workspace/GrantsManagementPage';
 import DonorManagementPage from './pages/workspace/DonorManagementPage';
 import FundraisingPage from './pages/workspace/FundraisingPage';
 import ProjectManagementPage from './pages/workspace/ProjectManagementPage';
 import VolunteerPage from './pages/workspace/VolunteerPage';
+
+// DOCS PAGES
+import GrantsGettingStarted from './pages/docs/GrantsGettingStarted';
+import DonorGettingStarted from './pages/docs/DonorGettingStarted';
+import FundraisingGettingStarted from './pages/docs/FundraisingGettingStarted';
 
 import { AuthProvider } from "./context/AuthContext";
 import { BoardProvider } from "./context/BoardContext";
@@ -61,11 +66,12 @@ function AppContent() {
     "/templates"
   ];
 
-  // Check if current path starts with /dashboard, /boards, or /workspaces
+  // Check if current path starts with /dashboard, /boards, /workspaces, OR /docs
   const isDashboardRoute = 
     location.pathname.startsWith('/dashboard') || 
     location.pathname.startsWith('/boards') ||
-    location.pathname.startsWith('/workspaces');
+    location.pathname.startsWith('/workspaces') ||
+    location.pathname.startsWith('/docs'); // 🆕 ADDED
   
   const hideNavbar = hideNavbarRoutes.includes(location.pathname) || isDashboardRoute;
 
@@ -172,6 +178,7 @@ function AppContent() {
             </SignupProtectedRoute>
           } 
         />
+        
         <Route
           path="/twelve"
           element={
@@ -195,7 +202,7 @@ function AppContent() {
           <Route index element={<DashboardHome />} />
         </Route>
 
-        {/* 🆕 WORKSPACE ROUTES - Each workspace has its own page */}
+        {/* WORKSPACE ROUTES - Each workspace has its own page */}
         <Route path="/workspaces/:workspaceId" element={<DashboardLayout />}>
           <Route path="grants-management" element={<GrantsManagementPage />} />
           <Route path="donor-management" element={<DonorManagementPage />} />
@@ -204,7 +211,14 @@ function AppContent() {
           <Route path="volunteer" element={<VolunteerPage />} />
         </Route>
 
-        {/* 🆕 TEMPLATE BOARD ROUTE - For predefined templates */}
+        {/* 🆕 DOCS ROUTES - Getting Started Documentation Pages */}
+        <Route path="/docs" element={<DashboardLayout />}>
+          <Route path="grants-getting-started" element={<GrantsGettingStarted />} />
+          <Route path="donor-getting-started" element={<DonorGettingStarted />} />
+          <Route path="fundraising-getting-started" element={<FundraisingGettingStarted />} />
+        </Route>
+
+        {/* TEMPLATE BOARD ROUTE - For predefined templates */}
         <Route path="/boards/template/:templateId" element={<DashboardLayout />}>
           <Route index element={<TemplateBoardPage />} />
         </Route>
