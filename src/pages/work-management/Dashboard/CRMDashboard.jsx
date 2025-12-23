@@ -61,7 +61,7 @@ const CRMDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#e1eff2]">
+    <div className="min-h-screen ">
       {/* Top Navbar - Full Width */}
       <MondayCRMNavbar />
       

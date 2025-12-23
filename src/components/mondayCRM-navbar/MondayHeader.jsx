@@ -51,7 +51,7 @@ export default function MondayHeader() {
           alignItems: 'center',
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: '10px'
+          // borderRadius: '10px'
         }}
       >
         {/* Left side - Text Container */}

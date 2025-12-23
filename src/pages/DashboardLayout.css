@@ -1,57 +1,39 @@
-/* src/pages/DashboardLayout.css - FIXED LAYOUT */
 
-/* ========================================
-   DASHBOARD LAYOUT - Full Page Structure
-   ======================================== */
-
-/* Main Container - Full Screen */
-/* Main outer background */
+.dashboard-layout-wrapper{
+  background: #E1EFF2; 
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  padding: 0px 10px;
+  
+}
 .dashboard-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  /* background: #E1EFF2;  */
   font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', sans-serif;
 }
 
-/* Container below navbar */
 .dashboard-container {
   display: flex;
-  /* height: calc(100vh - 64px);  */
   overflow: hidden;
-  background: #E1EFF2; /* ✅ Keep same as outer */
   position: relative;
 }
 
-/* Sidebar wrapper - has the cyan background */
-.dashboard-sidebar-wrapper {
-  flex-shrink: 0;
-  height: 100%;
-  overflow: hidden;
-  background: #EAF4F6; /* ✅ Sidebar cyan background */
-  border-right: 1px solid #c5d1d5;
-  z-index: 50;
-  margin: 0;
-  padding: 0;
-}
-
-/* Content area - white background for cards */
 .dashboard-content-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #E1EFF2; /* ✅ Keep consistent with outer */
 }
 
 .dashboard-main-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #E1EFF2; /* ✅ Background for content area */
-  padding: 24px; /* ✅ Add padding so cards don't touch edges */
+  padding: 24px; 
 }
 /* ========================================
    SIDEBAR - Fixed Left Side (NO GAP)
@@ -60,10 +42,7 @@
   flex-shrink: 0;
   height: 100%;
   overflow: hidden;
-  background: #ffffff; /* ✅ SIDEBAR WHITE */
-  border-right: 1px solid #d0d4e4; /* ✅ BORDER COLOR */
   z-index: 50;
-  /* ❌ Remove any margin/padding */
   margin: 0;
   padding: 0;
 }
@@ -76,10 +55,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #ffffff; /* ✅ CONTENT BACKGROUND */
+  background: #E1EFF2; 
+  border-radius: 10px 0px 0px 0px;
+  
 }
 
-/* Header (if you have MondayHeader) */
 .dashboard-header {
   flex-shrink: 0;
   background: #ffffff;
@@ -88,16 +68,14 @@
   z-index: 10;
 }
 
-/* Main Scrollable Content */
 .dashboard-main-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #ffffff; /* ✅ SCROLLABLE AREA BACKGROUND */
-  padding: 0; /* ❌ Remove padding if you want full width */
+  background: #ffffff; 
+  padding: 0; 
 }
 
-/* Custom Scrollbar */
 .dashboard-main-content::-webkit-scrollbar {
   width: 8px;
 }

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
 
-import SidebarHeader from './components/SidebarHeader';
+// import SidebarHeader from './components/SidebarHeader';
 import SidebarResizeHandle from './components/SidebarResizeHandle';
 import SidebarAppFeatures from './components/SidebarAppFeatures';
 import SidebarCollapsed from './components/SidebarCollapsed';
@@ -16,11 +16,11 @@ const Sidebar = ({ boards = [], onBoardClick }) => {
   return (
     <nav className="sidebar" style={{ width: isCollapsed ? 60 : sidebarWidth }}>
       
-      <SidebarHeader
+      {/* <SidebarHeader
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
         sidebarWidth={sidebarWidth}
-      />
+      /> */}
 
       {!isCollapsed && (
         <SidebarResizeHandle setSidebarWidth={setSidebarWidth} />

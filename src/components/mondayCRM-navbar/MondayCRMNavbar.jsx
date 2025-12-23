@@ -331,7 +331,7 @@ const MondayCRMNavbar = () => {
               }}
               className={`nav-btn ${isNotificationOpen ? 'active' : ''}`}
             >
-              <Bell size={20} />
+              <Bell size={17} />
             </button>
             
             {unreadCount > 0 && (
@@ -373,7 +373,7 @@ const MondayCRMNavbar = () => {
                   )}
                   
                   <button onClick={() => setIsNotificationOpen(false)} className="action-btn">
-                    <X size={20} />
+                    <X size={17} />
                   </button>
                 </div>
               </div>
@@ -446,7 +446,7 @@ const MondayCRMNavbar = () => {
               setIsInboxOpen(!isInboxOpen);
             }}
           >
-            <Inbox size={20} />
+            <Inbox size={17} />
           </button>
           {inboxUnreadCount > 0 && (
             <span className="badge-static">{inboxUnreadCount}</span>
@@ -457,7 +457,7 @@ const MondayCRMNavbar = () => {
               <div className="dropdown-header">
                 <h3 className="dropdown-title">Inbox</h3>
                 <button onClick={() => setIsInboxOpen(false)} className="action-btn">
-                  <X size={20} />
+                  <X size={17} />
                 </button>
               </div>
               <div className="notifications-list">
@@ -492,17 +492,17 @@ const MondayCRMNavbar = () => {
             setIsInviteOpen(!isInviteOpen);
           }}
         >
-          <UserPlus size={20} />
+          <UserPlus size={17} />
         </button>
         {isInviteOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '400px' }}>
             <div className="dropdown-header">
               <h3 className="dropdown-title">Invite Team Members</h3>
               <button onClick={() => setIsInviteOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '17px' }}>
               <div style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#323338' }}>
                   Email address
@@ -553,14 +553,14 @@ const MondayCRMNavbar = () => {
             setIsAppsOpen(!isAppsOpen);
           }}
         >
-          <Puzzle size={20} />
+          <Puzzle size={17} />
         </button>
         {isAppsOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '350px' }}>
             <div className="dropdown-header">
               <h3 className="dropdown-title">Apps & Integrations</h3>
               <button onClick={() => setIsAppsOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
             <div className="notifications-list">
@@ -600,17 +600,17 @@ const MondayCRMNavbar = () => {
             setIsAIOpen(!isAIOpen);
           }}
         >
-          <Bot size={20} />
+          <Bot size={17} />
         </button>
         {isAIOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '400px' }}>
             <div className="dropdown-header">
               <h3 className="dropdown-title">🤖 AI Assistant</h3>
               <button onClick={() => setIsAIOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '17px' }}>
               <div style={{ marginBottom: '15px', fontSize: '14px', color: '#323338' }}>
                 How can I help you today?
               </div>
@@ -654,14 +654,14 @@ const MondayCRMNavbar = () => {
             setIsSettingsOpen(!isSettingsOpen);
           }}
         >
-          <Settings size={20} />
+          <Settings size={17} />
         </button>
         {isSettingsOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '300px' }}>
             <div className="dropdown-header">
               <h3 className="dropdown-title">Settings</h3>
               <button onClick={() => setIsSettingsOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
             <div className="notifications-list">
@@ -700,7 +700,7 @@ const MondayCRMNavbar = () => {
             }
           }}
         >
-          <Search size={20} />
+          <Search size={17} />
         </button>
         {isSearchOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '500px' }}>
@@ -722,7 +722,7 @@ const MondayCRMNavbar = () => {
                 />
               </div>
               <button onClick={() => setIsSearchOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
             <div className="notifications-list">
@@ -756,16 +756,16 @@ const MondayCRMNavbar = () => {
               setIsHelpOpen(!isHelpOpen);
             }}
           >
-            <HelpCircle size={20} />
+            <HelpCircle size={17} />
           </button>
           <div className="badge-orange"></div>
 
           {isHelpOpen && (
-            <div className="notification-dropdown" style={{ right: '0', width: '320px' }}>
+            <div className="notification-dropdown" style={{ right: '0', width: '317px' }}>
               <div className="dropdown-header">
                 <h3 className="dropdown-title">Help & Support</h3>
                 <button onClick={() => setIsHelpOpen(false)} className="action-btn">
-                  <X size={20} />
+                  <X size={17} />
                 </button>
               </div>
               <div className="notifications-list">
@@ -808,14 +808,14 @@ const MondayCRMNavbar = () => {
             setIsFavoritesOpen(!isFavoritesOpen);
           }}
         >
-          <Heart size={20} />
+          <Heart size={17} />
         </button>
         {isFavoritesOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '300px' }}>
             <div className="dropdown-header">
               <h3 className="dropdown-title">Favorites</h3>
               <button onClick={() => setIsFavoritesOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
             <div className="notifications-list">
@@ -846,14 +846,14 @@ const MondayCRMNavbar = () => {
             setIsAppsLauncherOpen(!isAppsLauncherOpen);
           }}
         >
-          <Grid size={20} />
+          <Grid size={17} />
         </button>
         {isAppsLauncherOpen && (
           <div className="notification-dropdown" style={{ right: '0', width: '300px' }}>
             <div className="dropdown-header">
               <h3 className="dropdown-title">Apps</h3>
               <button onClick={() => setIsAppsLauncherOpen(false)} className="action-btn">
-                <X size={20} />
+                <X size={17} />
               </button>
             </div>
             <div style={{ padding: '15px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>

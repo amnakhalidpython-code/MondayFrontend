@@ -142,7 +142,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
       'Volunteer Registration Management': '#FFCB00',
       'Project Management': '#0073EA'
     };
-    return colorMap[workspaceLabel] || '#666';
+    return colorMap[workspaceLabel] || '#007f9b';
   };
 
   const getWorkspaceInitial = (workspaceLabel) => {
@@ -167,7 +167,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     if (currentWorkspace) {
       return getWorkspaceColor(currentWorkspace.label);
     }
-    return category === 'ngo' || category === 'nonprofit' ? '#FB275D' : '#666';
+    return category === 'ngo' || category === 'nonprofit' ? '#FB275D' : '#007f9b';
   };
 
   return (

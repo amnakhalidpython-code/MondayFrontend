@@ -1,23 +1,19 @@
-// BoardPage.jsx - Updated with imported BoardHeader
+// BoardPage.jsx - Updated with Tailwind UI
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   ChevronDown, 
   ChevronRight,
-  ChevronUp,
   Plus, 
-  Search, 
   User, 
-  Filter, 
-  MoreHorizontal,
   Info,
   MessageSquare,
   Star,
- 
+  MoreHorizontal,
+  CheckCircle2,
 } from 'lucide-react';
-import './BoardPage.css';
 import ActionBar from '../components/board/components/ActionBar';
-import BoardHeader from '../components/board/components/BoardHeader'; // Import the separate component
+import BoardHeader from '../components/board/components/BoardHeader'; 
 
 const BoardPage = () => {
   const { boardId } = useParams();
@@ -302,7 +298,7 @@ const BoardPage = () => {
   };
 
   return (
-    <div className="board-page">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* USE IMPORTED BOARD HEADER */}
       <BoardHeader boardTitle={boardName} />
 
@@ -320,156 +316,177 @@ const BoardPage = () => {
       />
 
       {/* BOARD CONTENT */}
-      <div className="board-content">
+      <div className="p-6 flex-1 overflow-y-auto bg-white">
         {(searchQuery ? filteredGroups : groups).map(group => (
-          <div key={group.id} className="board-group">
+          <div key={group.id} className="mb-6">
             {/* GROUP HEADER */}
-            <div className="group-header-row">
-              <button 
-                onClick={() => toggleGroup(group.id)}
-                className="group-toggle"
-              >
+            <div 
+              className="flex items-center gap-2 mb-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              onClick={() => toggleGroup(group.id)}
+            >
+              <button className="text-gray-500 hover:text-gray-700">
                 {group.expanded ? (
-                  <ChevronDown size={16} style={{ color: group.color }} />
+                  <ChevronDown size={18} style={{ color: group.color }} />
                 ) : (
-                  <ChevronRight size={16} style={{ color: group.color }} />
+                  <ChevronRight size={18} style={{ color: group.color }} />
                 )}
               </button>
-              <h3 className="group-title" style={{ color: group.color }}>
+              <div className="w-1 h-5 rounded" style={{ backgroundColor: group.color }}></div>
+              <h3 className="text-base font-medium text-gray-800" style={{ color: group.color }}>
                 {group.name}
               </h3>
-              <span className="group-count">
-                {group.tasks.length === 0 ? 'No Tasks' : `${group.tasks.length} Tasks`}
+              <span className="text-sm text-gray-500">
+                {group.tasks.length === 0 ? 'No Tasks' : `${group.tasks.length} ${group.tasks.length === 1 ? 'Task' : 'Tasks'}`}
               </span>
             </div>
 
             {group.expanded && (
-              <div className="group-content" style={{ borderLeftColor: group.color }}>
-                <div className="board-table">
-                  {/* TABLE HEADER */}
-                  <div className="table-header">
-                    <div className="table-cell cell-checkbox"></div>
-                    <div className="table-cell cell-task">Task</div>
-                    {!hiddenColumns.includes('owner') && (
-                      <div className="table-cell cell-owner">Owner</div>
-                    )}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                {/* TABLE HEADER */}
+                <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] bg-gray-50 border-b border-gray-200 text-xs min-h-[36px]">
+                  <div className="p-3 flex items-center justify-center border-r border-gray-200">
+                    <div className="w-4 h-4 border border-gray-300 rounded"></div>
+                  </div>
+                  <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                    <span>Task</span>
+                  </div>
+                  {!hiddenColumns.includes('owner') && (
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                      <User size={14} />
+                      <span>Owner</span>
+                    </div>
+                  )}
+                  {!hiddenColumns.includes('status') && (
+                    <div className="p-9 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                      <span>Status</span>
+                      <Info size={12} className="text-gray-400" />
+                    </div>
+                  )}
+                  {!hiddenColumns.includes('dueDate') && (
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                      <span>Due date</span>
+                      <Info size={12} className="text-gray-400" />
+                    </div>
+                  )}
+                  {!hiddenColumns.includes('numbers') && (
+                    <div className="p-3 flex items-center gap-2 border-r border-gray-200 font-medium text-gray-600">
+                      <span>Numbers</span>
+                    </div>
+                  )}
+                  <div className="p-3 flex items-center justify-center">
+                    <Plus size={14} className="text-gray-400" />
+                  </div>
+                </div>
+
+                {/* TABLE ROWS */}
+                {group.tasks.map(task => (
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    groupId={group.id}
+                    groupColor={group.color}
+                    statusConfig={statusConfig}
+                    updateTaskStatus={updateTaskStatus}
+                    hiddenColumns={hiddenColumns}
+                  />
+                ))}
+
+                {/* ADD TASK ROW */}
+                {newTaskInput.groupId === group.id ? (
+                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3 border-r border-gray-100">
+                      <input
+                        type="text"
+                        value={newTaskInput.value}
+                        onChange={(e) => setNewTaskInput({ ...newTaskInput, value: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveTask(group.id);
+                          if (e.key === 'Escape') setNewTaskInput({ groupId: null, value: '' });
+                        }}
+                        onBlur={() => saveTask(group.id)}
+                        className="w-full text-sm text-gray-800 outline-none border-none"
+                        placeholder="Task name"
+                        autoFocus
+                      />
+                    </div>
+                    {!hiddenColumns.includes('owner') && <div className="p-3 border-r border-gray-100"></div>}
+                    {!hiddenColumns.includes('status') && <div className="p-3 border-r border-gray-100"></div>}
+                    {!hiddenColumns.includes('dueDate') && <div className="p-3 border-r border-gray-100"></div>}
+                    {!hiddenColumns.includes('numbers') && <div className="p-3 border-r border-gray-100"></div>}
+                    <div className="p-3"></div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3 border-r border-gray-100">
+                      <button 
+                        onClick={() => startAddTask(group.id)}
+                        className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2"
+                      >
+                        <Plus size={14} />
+                        <span>Add task</span>
+                      </button>
+                    </div>
+                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3 border-r border-gray-100"></div>
+                    <div className="p-3"></div>
+                  </div>
+                )}
+
+                {/* SUMMARY ROW */}
+                {group.tasks.length > 0 && (
+                  <div className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] bg-gray-50">
+                    <div className="p-3 border-r border-gray-200"></div>
+                    <div className="p-3 border-r border-gray-200"></div>
+                    {!hiddenColumns.includes('owner') && <div className="p-3 border-r border-gray-200"></div>}
                     {!hiddenColumns.includes('status') && (
-                      <div className="table-cell cell-status">
-                        Status
-                        <Info size={14} className="info-icon" />
+                      <div className="p-2 border-r border-gray-200">
+                        <div className="flex h-2 rounded-full overflow-hidden bg-gray-200">
+                          {getStatusSummary(group.tasks).done > 0 && (
+                            <div style={{ width: `${getStatusSummary(group.tasks).done}%`, backgroundColor: '#00C875' }}></div>
+                          )}
+                          {getStatusSummary(group.tasks).working > 0 && (
+                            <div style={{ width: `${getStatusSummary(group.tasks).working}%`, backgroundColor: '#FDAB3D' }}></div>
+                          )}
+                          {getStatusSummary(group.tasks).stuck > 0 && (
+                            <div style={{ width: `${getStatusSummary(group.tasks).stuck}%`, backgroundColor: '#E44258' }}></div>
+                          )}
+                        </div>
                       </div>
                     )}
                     {!hiddenColumns.includes('dueDate') && (
-                      <div className="table-cell cell-date">
-                        Due date
-                        <Info size={14} className="info-icon" />
+                      <div className="p-3 border-r border-gray-200">
+                        {getDateRange(group.tasks) !== '-' && (
+                          <div className="inline-flex px-3 py-1 bg-blue-500 text-white text-xs rounded-full font-medium">
+                            {getDateRange(group.tasks)}
+                          </div>
+                        )}
                       </div>
                     )}
                     {!hiddenColumns.includes('numbers') && (
-                      <div className="table-cell cell-numbers">Numbers</div>
+                      <div className="p-3 border-r border-gray-200 text-right">
+                        <div className="text-sm font-semibold text-gray-800">0</div>
+                        <div className="text-xs text-gray-500">sum</div>
+                      </div>
                     )}
-                    <div className="table-cell cell-add">
-                      <Plus size={16} />
-                    </div>
+                    <div className="p-3"></div>
                   </div>
-
-                  {/* TABLE ROWS */}
-                  {group.tasks.map(task => (
-                    <TaskRow
-                      key={task.id}
-                      task={task}
-                      groupId={group.id}
-                      groupColor={group.color}
-                      statusConfig={statusConfig}
-                      updateTaskStatus={updateTaskStatus}
-                      hiddenColumns={hiddenColumns}
-                    />
-                  ))}
-
-                  {/* ADD TASK ROW */}
-                  {newTaskInput.groupId === group.id ? (
-                    <div className="table-row add-row">
-                      <div className="table-cell cell-checkbox"></div>
-                      <div className="table-cell cell-task">
-                        <input
-                          type="text"
-                          value={newTaskInput.value}
-                          onChange={(e) => setNewTaskInput({ ...newTaskInput, value: e.target.value })}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveTask(group.id);
-                            if (e.key === 'Escape') setNewTaskInput({ groupId: null, value: '' });
-                          }}
-                          onBlur={() => saveTask(group.id)}
-                          className="add-task-input"
-                          placeholder="Task name"
-                          autoFocus
-                        />
-                      </div>
-                      {!hiddenColumns.includes('owner') && <div className="table-cell cell-owner"></div>}
-                      {!hiddenColumns.includes('status') && <div className="table-cell cell-status"></div>}
-                      {!hiddenColumns.includes('dueDate') && <div className="table-cell cell-date"></div>}
-                      {!hiddenColumns.includes('numbers') && <div className="table-cell cell-numbers"></div>}
-                      <div className="table-cell cell-add"></div>
-                    </div>
-                  ) : (
-                    <div className="table-row add-row-btn">
-                      <div className="table-cell cell-checkbox"></div>
-                      <div className="table-cell cell-task">
-                        <button 
-                          onClick={() => startAddTask(group.id)}
-                          className="add-task-btn"
-                        >
-                          <Plus size={14} />
-                          Add task
-                        </button>
-                      </div>
-                      <div className="table-cell cell-owner"></div>
-                      <div className="table-cell cell-status"></div>
-                      <div className="table-cell cell-date"></div>
-                      <div className="table-cell cell-numbers"></div>
-                      <div className="table-cell cell-add"></div>
-                    </div>
-                  )}
-
-                  {/* SUMMARY ROW */}
-                  {group.tasks.length > 0 && (
-                    <div className="table-row summary-row">
-                      <div className="table-cell cell-checkbox"></div>
-                      <div className="table-cell cell-task"></div>
-                      <div className="table-cell cell-owner"></div>
-                      <div className="table-cell cell-status">
-                        <StatusBar summary={getStatusSummary(group.tasks)} statusConfig={statusConfig} />
-                      </div>
-                      <div className="table-cell cell-date">
-                        <div className="date-range-pill">
-                          {getDateRange(group.tasks)}
-                        </div>
-                      </div>
-                      <div className="table-cell cell-numbers">
-                        <div className="numbers-sum">
-                          <span className="sum-value">0</span>
-                          <span className="sum-label">sum</span>
-                        </div>
-                      </div>
-                      <div className="table-cell cell-add"></div>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             )}
           </div>
         ))}
 
-        <div className="add-group-section">
-          <button className="add-group-btn">
-            <Plus size={20} />
+        <div className="mt-4">
+          <button className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+            <Plus size={16} />
             Add new group
           </button>
         </div>
       </div>
-
-      {/* HELP BUTTON */}
-      <button className="help-btn">Help</button>
     </div>
   );
 };
@@ -480,51 +497,49 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
 
   return (
     <div 
-      className="table-row task-row"
+      className="grid grid-cols-[40px_240px_140px_140px_140px_120px_40px] border-b border-gray-100 hover:bg-gray-50 transition-colors relative"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div className="table-cell cell-checkbox">
-        <div className="left-indicator" style={{ backgroundColor: groupColor }}></div>
-        <input type="checkbox" className="task-checkbox" />
+      <div className="p-3 flex items-center justify-center border-r border-gray-100 relative">
+        <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r" style={{ backgroundColor: groupColor }}></div>
+        <input type="checkbox" className="w-4 h-4 border-2 border-gray-300 rounded cursor-pointer" />
       </div>
 
-      <div className="table-cell cell-task">
-        <button className="expand-btn">
-          <ChevronRight size={16} />
-        </button>
-        <span className="task-name">{task.name}</span>
+      <div className="p-3 flex items-center gap-2 border-r border-gray-100">
+        <ChevronRight size={16} className="text-gray-500" />
+        <span className="text-sm text-gray-800">{task.name}</span>
         {showActions && (
-          <div className="task-actions">
-            <button className="task-action-btn">
-              <Star size={16} />
+          <div className="ml-auto flex items-center gap-1">
+            <button className="p-1 hover:bg-white rounded border border-gray-200">
+              <Star size={14} className="text-gray-400" />
             </button>
-            <button className="task-action-btn">
-              <MessageSquare size={16} />
+            <button className="p-1 hover:bg-white rounded border border-gray-200">
+              <MessageSquare size={14} className="text-gray-400" />
             </button>
           </div>
         )}
       </div>
 
       {!hiddenColumns.includes('owner') && (
-        <div className="table-cell cell-owner">
+        <div className="p-3 flex items-center border-r border-gray-100">
           {task.owner ? (
             <div 
-              className="owner-avatar"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"
               style={{ backgroundColor: task.owner.color }}
             >
               {task.owner.initial}
             </div>
           ) : (
-            <button className="add-owner-btn">
-              <User size={16} />
-            </button>
+            <div className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 cursor-pointer hover:border-blue-500 hover:text-blue-500 transition-colors">
+              <User size={14} />
+            </div>
           )}
         </div>
       )}
 
       {!hiddenColumns.includes('status') && (
-        <div className="table-cell cell-status">
+        <div className="p-2 flex items-center border-r border-gray-100">
           <StatusCell 
             currentStatus={task.status}
             statusConfig={statusConfig}
@@ -534,25 +549,34 @@ const TaskRow = ({ task, groupId, groupColor, statusConfig, updateTaskStatus, hi
       )}
 
       {!hiddenColumns.includes('dueDate') && (
-        <div className="table-cell cell-date">
+        <div className="p-3 flex items-center gap-2 border-r border-gray-100">
           {task.dueDate ? (
-            <div className="date-cell">
-              {task.overdue && <div className="overdue-dot"></div>}
-              <span>{task.dueDate}</span>
-            </div>
+            <>
+              {task.overdue && task.status !== 'done' && (
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+              )}
+              <span className={`text-sm ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                {task.dueDate}
+              </span>
+              {task.status === 'done' && <CheckCircle2 size={14} className="text-green-500" />}
+            </>
           ) : (
-            <span className="empty-date">-</span>
+            <span className="text-sm text-gray-400">-</span>
           )}
         </div>
       )}
 
       {!hiddenColumns.includes('numbers') && (
-        <div className="table-cell cell-numbers">
-          {task.numbers || ''}
+        <div className="p-3 flex items-center border-r border-gray-100">
+          <span className="text-sm text-gray-600">{task.numbers || '-'}</span>
         </div>
       )}
 
-      <div className="table-cell cell-add"></div>
+      <div className="p-3 flex items-center justify-center">
+        <button className="text-gray-400 hover:text-gray-600">
+          <MoreHorizontal size={16} />
+        </button>
+      </div>
     </div>
   );
 };
@@ -563,16 +587,16 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
 
   if (!currentStatus) {
     return (
-      <div className="status-dropdown">
+      <div className="relative w-full">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="status-btn empty"
+          className="w-full py-2 px-3 rounded text-xs font-medium bg-gray-300 text-gray-600 hover:opacity-90 transition-all"
         >
           -
         </button>
         {isOpen && (
           <>
-            <div className="dropdown-overlay" onClick={() => setIsOpen(false)} />
+            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
             <StatusMenu 
               statusConfig={statusConfig}
               onChange={(status) => {
@@ -589,10 +613,10 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
   const config = statusConfig[currentStatus];
 
   return (
-    <div className="status-dropdown">
+    <div className="relative w-full">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="status-btn"
+        className="w-full py-2 px-3 rounded text-xs font-medium text-white hover:opacity-90 transition-all"
         style={{ backgroundColor: config.bg }}
       >
         {config.label}
@@ -600,7 +624,7 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
 
       {isOpen && (
         <>
-          <div className="dropdown-overlay" onClick={() => setIsOpen(false)} />
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <StatusMenu 
             statusConfig={statusConfig}
             onChange={(status) => {
@@ -616,53 +640,17 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
 
 // STATUS MENU
 const StatusMenu = ({ statusConfig, onChange }) => (
-  <div className="status-menu">
+  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[180px]">
     {Object.entries(statusConfig).map(([key, config]) => (
       <button
         key={key}
         onClick={() => onChange(key)}
-        className="status-menu-item"
+        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors"
       >
-        <div 
-          className="status-color"
-          style={{ backgroundColor: config.bg }}
-        />
-        <span>{config.label}</span>
+        <div className="w-6 h-6 rounded" style={{ backgroundColor: config.bg }}></div>
+        <span className="text-gray-700">{config.label}</span>
       </button>
     ))}
-  </div>
-);
-
-// STATUS BAR
-const StatusBar = ({ summary, statusConfig }) => (
-  <div className="status-bar">
-    {summary.done > 0 && (
-      <div 
-        className="status-segment"
-        style={{ 
-          width: `${summary.done}%`,
-          backgroundColor: statusConfig.done.bg
-        }}
-      />
-    )}
-    {summary.working > 0 && (
-      <div 
-        className="status-segment"
-        style={{ 
-          width: `${summary.working}%`,
-          backgroundColor: statusConfig.working.bg
-        }}
-      />
-    )}
-    {summary.stuck > 0 && (
-      <div 
-        className="status-segment"
-        style={{ 
-          width: `${summary.stuck}%`,
-          backgroundColor: statusConfig.stuck.bg
-        }}
-      />
-    )}
   </div>
 );
 

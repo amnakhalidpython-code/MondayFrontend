@@ -6,27 +6,91 @@ export const boardTemplates = {
   // GRANTS PIPELINE BOARD
   // ================================
   'grants-pipeline': {
-    title: 'Grants Pipeline',
-    newItemText: 'New grant',
-    addItemText: '+ Add grant',
-    columns: [
-      { id: 'name', title: 'Grant', type: 'text', width: 300 },
-      { id: 'status', title: 'Status', type: 'status', width: 150 },
-      { id: 'owner', title: 'Owner', type: 'person', width: 120 },
-      { id: 'dueDate', title: 'Due Date', type: 'date', width: 120 },
-      { id: 'grantAmount', title: 'Grant Amount', type: 'number', width: 140 },
-      { id: 'grantProvider', title: 'Grant Provider', type: 'text', width: 200 }
-    ],
-    groups: [
-      { id: 'active', name: 'Active Grants', color: '#579BFC', expanded: true, tasks: [] },
-      { id: 'submitted', name: 'Grants Submitted', color: '#A25DDC', expanded: true, tasks: [] }
-    ],
-    statusConfig: {
-      working: { label: 'Working on it', bg: '#FDAB3D' },
-      awarded: { label: 'Awarded', bg: '#00C875' },
-      submitted: { label: 'Submitted', bg: '#A25DDC' }
+  title: 'Grants Pipeline',
+  newItemText: 'New grant',
+  addItemText: 'Add grant',
+  columns: [
+    { id: 'name', title: 'Grant', type: 'text', width: 320 },
+    { id: 'status', title: 'Status', type: 'status', width: 160 },
+    { id: 'owner', title: 'Owner', type: 'person', width: 120 },
+    { id: 'dueDate', title: 'Due Date', type: 'date', width: 140 },
+    { id: 'grantAmount', title: 'Grant Amount', type: 'number', width: 160 },
+    { id: 'grantProvider', title: 'Grant Provider', type: 'text', width: 220 }
+  ],
+  groups: [
+    {
+      id: 'active',
+      name: 'Active Grants',
+      color: '#FDAB3D',
+      expanded: true,
+      tasks: [
+        {
+          id: '1',
+          name: 'Grant Name 1',
+          status: 'working',
+          owner: { name: 'John Doe', initial: 'JD', color: '#7F8D9C' },
+          dueDate: 'Sep 14, 2025',
+          grantAmount: 35000,
+          grantProvider: 'Organization Name',
+          overdue: false
+        },
+        {
+          id: '2',
+          name: 'Community Health Initiative Grant',
+          status: 'working',
+          owner: { name: 'Sarah Chen', initial: 'SC', color: '#00C875' },
+          dueDate: 'Oct 20, 2025',
+          grantAmount: 75000,
+          grantProvider: 'Health Foundation',
+          overdue: false
+        }
+      ]
+    },
+    {
+      id: 'submitted',
+      name: 'Grants Submitted',
+      color: '#A25DDC',
+      expanded: true,
+      tasks: [
+        {
+          id: '3',
+          name: 'Grant Name 3',
+          status: 'working',
+          owner: null,
+          dueDate: 'Jun 14, 2025',
+          grantAmount: 50000,
+          grantProvider: 'Organization Name',
+          overdue: true
+        },
+        {
+          id: '4',
+          name: 'Grant Name 4',
+          status: 'awarded',
+          owner: { name: 'Alex Rivera', initial: 'AR', color: '#FDAB3D' },
+          dueDate: 'Jul 11, 2025',
+          grantAmount: 25000,
+          grantProvider: 'Organization Name',
+          overdue: true
+        },
+        {
+          id: '5',
+          name: 'Grant Name 2',
+          status: 'submitted',
+          owner: null,
+          dueDate: 'Aug 25, 2025',
+          grantAmount: 10000,
+          grantProvider: 'Organization Name',
+          overdue: false
+        }
+      ]
     }
-  },
+  ],
+  statusConfig: {
+    working: { label: 'Working on it', bg: '#FDAB3D' },
+    submitted: { label: 'Submitted', bg: '#A25DDC' },
+    awarded: { label: 'Awarded', bg: '#00C875' }
+  }
+},
 
   // ================================
   // DONORS BOARD

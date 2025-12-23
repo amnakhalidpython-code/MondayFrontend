@@ -64,6 +64,7 @@ const DashboardLayout = () => {
   };
 
   return (
+   < div className="dashboard-layout-wrapper">
     <div className="dashboard-layout">
       {/* ✅ Top Navbar - Always Visible */}
       <MondayCRMNavbar />
@@ -87,6 +88,7 @@ const DashboardLayout = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

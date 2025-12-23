@@ -21,7 +21,7 @@ const WorkspaceDropdown = ({
       'Project Management': '#579bfc'
       
     };
-    return colorMap[workspaceLabel] || '#666';
+    return colorMap[workspaceLabel] || '#007f9b';
   };
 
   // 🆕 WORKSPACE INITIALS

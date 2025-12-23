@@ -1,14 +1,13 @@
-/* Sidebar container - cyan background */
 .sidebar {
-  /* position: relative; */
+  position: relative;
   height: 100vh;
-  background: #E1EFF2; /* ✅ Sidebar cyan */
   font-family: 'Figtree', 'Roboto', 'Noto Sans Hebrew', sans-serif;
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; 
-  border-top: 1px solid #d0d4e4; /* ✅ Top border to match Monday.com */
+  border-radius: 10px 0px 0px 0px;
+  background-color: #F1F8F9;
 }
 
 /* Sidebar content */
@@ -21,7 +20,6 @@
   overflow-y: auto;
   opacity: 1;
   background: transparent;
-  
 }
 
 /* Sidebar section (top items) */
@@ -30,9 +28,37 @@
   flex-direction: column;
   gap: 2px;
   padding: 6px 16px 8px 16px;
-  margin-top: 6px;
-  background-color: transparent; /* ✅ Transparent */
-  
+  margin-top: 3px;
+  background-color: transparent; 
+}
+.sidebar-section.collapsed {
+  padding: 6px 8px;
+  align-items: center;
+}
+
+.sidebar-item-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #676879;
+  margin-bottom: 4px;
+}
+
+.sidebar-item-collapsed:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #323338;
+}
+
+.sidebar-item-collapsed.active {
+  background: rgba(255, 255, 255, 0.7);
+  color: #323338;
 }
 
 /* Sidebar items - buttons */
@@ -48,20 +74,21 @@
   cursor: pointer;
   transition: all 0.15s ease;
   color: #676879;
-  font-size: 14px;
+  font-size: 6px;
   font-weight: 400;
   text-decoration: none;
   width: 100%;
   text-align: left;
+  
 }
 
 .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.5); /* ✅ Semi-transparent white on hover */
+  background: rgba(255, 255, 255, 0.5); 
   color: #323338;
 }
 
 .sidebar-item.active {
-  background: rgba(255, 255, 255, 0.7); /* ✅ More opaque white for active */
+  background: rgba(255, 255, 255, 0.7); 
   color: #323338;
   font-weight: 500;
 }
@@ -73,7 +100,7 @@
   flex-direction: column;
   padding: 0 16px 16px 16px;
   overflow-y: auto;
-  background: transparent; /* ✅ Let parent cyan show */
+  background: transparent; 
 }
 
 /* Workspace items */
@@ -89,7 +116,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   color: #676879;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   text-align: left;
   width: 100%;
@@ -99,23 +126,23 @@
 /* ========================================
    COLLAPSE BUTTON - Monday.com Style
    ======================================== */
-.collapse-btn {
+/* .collapse-btn {
   position: absolute;
   top: 12px;
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(119, 46, 46, 0.8);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
-  z-index: 10;
+  z-index: 100000;
   color: #323338;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .collapse-btn:hover {
   background: rgba(255, 255, 255, 1);
@@ -150,8 +177,6 @@
   gap: 8px;
   align-items: center;
 }
-
-/* Icon Buttons - Monday.com exact style */
 .icon-btn {
   width: 24px;
   height: 24px;
@@ -191,7 +216,6 @@
   padding: 0;
 }
 
-/* Workspace Card - Monday.com exact dropdown style */
 .workspace-card {
   flex: 1;
   display: flex;
@@ -218,8 +242,6 @@
 .workspace-card:focus {
   outline: none;
 }
-
-/* Workspace Avatar - Monday.com exact style */
 .workspace-avatar {
   position: relative;
   width: 24px;
@@ -250,7 +272,6 @@
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-/* Workspace Name */
 .workspace-name {
   font-size: 14px;
   font-weight: 500;
@@ -273,8 +294,6 @@
 .workspace-card:hover .workspace-chevron {
   color: #323338;
 }
-
-/* Add Button - Monday.com exact primary style */
 .add-btn {
   width: 32px;
   height: 32px;
@@ -324,7 +343,7 @@
 }
 
 .item-label {
-  font-size: 14px;
+  font-size: 13px;
   flex: 1;
   text-align: left;
   overflow: hidden;
@@ -345,12 +364,11 @@
 }
 
 .workspace-item:hover {
-  background: rgba(255, 255, 255, 0.5); /* ✅ Semi-transparent white */
+  background: rgba(255, 255, 255, 0.5); 
   color: #323338;
 }
-
 .workspace-item.active {
-  background: rgba(255, 255, 255, 0.7); /* ✅ More opaque white */
+  background: rgba(255, 255, 255, 0.7); 
   color: #323338;
   font-weight: 500;
 }
@@ -374,8 +392,6 @@
   width: 16px;
   height: 16px;
 }
-
-/* Workspace Dropdown Menu - Monday.com exact style */
 .workspace-dropdown {
   position: fixed;
   background: #ffffff;
@@ -465,7 +481,6 @@
   margin: 8px 0;
 }
 
-/* Submenus - Monday.com exact style */
 .submenu {
   position: fixed;
   background: #ffffff;
@@ -475,28 +490,26 @@
   min-width: 220px;
   z-index: 10001;
   animation: fadeInSlideRight 0.2s ease;
-  /* Position will be set via JS */
 }
 .edit-submenu,
 .board-submenu,
 .doc-submenu,
 .form-submenu {
-  /* Position will be set dynamically via JavaScript */
 
 
-    position: fixed; /* ✅ Changed to fixed for proper positioning */
+    position: fixed; 
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 8px;
   min-width: 220px;
-  z-index: 10001; /* ✅ Higher than parent */
+  z-index: 10001; 
   animation: fadeInSlideRight 0.2s ease;
 }
 
 
 .workspace-subitem {
-  padding-left: 40px; /* Indent for sub-items */
+  padding-left: 40px; 
   font-size: 13px;
   height: 32px;
 }
@@ -528,7 +541,6 @@
   top: 180px;
 }
 
-/* Icon Picker Panel */
 .icon-picker-panel {
   position: absolute;
   left: 100%;
@@ -637,7 +649,6 @@
   max-width: 280px;
   z-index: 10000;
   animation: fadeInSlideDown 0.2s ease;
-  /* Position will be set via JS */
 }
 .add-menu-title {
   font-size: 12px;
@@ -671,7 +682,6 @@
   width: 240px;
 }
 
-/* Apps Section */
 .apps-section {
   margin-bottom: 12px;
 }
@@ -718,7 +728,6 @@
   background: #e8f2fa;
 }
 
-/* Import Icons */
 .import-icon {
   width: 24px;
   height: 24px;
