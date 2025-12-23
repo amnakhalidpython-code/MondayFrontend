@@ -48,7 +48,9 @@ export const nonprofitWorkspaceItems = [
     workspaceNumber: '2580945',
     icon: null,
     subItems: [
-      { label: 'Donors', icon: UserPlus }
+      { label: 'Donors', icon: UserPlus },
+       { label: 'Getting Started', icon: BookOpen }
+
     ]
   },
   { 
@@ -57,7 +59,8 @@ export const nonprofitWorkspaceItems = [
     workspaceNumber: '2580926',
     icon: null,
     subItems: [
-      { label: 'Project Management', icon: Briefcase }
+      { label: 'Project Management', icon: Briefcase },
+      { label: 'Getting Started', icon: BookOpen }
     ]
   },
   { 
@@ -66,7 +69,8 @@ export const nonprofitWorkspaceItems = [
     workspaceNumber: '2580952',
     icon: null,
     subItems: [
-      { label: 'Volunteer registration management', icon: UserPlus }
+      { label: 'Volunteer registration management', icon: UserPlus },
+      { label: 'Getting Started', icon: BookOpen }
     ]
   },
 ];

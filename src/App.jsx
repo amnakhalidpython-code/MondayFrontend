@@ -42,6 +42,8 @@ import CreateAccount12 from "./components/signup/signup12/CreateAccount12";
 import CreateAccount13 from "./components/signup/signup13/CreateAccount13";
 import CRMDashboard from "./pages/work-management/Dashboard/CRMDashboard";
 import TemplateCenterPage from './components/templates/TemplateCenterPage';
+import VolunteerLearningCenter from "./pages/docs/VolunteerLearningCenter";
+import PMlearningCenter from "./pages/docs/ProjectManagementLearningCenter";
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -216,6 +218,8 @@ function AppContent() {
           <Route path="grants-getting-started" element={<GrantsGettingStarted />} />
           <Route path="donor-getting-started" element={<DonorGettingStarted />} />
           <Route path="fundraising-getting-started" element={<FundraisingGettingStarted />} />
+          <Route path="volunteer-getting-started" element={<VolunteerLearningCenter />} />
+          <Route path="project-management-learning-center" element={<PMlearningCenter />} />
         </Route>
 
         {/* TEMPLATE BOARD ROUTE - For predefined templates */}
