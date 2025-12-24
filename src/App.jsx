@@ -44,6 +44,8 @@ import CRMDashboard from "./pages/work-management/Dashboard/CRMDashboard";
 import TemplateCenterPage from './components/templates/TemplateCenterPage';
 import VolunteerLearningCenter from "./pages/docs/VolunteerLearningCenter";
 import PMlearningCenter from "./pages/docs/ProjectManagementLearningCenter";
+import GrantsDashboard from "./pages/dasboard/GrantDashboard";
+import DonorsDashboard from "./pages/dasboard/DonorsDashboard";
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -68,12 +70,13 @@ function AppContent() {
     "/templates"
   ];
 
-  // Check if current path starts with /dashboard, /boards, /workspaces, OR /docs
+  // Check if current path starts with /dashboard, /boards, /workspaces, /docs, OR /dashboards
   const isDashboardRoute = 
     location.pathname.startsWith('/dashboard') || 
     location.pathname.startsWith('/boards') ||
     location.pathname.startsWith('/workspaces') ||
-    location.pathname.startsWith('/docs'); // 🆕 ADDED
+    location.pathname.startsWith('/docs') ||
+    location.pathname.startsWith('/dashboards'); // 🆕 ADDED
   
   const hideNavbar = hideNavbarRoutes.includes(location.pathname) || isDashboardRoute;
 
@@ -220,6 +223,12 @@ function AppContent() {
           <Route path="fundraising-getting-started" element={<FundraisingGettingStarted />} />
           <Route path="volunteer-getting-started" element={<VolunteerLearningCenter />} />
           <Route path="project-management-learning-center" element={<PMlearningCenter />} />
+        </Route>
+
+        {/* 🆕 DASHBOARD ROUTES - Same pattern as docs & boards */}
+        <Route path="/dashboards" element={<DashboardLayout />}>
+          <Route path="overview" element={<GrantsDashboard />} />
+          <Route path="donor-dashboard" element={<DonorsDashboard />} />
         </Route>
 
         {/* TEMPLATE BOARD ROUTE - For predefined templates */}

@@ -60,7 +60,7 @@ export const nonprofitWorkspaceItems = [
     icon: null,
     subItems: [
       { label: 'Project Management', icon: Briefcase },
-      { label: 'Getting Started', icon: BookOpen }
+      { label: 'Learning Center', icon: BookOpen }
     ]
   },
   { 
@@ -70,7 +70,7 @@ export const nonprofitWorkspaceItems = [
     icon: null,
     subItems: [
       { label: 'Volunteer registration management', icon: UserPlus },
-      { label: 'Getting Started', icon: BookOpen }
+      { label: 'Volunteer Learning Center', icon: BookOpen }
     ]
   },
 ];

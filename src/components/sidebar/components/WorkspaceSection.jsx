@@ -36,27 +36,32 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     'grant-providers': 'grants-management',
     'grants-dashboard': 'grants-management',
     'donors': 'donor-management',
+    'donors-dashboard': 'donor-management',
     'project-management': 'project-management',
     'volunteer-registration': 'volunteer'
   };
 
-  // SUB-ITEM TO TEMPLATE MAPPING
-  const subItemToTemplate = {
-    'Grants Pipeline': 'grants-pipeline',
-    'Getting Started': 'getting-started',
-    'Grant Providers': 'grant-providers',
-    'Grants Dashboard': 'grants-dashboard',
-    'Donors': 'donors',
-    'Donor Donations': 'donors',
-    'Donor Activities': 'donors',
-    'Donors Dashboard': 'donors',
-    'Project Management': 'project-management',
-    'Contacts': 'donors',
-    'Learning Center': 'getting-started',
-    'Volunteer registration management': 'volunteer-registration',
-    'Volunteer Registration': 'volunteer-registration',
-    'Volunteer Activities': 'volunteer-registration',
-    'Learning Center Volunteer': 'getting-started'
+  // 🆕 UPDATED: SUB-ITEM TO ROUTE MAPPING (Template, Dashboard, or Docs)
+  const subItemRouting = {
+    // ✅ GRANTS MANAGEMENT
+    'Grants Pipeline': { type: 'template', route: 'grants-pipeline' },
+    'Getting Started': { type: 'docs', route: null },
+    'Grant Providers': { type: 'disabled', route: null },
+    'Grants Dashboard': { type: 'dashboard', route: '/dashboards/overview' }, // ✅ Changed
+    
+    // ✅ DONOR MANAGEMENT
+    'Donors': { type: 'template', route: 'donors' },
+    'Donor Donations': { type: 'disabled', route: null },
+    'Donor Activities': { type: 'disabled', route: null },
+    'Donors Dashboard': { type: 'dashboard', route: '/dashboards/donor-dashboard' }, // ✅ Changed
+    
+    // ✅ PROJECT MANAGEMENT
+    'Project Management': { type: 'template', route: 'project-management' },
+    'Learning Center': { type: 'docs', route: null },
+    
+    // ✅ VOLUNTEER
+    'Volunteer registration management': { type: 'template', route: 'volunteer-registration' },
+    'Volunteer Learning Center': { type: 'docs', route: null }
   };
 
   // WORKSPACE TO GETTING STARTED DOCUMENTATION MAPPING
@@ -64,8 +69,8 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     'grants-management': '/docs/grants-getting-started',
     'donor-management': '/docs/donor-getting-started',
     'fundraising': '/docs/fundraising-getting-started',
-    'project-management': null,
-    'volunteer': null
+    'project-management': '/docs/project-management-learning-center',
+    'volunteer': '/docs/volunteer-getting-started'
   };
 
   // SET WORKSPACE BASED ON CURRENT ROUTE + DEFAULT TO GRANTS MANAGEMENT
@@ -73,7 +78,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     if ((category === 'ngo' || category === 'nonprofit') && staticWorkspaceItems.length > 0) {
       const pathParts = location.pathname.split('/');
       
-      // CHECK IF ON WORKSPACE PAGE: /workspaces/2565135/grants-management
+      // CHECK IF ON WORKSPACE PAGE
       if (pathParts[1] === 'workspaces' && pathParts[3]) {
         const workspaceId = pathParts[3];
         const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
@@ -84,7 +89,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         }
       }
       
-      // CHECK IF ON TEMPLATE BOARD: /boards/template/volunteer-registration
+      // CHECK IF ON TEMPLATE BOARD
       if (pathParts[1] === 'boards' && pathParts[2] === 'template' && pathParts[3]) {
         const templateId = pathParts[3];
         const workspaceId = templateToWorkspace[templateId];
@@ -93,16 +98,32 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
           const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
           if (workspace) {
             setCurrentWorkspace(workspace);
-            console.log('✅ Set workspace from template route:', workspace.label, 'for template:', templateId);
+            console.log('✅ Set workspace from template route:', workspace.label);
             return;
           }
         }
       }
 
-      // CHECK IF ON DOCS PAGE: /docs/grants-getting-started
+      // 🆕 CHECK IF ON DASHBOARD PAGE
+      if (pathParts[1] === 'dashboards' && pathParts[2]) {
+        const dashboardToWorkspace = {
+          'overview': 'grants-management',
+          'donor-dashboard': 'donor-management'
+        };
+        const workspaceId = dashboardToWorkspace[pathParts[2]];
+        if (workspaceId) {
+          const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
+          if (workspace) {
+            setCurrentWorkspace(workspace);
+            console.log('✅ Set workspace from dashboard route:', workspace.label);
+            return;
+          }
+        }
+      }
+
+      // CHECK IF ON DOCS PAGE
       if (pathParts[1] === 'docs' && pathParts[2]) {
         const docName = pathParts[2];
-        // Find workspace by matching doc path
         for (const [workspaceId, docPath] of Object.entries(workspaceToGettingStarted)) {
           if (docPath === `/docs/${docName}`) {
             const workspace = staticWorkspaceItems.find(item => item.id === workspaceId);
@@ -115,8 +136,8 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
         }
       }
       
-      // DEFAULT: Set to Grants Management for non-profit users
-      if (pathParts[1] !== 'workspaces' && pathParts[1] !== 'boards' && pathParts[1] !== 'docs') {
+      // DEFAULT: Set to Grants Management
+      if (pathParts[1] !== 'workspaces' && pathParts[1] !== 'boards' && pathParts[1] !== 'docs' && pathParts[1] !== 'dashboards') {
         const grantsWorkspace = staticWorkspaceItems.find(item => item.id === 'grants-management');
         if (grantsWorkspace && !currentWorkspace) {
           setCurrentWorkspace(grantsWorkspace);
@@ -141,28 +162,46 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
     console.log('🔄 Workspace changed to:', item.label);
   };
 
-  // UPDATED: Handle sub-item clicks with Getting Started doc routing
+  // 🆕 UPDATED: Handle sub-item clicks with proper routing logic
   const handleSubItemClick = (subItemLabel) => {
     setActiveItem(subItemLabel);
     
-    // ✅ Special handling for "Getting Started" - route to documentation
-    if (subItemLabel.includes('Getting Started') || subItemLabel === 'Getting Started' || subItemLabel === 'Learning Center' || subItemLabel === 'Learning Center Volunteer') {
+    const routing = subItemRouting[subItemLabel];
+    
+    if (!routing) {
+      console.log('⚠️ No routing configured for:', subItemLabel);
+      return;
+    }
+
+    // 🔒 DISABLED ITEMS - Show coming soon message
+    if (routing.type === 'disabled') {
+      console.log('🔒 Feature coming soon:', subItemLabel);
+      alert(`"${subItemLabel}" feature is coming soon! `);
+      return;
+    }
+
+    // ✅ DOCUMENTATION PAGES
+    if (routing.type === 'docs') {
       if (currentWorkspace && workspaceToGettingStarted[currentWorkspace.id]) {
         const docPath = workspaceToGettingStarted[currentWorkspace.id];
-        console.log('✅ Opening Getting Started doc:', docPath);
+        console.log('✅ Opening docs:', docPath);
         navigate(docPath);
         return;
       }
     }
-    
-    // Normal board handling
-    const templateId = subItemToTemplate[subItemLabel];
-    
-    if (templateId) {
-      console.log('✅ Opening template board:', templateId);
-      navigate(`/boards/template/${templateId}`);
-    } else {
-      console.log('ℹ️ Sub-item clicked but no board to open:', subItemLabel);
+
+    // ✅ DASHBOARD PAGES
+    if (routing.type === 'dashboard') {
+      console.log('✅ Opening dashboard:', routing.route);
+      navigate(routing.route);
+      return;
+    }
+
+    // ✅ TEMPLATE BOARDS
+    if (routing.type === 'template') {
+      console.log('✅ Opening template:', routing.route);
+      navigate(`/boards/template/${routing.route}`);
+      return;
     }
   };
 
@@ -207,6 +246,12 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
       return getWorkspaceColor(currentWorkspace.label);
     }
     return category === 'ngo' || category === 'nonprofit' ? '#FB275D' : '#007f9b';
+  };
+
+  // 🆕 Helper function to check if item is disabled
+  const isItemDisabled = (subItemLabel) => {
+    const routing = subItemRouting[subItemLabel];
+    return routing && routing.type === 'disabled';
   };
 
   return (
@@ -312,18 +357,21 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
       {/* WORKSPACE ITEMS */}
       <div className="workspace-items">
         
-        {/* ✅ ALWAYS SHOW ONLY CURRENT WORKSPACE SUB-ITEMS (For non-profit users) */}
+        {/* ✅ CURRENT WORKSPACE SUB-ITEMS */}
         {currentWorkspace && currentWorkspace.subItems && currentWorkspace.subItems.length > 0 && (
           <>
             {currentWorkspace.subItems.map((subItem, index) => {
               const subItemLabel = typeof subItem === 'object' ? subItem.label : subItem;
               const SubItemIcon = typeof subItem === 'object' && subItem.icon ? subItem.icon : null;
+              const disabled = isItemDisabled(subItemLabel);
               
               return (
                 <button
                   key={index}
                   onClick={() => handleSubItemClick(subItemLabel)}
-                  className={`workspace-item ${activeItem === subItemLabel ? 'active' : ''}`}
+                  className={`workspace-item ${activeItem === subItemLabel ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                  style={disabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                  title={disabled ? 'Coming soon!' : ''}
                 >
                   {SubItemIcon ? (
                     <SubItemIcon size={16} className="item-icon" style={{ color: '#676879' }} />
@@ -340,6 +388,7 @@ const WorkspaceSection = ({ activeItem, setActiveItem, boards = [], onBoardClick
                     </svg>
                   )}
                   <span>{subItemLabel}</span>
+                  {disabled && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>🚧</span>}
                 </button>
               );
             })}
