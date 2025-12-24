@@ -1,4 +1,3 @@
-// src/pages/TemplateBoardPage.jsx - Updated with Tailwind UI (Header & ActionBar unchanged)
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
@@ -193,16 +192,16 @@ const TemplateBoardPage = () => {
 
   if (!template) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl text-gray-600">Loading...</h2>
+      <div style={{ minHeight: '100vh', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '20px', color: '#676879' }}>Loading...</h2>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div style={{ minHeight: '100vh', backgroundColor: '#fff', display: 'flex', flexDirection: 'column' }}>
       <BoardHeader boardTitle={template.title} />
       <ActionBar 
         columns={boardColumns}
@@ -217,61 +216,76 @@ const TemplateBoardPage = () => {
         newItemText={template.newItemText}
       />
 
-      <div className="p-6 flex-1 overflow-y-auto bg-white">
+      <div style={{ padding: '24px', flex: 1, overflowY: 'auto', backgroundColor: '#fff' }}>
         {(searchQuery ? filteredGroups : groups).map(group => (
-          <div key={group.id} className="mb-6">
+          <div key={group.id} style={{ marginBottom: '24px' }}>
             {/* GROUP HEADER */}
             <div 
-              className="flex items-center gap-2 mb-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '8px',
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '8px',
+                transition: 'background-color 0.1s'
+              }}
               onClick={() => toggleGroup(group.id)}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f6f7fb'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <button className="text-gray-500 hover:text-gray-700">
+              <button style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 {group.expanded ? (
-                  <ChevronDown size={18} style={{ color: group.color }} />
+                  <ChevronDown size={16} style={{ color: group.color }} />
                 ) : (
-                  <ChevronRight size={18} style={{ color: group.color }} />
+                  <ChevronRight size={16} style={{ color: group.color }} />
                 )}
               </button>
-              <div className="w-1 h-5 rounded" style={{ backgroundColor: group.color }}></div>
-              <h3 className="text-base font-medium text-gray-800" style={{ color: group.color }}>
+              <div style={{ width: '4px', height: '20px', borderRadius: '2px', backgroundColor: group.color }}></div>
+              <h3 style={{ fontSize: '14px', fontWeight: 500, color: group.color, margin: 0 }}>
                 {group.name}
               </h3>
-              <span className="text-sm text-gray-500">
+              <span style={{ fontSize: '13px', color: '#676879' }}>
                 {group.tasks.length === 0 ? 'No Items' : `${group.tasks.length} ${group.tasks.length === 1 ? 'Item' : 'Items'}`}
               </span>
             </div>
 
             {group.expanded && (
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                {/* TABLE HEADER - Dynamic columns */}
+              <div style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #d0d4e4', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                {/* TABLE HEADER */}
                 <div 
-                  className="bg-white border-b border-gray-200 text-xs min-h-[32px] "
                   style={{
+                    backgroundColor: '#fff',
+                    borderBottom: '1px solid #d0d4e4',
+                    fontSize: '12px',
+                    minHeight: '40px',
                     display: 'grid',
                     gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                      if (col.id === 'name') return '200px';
-                      if (col.type === 'person') return '100px';
-                      if (col.type === 'status') return '120px';
-                      if (col.type === 'date') return '120px';
-                      if (col.id === 'grantAmount') return '120px';
-                      return '100px';
+                      if (col.id === 'name') return '400px';
+                      if (col.type === 'person') return '98px';
+                      if (col.type === 'status') return '140px';
+                      if (col.type === 'date') return '140px';
+                      if (col.id === 'grantAmount') return '140px';
+                      if (col.id === 'grantProvider') return '166px';
+                      return '120px';
                     }).join(' ')} 32px`
                   }}
                 >
-                  <div className="p-2 flex items-center justify-center border-r border-gray-200">
-                    <div className="w-3 h-3 border border-gray-300  rounded"></div>
+                  <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #d0d4e4' }}>
+                    <div style={{ width: '14px', height: '14px', border: '1px solid #c3c6d4', borderRadius: '2px' }}></div>
                   </div>
                   {boardColumns.map(col => (
                     !hiddenColumns.includes(col.id) && (
-                      <div key={col.id} className="p-2 flex items-center gap-1 border-r border-gray-200 font-medium text-gray-600">
+                      <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '4px', borderRight: '1px solid #d0d4e4', fontWeight: 500, color: '#323338' }}>
                         {col.type === 'person' && <User size={12} />}
                         <span>{col.title}</span>
-                        {col.type !== 'text' && <Info size={10} className="text-gray-400" />}
+                        {col.type !== 'text' && <Info size={10} style={{ color: '#c3c6d4' }} />}
                       </div>
                     )
                   ))}
-                  <div className="p-2 flex items-center justify-center ">
-                    <Plus size={12} className="text-gray-400" />
+                  <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Plus size={14} style={{ color: '#c3c6d4' }} />
                   </div>
                 </div>
 
@@ -292,21 +306,23 @@ const TemplateBoardPage = () => {
                 {/* ADD TASK ROW */}
                 {newTaskInput.groupId === group.id ? (
                   <div 
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors "
                     style={{
+                      borderBottom: '1px solid #e6e9ef',
+                      minHeight: '36px',
                       display: 'grid',
                       gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                        if (col.id === 'name') return '200px';
-                        if (col.type === 'person') return '100px';
-                        if (col.type === 'status') return '120px';
-                        if (col.type === 'date') return '120px';
-                        if (col.id === 'grantAmount') return '120px';
-                        return '100px';
+                        if (col.id === 'name') return '400px';
+                        if (col.type === 'person') return '98px';
+                        if (col.type === 'status') return '140px';
+                        if (col.type === 'date') return '140px';
+                        if (col.id === 'grantAmount') return '140px';
+                        if (col.id === 'grantProvider') return '166px';
+                        return '120px';
                       }).join(' ')} 32px`
                     }}
                   >
-                    <div className="p-2 border-r border-gray-100 "></div>
-                    <div className="p-2 border-r border-gray-100">
+                    <div style={{ padding: '8px', borderRight: '1px solid #e6e9ef' }}></div>
+                    <div style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}>
                       <input
                         type="text"
                         value={newTaskInput.value}
@@ -316,73 +332,96 @@ const TemplateBoardPage = () => {
                           if (e.key === 'Escape') setNewTaskInput({ groupId: null, value: '' });
                         }}
                         onBlur={() => saveTask(group.id)}
-                        className="w-full text-sm text-gray-800 outline-none border-none"
+                        style={{
+                          width: '100%',
+                          fontSize: '14px',
+                          color: '#323338',
+                          outline: 'none',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          fontFamily: 'Figtree, sans-serif'
+                        }}
                         placeholder={template.addItemText || "Item name"}
                         autoFocus
                       />
                     </div>
                     {boardColumns.filter(col => !hiddenColumns.includes(col.id) && col.id !== 'name').map(col => (
-                      <div key={col.id} className="p-2 border-r border-gray-100"></div>
+                      <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}></div>
                     ))}
-                    <div className="p-2"></div>
+                    <div style={{ padding: '8px' }}></div>
                   </div>
                 ) : (
                   <div 
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors "
                     style={{
+                      borderBottom: '1px solid #e6e9ef',
+                      minHeight: '36px',
                       display: 'grid',
                       gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                        if (col.id === 'name') return '200px';
-                        if (col.type === 'person') return '100px';
-                        if (col.type === 'status') return '120px';
-                        if (col.type === 'date') return '120px';
-                        if (col.id === 'grantAmount') return '120px';
-                        return '100px';
+                        if (col.id === 'name') return '400px';
+                        if (col.type === 'person') return '98px';
+                        if (col.type === 'status') return '140px';
+                        if (col.type === 'date') return '140px';
+                        if (col.id === 'grantAmount') return '140px';
+                        if (col.id === 'grantProvider') return '166px';
+                        return '120px';
                       }).join(' ')} 32px`
                     }}
                   >
-                    <div className="p-2 border-r border-gray-100"></div>
-                    <div className="p-2 border-r border-gray-100">
+                    <div style={{ padding: '8px', borderRight: '1px solid #e6e9ef' }}></div>
+                    <div style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}>
                       <button 
                         onClick={() => startAddTask(group.id)}
-                        className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2"
+                        style={{
+                          fontSize: '14px',
+                          color: '#676879',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontFamily: 'Figtree, sans-serif'
+                        }}
                       >
-                        <Plus size={12} />
+                        <Plus size={14} />
                         <span>{template.addItemText || 'Add item'}</span>
                       </button>
                     </div>
                     {boardColumns.filter(col => !hiddenColumns.includes(col.id) && col.id !== 'name').map(col => (
-                      <div key={col.id} className="p-2 border-r border-gray-100"></div>
+                      <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}></div>
                     ))}
-                    <div className="p-2"></div>
+                    <div style={{ padding: '8px' }}></div>
                   </div>
                 )}
 
                 {/* SUMMARY ROW */}
                 {group.tasks.length > 0 && (
                   <div 
-                    className="bg-gray-50"
                     style={{
+                      backgroundColor: '#f6f7fb',
+                      minHeight: '40px',
                       display: 'grid',
                       gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                        if (col.id === 'name') return '200px';
-                        if (col.type === 'person') return '100px';
-                        if (col.type === 'status') return '120px';
-                        if (col.type === 'date') return '120px';
-                        if (col.id === 'grantAmount') return '120px';
-                        return '100px';
+                        if (col.id === 'name') return '400px';
+                        if (col.type === 'person') return '98px';
+                        if (col.type === 'status') return '140px';
+                        if (col.type === 'date') return '140px';
+                        if (col.id === 'grantAmount') return '140px';
+                        if (col.id === 'grantProvider') return '166px';
+                        return '120px';
                       }).join(' ')} 32px`
                     }}
                   >
-                    <div className="p-2 border-r border-gray-200"></div>
+                    <div style={{ padding: '8px', borderRight: '1px solid #d0d4e4' }}></div>
                     {boardColumns.map(col => {
                       if (hiddenColumns.includes(col.id)) return null;
                       
                       if (col.type === 'status') {
                         const summary = getStatusSummary(group.tasks);
                         return (
-                          <div key={col.id} className="p-2 border-r border-gray-200">
-                            <div className="flex h-2 rounded-full overflow-hidden bg-white">
+                          <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #d0d4e4' }}>
+                            <div style={{ display: 'flex', height: '8px', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#fff' }}>
                               {Object.entries(statusConfig).map(([key, config]) => (
                                 summary[key] > 0 && (
                                   <div 
@@ -401,18 +440,18 @@ const TemplateBoardPage = () => {
                       
                       if (col.id === 'grantAmount') {
                         return (
-                          <div key={col.id} className="p-2 border-r border-gray-200 text-right">
-                            <div className="text-xs font-semibold text-gray-800">
+                          <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #d0d4e4', textAlign: 'center' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: '#323338' }}>
                               ${getTotalGrantAmount(group.tasks).toLocaleString('en-US')}
                             </div>
-                            <div className="text-[10px] text-gray-500">sum</div>
+                            <div style={{ fontSize: '11px', color: '#676879' }}>sum</div>
                           </div>
                         );
                       }
                       
-                      return <div key={col.id} className="p-2 border-r border-gray-200"></div>;
+                      return <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #d0d4e4' }}></div>;
                     })}
-                    <div className="p-2"></div>
+                    <div style={{ padding: '8px' }}></div>
                   </div>
                 )}
               </div>
@@ -420,10 +459,25 @@ const TemplateBoardPage = () => {
           </div>
         ))}
 
-        <div className="mt-4">
+        <div style={{ marginTop: '16px' }}>
           <button 
             onClick={addNewGroup}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            style={{
+              padding: '8px 16px',
+              fontSize: '14px',
+              color: '#676879',
+              border: '1px solid #c3c6d4',
+              borderRadius: '4px',
+              backgroundColor: '#fff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontFamily: 'Figtree, sans-serif',
+              transition: 'background-color 0.1s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f6f7fb'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}
           >
             <Plus size={16} />
             Add new group
@@ -440,24 +494,34 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
 
   return (
     <div 
-      className="border-b border-gray-100 hover:bg-gray-50 transition-colors relative min-h-[40px]"
       style={{
+        borderBottom: '1px solid #e6e9ef',
+        minHeight: '36px',
+        position: 'relative',
         display: 'grid',
         gridTemplateColumns: `32px ${columns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-          if (col.id === 'name') return '200px';
-          if (col.type === 'person') return '100px';
-          if (col.type === 'status') return '120px';
-          if (col.type === 'date') return '120px';
-          if (col.id === 'grantAmount') return '120px';
-          return '100px';
-        }).join(' ')} 32px`
+          if (col.id === 'name') return '400px';
+          if (col.type === 'person') return '98px';
+          if (col.type === 'status') return '140px';
+          if (col.type === 'date') return '140px';
+          if (col.id === 'grantAmount') return '140px';
+          if (col.id === 'grantProvider') return '166px';
+          return '120px';
+        }).join(' ')} 32px`,
+        transition: 'background-color 0.1s'
       }}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#f6f7fb';
+        setShowActions(true);
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+        setShowActions(false);
+      }}
     >
-      <div className="p-2 flex items-center justify-center border-r border-gray-100 relative">
-        <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r" style={{ backgroundColor: groupColor }}></div>
-        <input type="checkbox" className="w-3 h-3 border-2 border-gray-300 rounded cursor-pointer" />
+      <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #e6e9ef', position: 'relative' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', backgroundColor: groupColor, borderTopRightRadius: '2px', borderBottomRightRadius: '2px' }}></div>
+        <input type="checkbox" style={{ width: '14px', height: '14px', border: '2px solid #c3c6d4', borderRadius: '2px', cursor: 'pointer' }} />
       </div>
 
       {columns.map(col => {
@@ -465,16 +529,16 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
 
         if (col.id === 'name') {
           return (
-            <div key={col.id} className="p-2 flex items-center gap-2 border-r border-gray-100">
-              <ChevronRight size={14} className="text-gray-500" />
-              <span className="text-sm text-gray-800">{task.name}</span>
+            <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '1px solid #e6e9ef' }}>
+              <ChevronRight size={14} style={{ color: '#676879' }} />
+              <span style={{ fontSize: '14px', color: '#323338', fontFamily: 'Figtree, sans-serif' }}>{task.name}</span>
               {showActions && (
-                <div className="ml-auto flex items-center gap-1">
-                  <button className="p-1 hover:bg-white rounded border border-gray-200">
-                    <Star size={12} className="text-gray-400" />
+                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <button style={{ padding: '4px', background: '#fff', border: '1px solid #d0d4e4', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <Star size={12} style={{ color: '#c3c6d4' }} />
                   </button>
-                  <button className="p-1 hover:bg-white rounded border border-gray-200">
-                    <MessageSquare size={12} className="text-gray-400" />
+                  <button style={{ padding: '4px', background: '#fff', border: '1px solid #d0d4e4', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <MessageSquare size={12} style={{ color: '#c3c6d4' }} />
                   </button>
                 </div>
               )}
@@ -484,16 +548,26 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
 
         if (col.type === 'person') {
           return (
-            <div key={col.id} className="p-2 flex items-center border-r border-gray-100">
+            <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
               {task.owner ? (
                 <div 
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-semibold"
-                  style={{ backgroundColor: task.owner.color }}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    backgroundColor: task.owner.color
+                  }}
                 >
                   {task.owner.initial}
                 </div>
               ) : (
-                <div className="w-6 h-6 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 cursor-pointer hover:border-blue-500 hover:text-blue-500 transition-colors">
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px dashed #c3c6d4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c3c6d4', cursor: 'pointer' }}>
                   <User size={12} />
                 </div>
               )}
@@ -503,7 +577,7 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
 
         if (col.type === 'status') {
           return (
-            <div key={col.id} className="p-2 flex items-center border-r border-gray-100">
+            <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
               <StatusCell 
                 currentStatus={task.status}
                 statusConfig={statusConfig}
@@ -515,19 +589,19 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
 
         if (col.type === 'date') {
           return (
-            <div key={col.id} className="p-2 flex items-center gap-2 border-r border-gray-100">
+            <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px', borderRight: '1px solid #e6e9ef' }}>
               {task.dueDate ? (
                 <>
                   {task.overdue && task.status !== 'done' && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#d83a52' }}></div>
                   )}
-                  <span className={`text-xs ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                  <span style={{ fontSize: '14px', color: task.status === 'done' ? '#c3c6d4' : '#323338', textDecoration: task.status === 'done' ? 'line-through' : 'none', fontFamily: 'Figtree, sans-serif' }}>
                     {task.dueDate}
                   </span>
-                  {task.status === 'done' && <CheckCircle2 size={12} className="text-green-500" />}
+                  {task.status === 'done' && <CheckCircle2 size={14} style={{ color: '#00c875' }} />}
                 </>
               ) : (
-                <span className="text-xs text-gray-400">-</span>
+                <span style={{ fontSize: '14px', color: '#c3c6d4' }}>-</span>
               )}
             </div>
           );
@@ -535,23 +609,38 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
 
         if (col.id === 'grantAmount') {
           return (
-            <div key={col.id} className="p-2 flex items-center border-r border-gray-100">
-              <span className="text-xs text-gray-600">
+            <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
+              <span style={{ fontSize: '14px', color: '#323338', fontFamily: 'Figtree, sans-serif' }}>
                 {task.grantAmount ? `$${task.grantAmount.toLocaleString('en-US')}` : '-'}
               </span>
             </div>
           );
         }
 
+        if (col.id === 'grantProvider') {
+          return (
+            <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
+              {task.grantProvider ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: '4px', height: '16px', backgroundColor: '#0073ea', borderRadius: '2px' }}></div>
+                  <span style={{ fontSize: '14px', color: '#0073ea', fontFamily: 'Figtree, sans-serif' }}>{task.grantProvider}</span>
+                </div>
+              ) : (
+                <span style={{ fontSize: '14px', color: '#c3c6d4' }}>-</span>
+              )}
+            </div>
+          );
+        }
+
         return (
-          <div key={col.id} className="p-2 flex items-center border-r border-gray-100">
-            <span className="text-xs text-gray-600">{task[col.id] || '-'}</span>
+          <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
+            <span style={{ fontSize: '14px', color: '#323338', fontFamily: 'Figtree, sans-serif' }}>{task[col.id] || '-'}</span>
           </div>
         );
       })}
 
-      <div className="p-2 flex items-center justify-center">
-        <button className="text-gray-400 hover:text-gray-600">
+      <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button style={{ color: '#c3c6d4', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
           <MoreHorizontal size={14} />
         </button>
       </div>
