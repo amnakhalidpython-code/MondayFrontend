@@ -13,7 +13,10 @@ import {
 } from 'lucide-react';
 import ActionBar from '../components/board/components/ActionBar';
 import BoardHeader from '../components/board/components/BoardHeader';
+import TanStackBoardTable from '../components/board/TanStackBoardTable';
 import { getTemplateById } from '../config/boardTemplates';
+import { fetchDonors } from '../services/api/donorService';
+import { fetchColumns } from '../services/api/columnService';
 
 const TemplateBoardPage = () => {
   const { templateId } = useParams();
@@ -27,18 +30,106 @@ const TemplateBoardPage = () => {
   const [currentGroupBy, setCurrentGroupBy] = useState(null);
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [newTaskInput, setNewTaskInput] = useState({ groupId: null, value: '' });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (templateId) {
       const templateData = getTemplateById(templateId);
       if (templateData) {
         setTemplate(templateData);
-        setGroups(templateData.groups);
-        setBoardColumns(templateData.columns);
         setStatusConfig(templateData.statusConfig);
+
+        // If it's the donors template, fetch from API
+        if (templateId === 'donors') {
+          loadDonorsFromAPI(templateData);
+        } else {
+        // Use hardcoded data for other templates
+          setGroups(templateData.groups);
+          setBoardColumns(templateData.columns);
+        }
       }
     }
   }, [templateId]);
+
+  const loadDonorsFromAPI = async (templateData) => {
+    setLoading(true);
+    try {
+      // Fetch donors and columns from API
+      const [donorsResponse, columnsResponse] = await Promise.all([
+        fetchDonors({ page: 1, limit: 100 }),
+        fetchColumns()
+      ]);
+
+      if (donorsResponse.success && columnsResponse.success) {
+        // Map API columns to board columns format
+        const apiColumns = columnsResponse.data.map(col => ({
+          id: col.column_key,
+          title: col.title,
+          type: col.type,
+          width: col.width || 150
+        }));
+
+        // Use API columns if available, otherwise use template columns
+        setBoardColumns(apiColumns.length > 0 ? apiColumns : templateData.columns);
+
+        // Map API donors to tasks format
+        const donorTasks = donorsResponse.data.donors.map(donor => ({
+          id: donor._id,
+          name: donor.donor_name,
+          email: donor.email,
+          phone: donor.phone,
+          donated: donor.total_donated,
+          donations: donor.total_donations,
+          status: donor.status,
+          ...donor.customFields // Merge custom fields
+        }));
+
+        // Group donors by status
+        const groupedDonors = {
+          potential: donorTasks.filter(d => d.status === 'potential'),
+          active: donorTasks.filter(d => d.status === 'active'),
+          inactive: donorTasks.filter(d => d.status === 'inactive')
+        };
+
+        // Create groups
+        const apiGroups = [
+          {
+            id: 'potential',
+            name: 'Potential Donors',
+            color: '#FF6B6B',
+            expanded: true,
+            tasks: groupedDonors.potential
+          },
+          {
+            id: 'active',
+            name: 'Active Donors',
+            color: '#00C875',
+            expanded: true,
+            tasks: groupedDonors.active
+          }
+        ];
+
+        setGroups(apiGroups);
+      } else {
+        // Fallback to template data if API fails
+        console.warn('API returned unsuccessful response, using template data');
+        setGroups(templateData.groups);
+        setBoardColumns(templateData.columns);
+      }
+    } catch (error) {
+      console.error('Error loading donors from API:', error);
+      console.warn('⚠️ Backend API is not available. Using demo data.');
+      console.warn('To use real data, please:');
+      console.warn('1. Start the backend server: cd MondayClone && npm run dev');
+      console.warn('2. Fix MongoDB connection (see MONGODB_TROUBLESHOOTING.md)');
+
+      // Fallback to template data
+      setGroups(templateData.groups);
+      setBoardColumns(templateData.columns);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (query) => setSearchQuery(query);
 
@@ -116,6 +207,11 @@ const TemplateBoardPage = () => {
     setGroups(newGroups);
   };
 
+  const handleFilter = (columnId, filterValue) => {
+    // Implement filter logic here if needed
+    console.log('Filter:', columnId, filterValue);
+  };
+
   const handleAddTask = () => {
     const firstGroup = groups[0];
     if (firstGroup) {
@@ -161,6 +257,285 @@ const TemplateBoardPage = () => {
     ));
   };
 
+  // Handler for updating task field (used by TanStackBoardTable)
+  const handleUpdateTask = async (groupId, taskId, field, value) => {
+    // If donors template, use API
+    if (templateId === 'donors') {
+      try {
+        const { updateDonor } = await import('../services/api/donorService');
+        let updatePayload = {};
+        if (field === 'status') {
+          updatePayload = { status: value };
+        } else if (field === 'name') {
+          updatePayload = { donor_name: value };
+        } else {
+          // For custom fields, assume the field name is the column_key
+          updatePayload = { [field]: value };
+        }
+
+        const response = await updateDonor(taskId, updatePayload);
+
+        if (response.success) {
+          // Reload donors from API to reflect changes
+          const templateData = getTemplateById(templateId);
+          await loadDonorsFromAPI(templateData);
+        }
+      } catch (error) {
+        console.error('Error updating donor:', error);
+      }
+    } else {
+      // Local state update for other templates
+      setGroups(groups.map(g =>
+        g.id === groupId ? {
+          ...g,
+          tasks: g.tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t)
+        } : g
+      ));
+    }
+  };
+
+  // Handler for adding task (used by TanStackBoardTable)
+  const handleAddTaskToGroup = async (groupId, taskName) => {
+    if (!taskName.trim()) return;
+
+    // If donors template, use API
+    if (templateId === 'donors') {
+      try {
+        const { createDonor } = await import('../services/api/donorService');
+        const response = await createDonor({
+          donor_name: taskName,
+          email: `${taskName.toLowerCase().replace(/\s+/g, '')}@example.com`, // Temporary email
+          status: groupId // Use group id as status
+        });
+
+        if (response.success) {
+          // Reload donors from API
+          const templateData = getTemplateById(templateId);
+          await loadDonorsFromAPI(templateData);
+        }
+      } catch (error) {
+        console.error('Error creating donor:', error);
+      }
+    } else {
+      // Local state update for other templates
+      setGroups(groups.map(g =>
+        g.id === groupId ? {
+          ...g,
+          tasks: [...g.tasks, {
+            id: Date.now().toString(),
+            name: taskName,
+            owner: null,
+            status: null,
+            dueDate: '',
+            overdue: false,
+            grantAmount: 0,
+            grantProvider: '',
+            email: '',
+            phone: '',
+            donated: 0,
+            donations: ''
+          }]
+        } : g
+      ));
+    }
+  };
+
+  // Handler for adding a new column
+  const handleAddColumn = async (columnType) => {
+    // If donors template, use API
+    if (templateId === 'donors') {
+      try {
+        const { createColumn } = await import('../services/api/columnService');
+        const columnKey = `custom_${columnType}_${Date.now()}`;
+        const response = await createColumn({
+          column_key: columnKey,
+          title: `New ${columnType}`,
+          type: columnType,
+          width: 150
+        });
+
+        if (response.success) {
+          // Reload columns from API
+          const { fetchColumns } = await import('../services/api/columnService');
+          const columnsResponse = await fetchColumns();
+          if (columnsResponse.success) {
+            const apiColumns = columnsResponse.data.map(col => ({
+              id: col.column_key,
+              title: col.title,
+              type: col.type,
+              width: col.width || 150
+            }));
+            setBoardColumns(apiColumns);
+          }
+        }
+      } catch (error) {
+        console.error('Error creating column:', error);
+      }
+    } else {
+      // Local state update for other templates
+      const newColumn = {
+        id: `col-${Date.now()}`,
+        title: `New ${columnType}`,
+        type: columnType,
+        width: 150
+      };
+      setBoardColumns([...boardColumns, newColumn]);
+    }
+  };
+
+
+  // Handler for renaming a column
+  const handleRenameColumn = async (columnId, newTitle) => {
+    if (templateId === 'donors') {
+      try {
+        const { renameColumn } = await import('../services/api/columnService');
+        const response = await renameColumn(columnId, newTitle);
+
+        if (response.success) {
+          // Update local state
+          setBoardColumns(boardColumns.map(col =>
+            col.id === columnId ? { ...col, title: newTitle } : col
+          ));
+        }
+      } catch (error) {
+        console.error('Error renaming column:', error);
+        // Still update locally if API fails
+        setBoardColumns(boardColumns.map(col =>
+          col.id === columnId ? { ...col, title: newTitle } : col
+        ));
+      }
+    } else {
+      // Local state update for other templates
+      setBoardColumns(boardColumns.map(col =>
+        col.id === columnId ? { ...col, title: newTitle } : col
+      ));
+    }
+  };
+
+  // Handler for deleting a column
+  const handleDeleteColumn = async (columnId) => {
+    if (templateId === 'donors') {
+      try {
+        const { deleteColumn } = await import('../services/api/columnService');
+        const response = await deleteColumn(columnId);
+
+        if (response.success) {
+          setBoardColumns(boardColumns.filter(col => col.id !== columnId));
+        }
+      } catch (error) {
+        console.error('Error deleting column:', error);
+        // Still delete locally if API fails
+        setBoardColumns(boardColumns.filter(col => col.id !== columnId));
+      }
+    } else {
+      setBoardColumns(boardColumns.filter(col => col.id !== columnId));
+    }
+  };
+
+  // Handler for duplicating a column
+  const handleDuplicateColumn = async (columnId) => {
+    if (templateId === 'donors') {
+      try {
+        const { duplicateColumn, fetchColumns } = await import('../services/api/columnService');
+        const response = await duplicateColumn(columnId);
+
+        if (response.success) {
+          // Reload all columns from API
+          const columnsResponse = await fetchColumns();
+          if (columnsResponse.success) {
+            const apiColumns = columnsResponse.data.map(col => ({
+              id: col.column_key,
+              title: col.title,
+              type: col.type,
+              width: col.width || 150
+            }));
+            setBoardColumns(apiColumns);
+          }
+        }
+      } catch (error) {
+        console.error('Error duplicating column:', error);
+        // Fallback to local duplication
+        const columnToDuplicate = boardColumns.find(col => col.id === columnId);
+        if (columnToDuplicate) {
+          const newColumn = {
+            ...columnToDuplicate,
+            id: `${columnId}_copy_${Date.now()}`,
+            title: `${columnToDuplicate.title} (Copy)`
+          };
+          setBoardColumns([...boardColumns, newColumn]);
+        }
+      }
+    } else {
+      // Local duplication for other templates
+      const columnToDuplicate = boardColumns.find(col => col.id === columnId);
+      if (columnToDuplicate) {
+        const newColumn = {
+          ...columnToDuplicate,
+          id: `${columnId}_copy_${Date.now()}`,
+          title: `${columnToDuplicate.title} (Copy)`
+        };
+        setBoardColumns([...boardColumns, newColumn]);
+      }
+    }
+  };
+
+  // Handler for adding column to the right
+  const handleAddColumnToRight = async (columnId) => {
+    if (templateId === 'donors') {
+      try {
+        const { addColumnToRight, fetchColumns } = await import('../services/api/columnService');
+        const response = await addColumnToRight(columnId, {
+          column_key: `new_col_${Date.now()}`,
+          title: 'New Column',
+          type: 'text'
+        });
+
+        if (response.success) {
+          // Reload all columns from API
+          const columnsResponse = await fetchColumns();
+          if (columnsResponse.success) {
+            const apiColumns = columnsResponse.data.map(col => ({
+              id: col.column_key,
+              title: col.title,
+              type: col.type,
+              width: col.width || 150
+            }));
+            setBoardColumns(apiColumns);
+          }
+        }
+      } catch (error) {
+        console.error('Error adding column to right:', error);
+        // Fallback to local addition
+        const columnIndex = boardColumns.findIndex(col => col.id === columnId);
+        if (columnIndex !== -1) {
+          const newColumn = {
+            id: `col_${Date.now()}`,
+            title: 'New Column',
+            type: 'text',
+            width: 150
+          };
+          const newColumns = [...boardColumns];
+          newColumns.splice(columnIndex + 1, 0, newColumn);
+          setBoardColumns(newColumns);
+        }
+      }
+    } else {
+      // Local addition for other templates
+      const columnIndex = boardColumns.findIndex(col => col.id === columnId);
+      if (columnIndex !== -1) {
+        const newColumn = {
+          id: `col_${Date.now()}`,
+          title: 'New Column',
+          type: 'text',
+          width: 150
+        };
+        const newColumns = [...boardColumns];
+        newColumns.splice(columnIndex + 1, 0, newColumn);
+        setBoardColumns(newColumns);
+      }
+    }
+  };
+
   const getStatusSummary = (tasks) => {
     const total = tasks.length || 1;
     const counts = {};
@@ -190,11 +565,13 @@ const TemplateBoardPage = () => {
     setGroups([...groups, newGroup]);
   };
 
-  if (!template) {
+  if (!template || loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '20px', color: '#676879' }}>Loading...</h2>
+          <h2 style={{ fontSize: '20px', color: '#676879' }}>
+            {loading ? 'Loading donors...' : 'Loading...'}
+          </h2>
         </div>
       </div>
     );
@@ -252,209 +629,22 @@ const TemplateBoardPage = () => {
             </div>
 
             {group.expanded && (
-              <div style={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #d0d4e4', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                {/* TABLE HEADER */}
-                <div 
-                  style={{
-                    backgroundColor: '#fff',
-                    borderBottom: '1px solid #d0d4e4',
-                    fontSize: '12px',
-                    minHeight: '40px',
-                    display: 'grid',
-                    gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                      if (col.id === 'name') return '400px';
-                      if (col.type === 'person') return '98px';
-                      if (col.type === 'status') return '140px';
-                      if (col.type === 'date') return '140px';
-                      if (col.id === 'grantAmount') return '140px';
-                      if (col.id === 'grantProvider') return '166px';
-                      return '120px';
-                    }).join(' ')} 32px`
-                  }}
-                >
-                  <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid #d0d4e4' }}>
-                    <div style={{ width: '14px', height: '14px', border: '1px solid #c3c6d4', borderRadius: '2px' }}></div>
-                  </div>
-                  {boardColumns.map(col => (
-                    !hiddenColumns.includes(col.id) && (
-                      <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '4px', borderRight: '1px solid #d0d4e4', fontWeight: 500, color: '#323338' }}>
-                        {col.type === 'person' && <User size={12} />}
-                        <span>{col.title}</span>
-                        {col.type !== 'text' && <Info size={10} style={{ color: '#c3c6d4' }} />}
-                      </div>
-                    )
-                  ))}
-                  <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Plus size={14} style={{ color: '#c3c6d4' }} />
-                  </div>
-                </div>
-
-                {/* TABLE ROWS */}
-                {group.tasks.map(task => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    groupId={group.id}
-                    groupColor={group.color}
-                    columns={boardColumns}
-                    statusConfig={statusConfig}
-                    updateTaskStatus={updateTaskStatus}
-                    hiddenColumns={hiddenColumns}
-                  />
-                ))}
-
-                {/* ADD TASK ROW */}
-                {newTaskInput.groupId === group.id ? (
-                  <div 
-                    style={{
-                      borderBottom: '1px solid #e6e9ef',
-                      minHeight: '36px',
-                      display: 'grid',
-                      gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                        if (col.id === 'name') return '400px';
-                        if (col.type === 'person') return '98px';
-                        if (col.type === 'status') return '140px';
-                        if (col.type === 'date') return '140px';
-                        if (col.id === 'grantAmount') return '140px';
-                        if (col.id === 'grantProvider') return '166px';
-                        return '120px';
-                      }).join(' ')} 32px`
-                    }}
-                  >
-                    <div style={{ padding: '8px', borderRight: '1px solid #e6e9ef' }}></div>
-                    <div style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}>
-                      <input
-                        type="text"
-                        value={newTaskInput.value}
-                        onChange={(e) => setNewTaskInput({ ...newTaskInput, value: e.target.value })}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveTask(group.id);
-                          if (e.key === 'Escape') setNewTaskInput({ groupId: null, value: '' });
-                        }}
-                        onBlur={() => saveTask(group.id)}
-                        style={{
-                          width: '100%',
-                          fontSize: '14px',
-                          color: '#323338',
-                          outline: 'none',
-                          border: 'none',
-                          backgroundColor: 'transparent',
-                          fontFamily: 'Figtree, sans-serif'
-                        }}
-                        placeholder={template.addItemText || "Item name"}
-                        autoFocus
-                      />
-                    </div>
-                    {boardColumns.filter(col => !hiddenColumns.includes(col.id) && col.id !== 'name').map(col => (
-                      <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}></div>
-                    ))}
-                    <div style={{ padding: '8px' }}></div>
-                  </div>
-                ) : (
-                  <div 
-                    style={{
-                      borderBottom: '1px solid #e6e9ef',
-                      minHeight: '36px',
-                      display: 'grid',
-                      gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                        if (col.id === 'name') return '400px';
-                        if (col.type === 'person') return '98px';
-                        if (col.type === 'status') return '140px';
-                        if (col.type === 'date') return '140px';
-                        if (col.id === 'grantAmount') return '140px';
-                        if (col.id === 'grantProvider') return '166px';
-                        return '120px';
-                      }).join(' ')} 32px`
-                    }}
-                  >
-                    <div style={{ padding: '8px', borderRight: '1px solid #e6e9ef' }}></div>
-                    <div style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}>
-                      <button 
-                        onClick={() => startAddTask(group.id)}
-                        style={{
-                          fontSize: '14px',
-                          color: '#676879',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: 0,
-                          fontFamily: 'Figtree, sans-serif'
-                        }}
-                      >
-                        <Plus size={14} />
-                        <span>{template.addItemText || 'Add item'}</span>
-                      </button>
-                    </div>
-                    {boardColumns.filter(col => !hiddenColumns.includes(col.id) && col.id !== 'name').map(col => (
-                      <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #e6e9ef' }}></div>
-                    ))}
-                    <div style={{ padding: '8px' }}></div>
-                  </div>
-                )}
-
-                {/* SUMMARY ROW */}
-                {group.tasks.length > 0 && (
-                  <div 
-                    style={{
-                      backgroundColor: '#f6f7fb',
-                      minHeight: '40px',
-                      display: 'grid',
-                      gridTemplateColumns: `32px ${boardColumns.filter(col => !hiddenColumns.includes(col.id)).map(col => {
-                        if (col.id === 'name') return '400px';
-                        if (col.type === 'person') return '98px';
-                        if (col.type === 'status') return '140px';
-                        if (col.type === 'date') return '140px';
-                        if (col.id === 'grantAmount') return '140px';
-                        if (col.id === 'grantProvider') return '166px';
-                        return '120px';
-                      }).join(' ')} 32px`
-                    }}
-                  >
-                    <div style={{ padding: '8px', borderRight: '1px solid #d0d4e4' }}></div>
-                    {boardColumns.map(col => {
-                      if (hiddenColumns.includes(col.id)) return null;
-                      
-                      if (col.type === 'status') {
-                        const summary = getStatusSummary(group.tasks);
-                        return (
-                          <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #d0d4e4' }}>
-                            <div style={{ display: 'flex', height: '8px', borderRadius: '4px', overflow: 'hidden', backgroundColor: '#fff' }}>
-                              {Object.entries(statusConfig).map(([key, config]) => (
-                                summary[key] > 0 && (
-                                  <div 
-                                    key={key}
-                                    style={{ 
-                                      width: `${summary[key]}%`, 
-                                      backgroundColor: config.bg 
-                                    }}
-                                  ></div>
-                                )
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                      
-                      if (col.id === 'grantAmount') {
-                        return (
-                          <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #d0d4e4', textAlign: 'center' }}>
-                            <div style={{ fontSize: '14px', fontWeight: 600, color: '#323338' }}>
-                              ${getTotalGrantAmount(group.tasks).toLocaleString('en-US')}
-                            </div>
-                            <div style={{ fontSize: '11px', color: '#676879' }}>sum</div>
-                          </div>
-                        );
-                      }
-                      
-                      return <div key={col.id} style={{ padding: '8px 12px', borderRight: '1px solid #d0d4e4' }}></div>;
-                    })}
-                    <div style={{ padding: '8px' }}></div>
-                  </div>
-                )}
-              </div>
+              <TanStackBoardTable
+                data={group.tasks}
+                columns={boardColumns.filter(col => !hiddenColumns.includes(col.id))}
+                onUpdateTask={(taskId, field, value) => handleUpdateTask(group.id, taskId, field, value)}
+                onAddTask={(taskName) => handleAddTaskToGroup(group.id, taskName)}
+                onAddColumn={handleAddColumn}
+                groupColor={group.color}
+                statusConfig={statusConfig}
+                onSort={handleSort}
+                onFilter={handleFilter}
+                onGroupBy={handleGroupBy}
+                onRename={handleRenameColumn}
+                onDelete={handleDeleteColumn}
+                onDuplicate={handleDuplicateColumn}
+                onAddToRight={handleAddColumnToRight}
+              />
             )}
           </div>
         ))}

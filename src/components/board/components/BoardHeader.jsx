@@ -65,13 +65,11 @@ const BoardHeader = ({ boardTitle = 'work' }) => {
         <div className="flex items-center gap-2">
           <button className=" text-[13px] inline-flex items-center justify-center px-2 py-1.5 h-8 bg-transparent border border-gray-300 rounded text-sm font-normal text-gray-800 cursor-pointer transition-all whitespace-nowrap hover:bg-gray-100 hover:border-gray-400">
             Invite / 1
+          </button>
 
-              <button className="inline-flex items-center justify-center w-8 h-8 p-0 bg-transparent  text-gray-800 cursor-pointer transition-all flex-shrink-0 hover:bg-gray-100 hover:border-gray-400" aria-label="Copy Link">
+          <button className="inline-flex items-center justify-center w-8 h-8 p-0 bg-transparent  text-gray-800 cursor-pointer transition-all flex-shrink-0 hover:bg-gray-100 hover:border-gray-400" aria-label="Copy Link">
             <Link2 size={18} />
           </button>
-          </button>
-
-        
         </div>
 
         {/* Menu Button */}

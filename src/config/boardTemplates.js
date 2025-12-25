@@ -108,8 +108,94 @@ export const boardTemplates = {
       { id: 'donations', title: 'Donations', type: 'text', width: 200 }
     ],
     groups: [
-      { id: 'potential', name: 'Potential Donors', color: '#FF6B6B', expanded: true, tasks: [] },
-      { id: 'active', name: 'Active Donors', color: '#00C875', expanded: true, tasks: [] }
+      {
+        id: 'potential',
+        name: 'Potential Donors',
+        color: '#FF6B6B',
+        expanded: true,
+        tasks: [
+          {
+            id: '1',
+            name: 'Michael Brown',
+            status: 'potential',
+            email: 'mbrown@example.com',
+            phone: '+1 555-0103',
+            donated: 0,
+            donations: '-'
+          },
+          {
+            id: '2',
+            name: 'David Wilson',
+            status: 'potential',
+            email: 'dwilson@example.com',
+            phone: '+1 555-0105',
+            donated: 0,
+            donations: '-'
+          },
+          {
+            id: '3',
+            name: 'Lisa Anderson',
+            status: 'potential',
+            email: 'lisa.anderson@example.com',
+            phone: '+1 555-0108',
+            donated: 0,
+            donations: '-'
+          }
+        ]
+      },
+      {
+        id: 'active',
+        name: 'Active Donors',
+        color: '#00C875',
+        expanded: true,
+        tasks: [
+          {
+            id: '4',
+            name: 'John Smith',
+            status: 'active',
+            email: 'john.smith@example.com',
+            phone: '+1 555-0101',
+            donated: 5000,
+            donations: 'Annual Fund, Building Campaign, Scholarship'
+          },
+          {
+            id: '5',
+            name: 'Sarah Johnson',
+            status: 'active',
+            email: 'sarah.j@example.com',
+            phone: '+1 555-0102',
+            donated: 10000,
+            donations: 'Major Gift, Annual Fund, Endowment'
+          },
+          {
+            id: '6',
+            name: 'Emily Davis',
+            status: 'active',
+            email: 'emily.davis@example.com',
+            phone: '+1 555-0104',
+            donated: 7500,
+            donations: 'Building Campaign, Annual Fund'
+          },
+          {
+            id: '7',
+            name: 'Robert Martinez',
+            status: 'active',
+            email: 'rmartinez@example.com',
+            phone: '+1 555-0106',
+            donated: 3500,
+            donations: 'Annual Fund, Scholarship'
+          },
+          {
+            id: '8',
+            name: 'Jennifer Lee',
+            status: 'active',
+            email: 'jennifer.lee@example.com',
+            phone: '+1 555-0107',
+            donated: 12000,
+            donations: 'Major Gift, Building Campaign, Endowment'
+          }
+        ]
+      }
     ],
     statusConfig: {
       potential: { label: 'Potential', bg: '#FF6B6B' },
