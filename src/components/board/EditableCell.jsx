@@ -28,10 +28,11 @@ const EditableCell = ({ value, onSave, type = 'text', placeholder = '', classNam
   };
 
   const handleKeyDown = (e) => {
-    e.preventdefault()
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSave();
     } else if (e.key === 'Escape') {
+      e.preventDefault();
       setEditValue(value || '');
       setIsEditing(false);
     }

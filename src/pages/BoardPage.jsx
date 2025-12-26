@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   ChevronDown, 
@@ -10,10 +10,21 @@ import BoardHeader from '../components/board/components/BoardHeader';
 import TanStackBoardTable from '../components/board/TanStackBoardTable';
 import boardApi from '../services/boardApi';
 import boardTemplates from '../config/boardTemplates';
+import { useAuth } from '../context/AuthContext';
 
 const BoardPage = () => {
   const { boardId } = useParams();
-  const [boardName, setBoardName] = useState('Loading...');
+  const { user } = useAuth();
+
+  // Lazy initialize state from localStorage
+  const [boardName, setBoardName] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`board_name_${boardId}`);
+      return saved ? JSON.parse(saved) : 'Loading...';
+    } catch {
+      return 'Loading...';
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [hiddenColumns, setHiddenColumns] = useState([]);
@@ -22,111 +33,153 @@ const BoardPage = () => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   
   // Board Data
-  const [groups, setGroups] = useState([]);
-  const [boardColumns, setBoardColumns] = useState([]);
-  const [statusConfig, setStatusConfig] = useState({});
+  const [groups, setGroups] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`board_groups_${boardId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [boardColumns, setBoardColumns] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`board_columns_${boardId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [statusConfig, setStatusConfig] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`board_status_${boardId}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  console.log('Component Render State:', { boardColumns, groups, loading });
+
+  // Effect to save state to localStorage whenever it changes
+  useEffect(() => {
+    if (!loading && boardId) {
+      try {
+        localStorage.setItem(`board_name_${boardId}`, JSON.stringify(boardName));
+        localStorage.setItem(`board_groups_${boardId}`, JSON.stringify(groups));
+        localStorage.setItem(`board_columns_${boardId}`, JSON.stringify(boardColumns));
+        localStorage.setItem(`board_status_${boardId}`, JSON.stringify(statusConfig));
+      } catch (error) {
+        console.error("Failed to save to local storage", error);
+      }
+    }
+  }, [boardName, groups, boardColumns, statusConfig, boardId, loading]);
 
   // Fetch board data from API
+  const fetchBoardData = useCallback(async () => {
+    // if (!user || !boardId) return;
+
+    // try {
+    //   setLoading(true);
+
+    //   // Using getBoardById from service
+    //   const data = await boardApi.getBoardById(boardId, user.uid);
+    //   console.log('API Response Data:', data);
+
+    //   if (data.success && data.board) {
+    //     setBoardName(data.board.name || 'Untitled Board');
+
+    //     let columns = Array.isArray(data.board.columns) ? data.board.columns : [];
+    //     let statuses = data.board.statusConfig || {};
+    //     let apiGroups = data.board.groups || [];
+
+    //     // Force "Donors" template structure if acceptable or empty
+    //     if (columns.length === 0 || data.board.name?.toLowerCase().includes('donor')) {
+    //       columns = [
+    //         { id: 'name', title: 'Donor', type: 'text', width: 280 },
+    //         { id: 'status', title: 'Status', type: 'status', width: 140 },
+    //         { id: 'email', title: 'Email', type: 'email', width: 200 },
+    //         { id: 'phone', title: 'Phone', type: 'phone', width: 180 },
+    //         { id: 'donated', title: '$ Donated', type: 'number', width: 140 },
+    //         { id: 'donations', title: 'Donations', type: 'text', width: 140 }, // Using text to show "-" or custom format
+    //         { id: 'files', title: 'Files', type: 'file', width: 120 }
+    //       ];
+    //       statuses = {
+    //         potential: { label: 'Potential', bg: '#FFCB00' },
+    //         active: { label: 'Active', bg: '#00C875' }
+    //       };
+
+    //       // If groups are empty, provide a clean "Potential Donors" group
+    //       if (apiGroups.length === 0) {
+    //         apiGroups = [
+    //           { 
+    //             id: 'group-potential',
+    //             name: 'Potential Donors',
+    //             color: '#FDAB3D',
+    //             expanded: true,
+    //             tasks: [
+    //               {
+    //                 id: 't1',
+    //                 name: 'Lorenzo Harvey',
+    //                 email: 'Lorenzo@email.com',
+    //                 phone: '+1 541 754 3010',
+    //                 status: 'potential',
+    //                 donated: 0,
+    //                 donations: null
+    //               }
+    //             ]
+    //           },
+    //           { 
+    //             id: 'group-active',
+    //             name: 'Active Donors',
+    //             color: '#00C875',
+    //             expanded: true,
+    //             tasks: []
+    //           }
+    //         ];
+    //       }
+    //     }
+
+    //     setBoardColumns(columns);
+    //     setStatusConfig(statuses);
+    //     setGroups(apiGroups);
+    //   } else {
+    //     setBoardName('Untitled Board');
+    //     setBoardColumns([]);
+    //     setStatusConfig({});
+    //     setGroups([]);
+    //   }
+
+    // } catch (error) {
+    //   console.error('Error fetching board:', error);
+    //   // Fallback for demo/error state
+    //   setBoardName('Donors');
+    //   setBoardColumns([
+    //     { id: 'name', title: 'Donor', type: 'text', width: 280 },
+    //     { id: 'status', title: 'Status', type: 'status', width: 140 },
+    //     { id: 'email', title: 'Email', type: 'email', width: 200 },
+    //     { id: 'phone', title: 'Phone', type: 'phone', width: 180 },
+    //     { id: 'donated', title: '$ Donated', type: 'number', width: 140 },
+    //     { id: 'donations', title: 'Donations', type: 'text', width: 140 },
+    //     { id: 'files', title: 'Files', type: 'file', width: 120 }
+    //   ]);
+    //   setGroups([
+    //     {
+    //       id: 'group-fallback',
+    //       name: 'Potential Donors',
+    //       color: '#FDAB3D',
+    //       expanded: true,
+    //       tasks: []
+    //     }
+    //   ]);
+    // } finally {
+    //   setLoading(false);
+    // }
+    setLoading(false); // Set loading to false to show the UI
+  }, [boardId, user]);
+
   useEffect(() => {
-    const fetchBoardData = async () => {
-      try {
-        setLoading(true);
-        // Using getBoardById from service
-        // In a real app, userId would come from AuthContext
-        const data = await boardApi.getBoardById(boardId, 'user-123');
-
-        if (data.success && data.board) {
-          setBoardName(data.board.name || 'Untitled Board');
-
-          let columns = data.board.columns || [];
-          let statuses = data.board.statusConfig || {};
-          let apiGroups = data.board.groups || [];
-
-          // Force "Donors" template structure if acceptable or empty
-          if (columns.length === 0 || data.board.name?.toLowerCase().includes('donor')) {
-            columns = [
-              { id: 'name', title: 'Donor', type: 'text', width: 280 },
-              { id: 'status', title: 'Status', type: 'status', width: 140 },
-              { id: 'email', title: 'Email', type: 'email', width: 200 },
-              { id: 'phone', title: 'Phone', type: 'phone', width: 180 },
-              { id: 'donated', title: '$ Donated', type: 'number', width: 140 },
-              { id: 'donations', title: 'Donations', type: 'text', width: 140 }, // Using text to show "-" or custom format
-              { id: 'files', title: 'Files', type: 'file', width: 120 }
-            ];
-            statuses = {
-              potential: { label: 'Potential', bg: '#FFCB00' },
-              active: { label: 'Active', bg: '#00C875' }
-            };
-
-            // If groups are empty, provide a clean "Potential Donors" group
-            if (apiGroups.length === 0) {
-              apiGroups = [
-                { 
-                  id: 'group-potential',
-                  name: 'Potential Donors',
-                  color: '#FDAB3D',
-                  expanded: true,
-                  tasks: [
-                    {
-                      id: 't1',
-                      name: 'Lorenzo Harvey',
-                      email: 'Lorenzo@email.com',
-                      phone: '+1 541 754 3010',
-                      status: 'potential',
-                      donated: 0,
-                      donations: null
-                    }
-                  ]
-                },
-                { 
-                  id: 'group-active',
-                  name: 'Active Donors',
-                  color: '#00C875',
-                  expanded: true,
-                  tasks: []
-                }
-              ];
-            }
-          }
-
-          setBoardColumns(columns);
-          setStatusConfig(statuses);
-          setGroups(apiGroups);
-        } else {
-          setBoardName('Untitled Board');
-        }
-
-      } catch (error) {
-        console.error('Error fetching board:', error);
-        // Fallback for demo/error state
-        setBoardName('Donors');
-        setBoardColumns([
-          { id: 'name', title: 'Donor', type: 'text', width: 280 },
-          { id: 'status', title: 'Status', type: 'status', width: 140 },
-          { id: 'email', title: 'Email', type: 'email', width: 200 },
-          { id: 'phone', title: 'Phone', type: 'phone', width: 180 },
-          { id: 'donated', title: '$ Donated', type: 'number', width: 140 },
-          { id: 'donations', title: 'Donations', type: 'text', width: 140 },
-          { id: 'files', title: 'Files', type: 'file', width: 120 }
-        ]);
-        setGroups([
-          {
-            id: 'group-fallback',
-            name: 'Potential Donors',
-            color: '#FDAB3D',
-            expanded: true,
-            tasks: []
-          }
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (boardId) {
-      fetchBoardData();
-    }
-  }, [boardId]);
+    fetchBoardData();
+  }, [fetchBoardData]);
 
   // Search functionality
   const handleSearch = (query) => {
@@ -161,40 +214,45 @@ const BoardPage = () => {
   const handleAddTask = async (groupId, taskName) => {
     if (!taskName.trim()) return;
 
-    try {
-      // Optimistic Update
-      const newTask = {
-        id: Date.now().toString(),
-        name: taskName,
-        status: null,
-        email: '',
-        phone: '',
-        donated: 0,
-        donations: null
-      };
+    // 1. Optimistic Update
+    const newTask = {
+      id: Date.now().toString(),
+      name: taskName,
+      status: null,
+      email: '',
+      phone: '',
+      donated: 0,
+      donations: null
+    };
+    const originalGroups = groups; // Save original state for rollback
+    const newGroups = groups.map(g =>
+      g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g
+    );
+    setGroups(newGroups);
 
-      const newGroups = groups.map(g =>
-        g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g
-      );
-      setGroups(newGroups);
+    // try {
+    //   // 2. API Call
+    //   const response = await boardApi.addItemToBoard(boardId, groupId, { name: taskName });
 
-      // API Call
-      const response = await boardApi.addItemToBoard(boardId, groupId, { name: taskName });
-      if (response.success && response.item) {
-        setGroups(prev => prev.map(g =>
-          g.id === groupId ? {
-            ...g,
-            tasks: g.tasks.map(t => t.id === newTask.id ? response.item : t)
-          } : g
-        ));
-      }
-    } catch (err) {
-      console.error("Failed to add task:", err);
-    }
+    //   // 3. Re-fetch data on success
+    //   if (response.success) {
+    //     // API call was successful, re-fetch the entire board to get the correct IDs
+    //     await fetchBoardData();
+    //   } else {
+    //     // API call failed, roll back the optimistic update.
+    //     console.error("Failed to add task on server, rolling back.", response);
+    //     setGroups(originalGroups);
+    //   }
+    // } catch (err) {
+    //   console.error("Failed to add task:", err);
+    //   // Network or other error, roll back.
+    //   setGroups(originalGroups);
+    // }
   };
 
   // Backend Integration: Update Task
   const handleUpdateTask = async (taskId, field, value) => {
+    console.log(`Updating Task: ${taskId}, Field: ${field}, Value:`, value);
     try {
       // Optimistic Update
       setGroups(prev => prev.map(g => ({
@@ -203,10 +261,31 @@ const BoardPage = () => {
       })));
 
       // API Call
-      await boardApi.updateBoardItem(boardId, taskId, { [field]: value });
+      // await boardApi.updateBoardItem(boardId, taskId, { [field]: value });
     } catch (err) {
       console.error("Failed to update task:", err);
     }
+  };
+
+  // Backend Integration: Delete Task
+  const handleDeleteTask = async (taskId) => {
+    const originalGroups = groups;
+    
+    // Optimistic Update
+    const newGroups = groups.map(group => ({
+      ...group,
+      tasks: group.tasks.filter(task => task.id !== taskId)
+    }));
+    setGroups(newGroups);
+
+    // try {
+    //   // API Call
+    //   await boardApi.deleteItemFromBoard(boardId, taskId);
+    // } catch (err) {
+    //   console.error("Failed to delete task:", err);
+    //   // Rollback on failure
+    //   setGroups(originalGroups);
+    // }
   };
 
   // Add New Column Handler
@@ -287,13 +366,14 @@ const BoardPage = () => {
                 </div>
 
                 {group.expanded && (
-                  <div className="pl-1 border-2 border-purple-500">
+                  <div className="pl-1">
                     <TanStackBoardTable
                       data={group.tasks}
                       columns={visibleColumns}
                         groupColor={group.color}
                         statusConfig={statusConfig}
                       onUpdateTask={handleUpdateTask}
+                      onDeleteTask={handleDeleteTask}
                       onAddTask={(val) => handleAddTask(group.id, val)}
                       onAddColumn={handleAddColumn}
                       onSort={handleSort}

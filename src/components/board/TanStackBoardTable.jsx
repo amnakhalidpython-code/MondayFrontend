@@ -522,9 +522,56 @@ const TanStackBoardTable = ({
             }
 
             if (col.title.includes("$")) {
+              const [isEditing, setIsEditing] = React.useState(false);
+              const [editValue, setEditValue] = React.useState(val || "");
+              const inputRef = React.useRef(null);
+
+              React.useEffect(() => {
+                if (isEditing && inputRef.current) {
+                  inputRef.current.focus();
+                  inputRef.current.select();
+                }
+              }, [isEditing]);
+
+              const handleSave = () => {
+                if (editValue !== val) {
+                  onUpdateTask(rowOriginal.id, col.id, Number(editValue) || 0);
+                }
+                setIsEditing(false);
+              };
+
+              if (isEditing) {
+                return (
+                  <input
+                    ref={inputRef}
+                    type="number"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={handleSave}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === "Tab") {
+                        e.preventDefault();
+                        handleSave();
+                      }
+                      if (e.key === "Escape") {
+                        setEditValue(val || "");
+                        setIsEditing(false);
+                      }
+                    }}
+                    className="w-full h-full px-2 text-[13px] text-right text-[#323338] bg-white border-2 border-blue-500 rounded focus:outline-none"
+                    placeholder="0"
+                  />
+                );
+              }
+
               return (
-                <div className="px-2 text-[13px] text-[#323338] text-center w-full truncate overflow-hidden">
-                  {val ? `$${Number(val).toLocaleString()}` : ""}
+                <div
+                  onClick={() => setIsEditing(true)}
+                  className="w-full h-full px-2 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors overflow-hidden"
+                >
+                  <span className="text-[13px] text-[#323338] truncate">
+                    {val ? `${Number(val).toLocaleString()}` : ""}
+                  </span>
                 </div>
               );
             }
@@ -548,7 +595,7 @@ const TanStackBoardTable = ({
             }
 
             // Default text cell - make it editable
-            if (col.type === "text" || !col.type) {
+            if (col.type === "text") {
               const [isEditing, setIsEditing] = React.useState(false);
               const [editValue, setEditValue] = React.useState(val || "");
               const inputRef = React.useRef(null);
@@ -678,6 +725,17 @@ const TanStackBoardTable = ({
       maxSize: 800,
     },
   });
+
+  // Calculate sums for currency columns
+  const columnSums = useMemo(() => {
+    const sums = {};
+    propColumns.forEach(col => {
+      if (col.title.includes('$')) {
+        sums[col.id] = data.reduce((acc, row) => acc + (Number(row[col.id]) || 0), 0);
+      }
+    });
+    return sums;
+  }, [data, propColumns]);
 
   return (
     <div className="w-full overflow-x-auto">
@@ -840,10 +898,10 @@ const TanStackBoardTable = ({
                 }}
                 className="border-r border-[#d0d4e4] h-full flex items-center justify-center text-[13px] flex-shrink-0 overflow-hidden"
               >
-                {(col.id.includes("donated") || col.id === "grantAmount") && (
+                {columnSums[col.id] !== undefined && (
                   <div className="flex flex-col items-center justify-center h-full w-full overflow-hidden">
                     <span className="font-semibold text-[#323338] leading-tight truncate">
-                      $20,800
+                      {`${Number(columnSums[col.id]).toLocaleString()}`}
                     </span>
                     <span className="text-[10px] text-gray-500 leading-tight truncate">
                       sum

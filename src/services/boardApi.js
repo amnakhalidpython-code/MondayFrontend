@@ -68,8 +68,9 @@ export const addItemToBoard = async (boardId, groupId, itemData) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        groupId,
-        data: itemData
+        title: itemData.name, 
+        group: groupId,       
+        data: itemData        
       })
     });
 
