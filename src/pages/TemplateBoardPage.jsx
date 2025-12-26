@@ -15,8 +15,8 @@ import ActionBar from '../components/board/components/ActionBar';
 import BoardHeader from '../components/board/components/BoardHeader';
 import TanStackBoardTable from '../components/board/TanStackBoardTable';
 import { getTemplateById } from '../config/boardTemplates';
-import { fetchDonors } from '../services/api/donorService';
-import { fetchColumns } from '../services/api/columnService';
+import * as donorService from '../services/api/donorService';
+import * as columnService from '../services/api/columnService';
 
 const TemplateBoardPage = () => {
   const { templateId } = useParams();
@@ -56,9 +56,11 @@ const TemplateBoardPage = () => {
     try {
       // Fetch donors and columns from API
       const [donorsResponse, columnsResponse] = await Promise.all([
-        fetchDonors({ page: 1, limit: 100 }),
-        fetchColumns()
+        donorService.fetchDonors({ page: 1, limit: 100 }),
+        columnService.fetchColumns()
       ]);
+
+      console.log('--- DEBUG: Raw API Response ---', donorsResponse);
 
       if (donorsResponse.success && columnsResponse.success) {
         // Map API columns to board columns format
@@ -70,19 +72,22 @@ const TemplateBoardPage = () => {
         }));
 
         // Use API columns if available, otherwise use template columns
-        setBoardColumns(apiColumns.length > 0 ? apiColumns : templateData.columns);
+        console.log('--- DEBUG: Columns from API ---', apiColumns);
+        if (apiColumns.length > 0) {
+          console.log('--- DEBUG: Using columns from API ---');
+          setBoardColumns(apiColumns);
+        } else {
+          console.log('--- DEBUG: API returned no columns, falling back to template columns ---');
+          setBoardColumns(templateData.columns);
+        }
 
-        // Map API donors to tasks format
+        // Map API donors to tasks format, ensuring keys match column_keys from the API
         const donorTasks = donorsResponse.data.donors.map(donor => ({
-          id: donor._id,
-          name: donor.donor_name,
-          email: donor.email,
-          phone: donor.phone,
-          donated: donor.total_donated,
-          donations: donor.total_donations,
-          status: donor.status,
-          ...donor.customFields // Merge custom fields
+          ...donor, // Use all original fields like 'donor_name', 'email', etc.
+          id: donor._id, // Ensure 'id' is present for the table's internal keying
         }));
+
+        console.log('--- DEBUG: Mapped Rows for UI ---', donorTasks);
 
         // Group donors by status
         const groupedDonors = {
@@ -141,12 +146,16 @@ const TemplateBoardPage = () => {
     const filtered = groups.map(group => ({
       ...group,
       tasks: group.tasks.filter(task => 
-        task.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.donor_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.owner?.name?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     })).filter(group => group.tasks.length > 0);
     setFilteredGroups(filtered);
   }, [searchQuery, groups]);
+
+  useEffect(() => {
+    console.log('--- DEBUG: Board group state updated ---', groups);
+  }, [groups]);
 
   const handleSort = (columnId, order) => {
     setCurrentSort({ column: columnId, order });
@@ -259,279 +268,246 @@ const TemplateBoardPage = () => {
 
   // Handler for updating task field (used by TanStackBoardTable)
   const handleUpdateTask = async (groupId, taskId, field, value) => {
-    // If donors template, use API
+    // Optimistic Update for all templates
+    setGroups(prevGroups =>
+      prevGroups.map(g => {
+        const taskIndex = g.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex === -1) return g;
+
+        const newTasks = [...g.tasks];
+        newTasks[taskIndex] = { ...newTasks[taskIndex], [field]: value };
+        return { ...g, tasks: newTasks };
+      })
+    );
+
+    // If donors template, send update to API in the background
     if (templateId === 'donors') {
       try {
-        const { updateDonor } = await import('../services/api/donorService');
-        let updatePayload = {};
-        if (field === 'status') {
-          updatePayload = { status: value };
-        } else if (field === 'name') {
-          updatePayload = { donor_name: value };
-        } else {
-          // For custom fields, assume the field name is the column_key
-          updatePayload = { [field]: value };
-        }
-
-        const response = await updateDonor(taskId, updatePayload);
-
-        if (response.success) {
-          // Reload donors from API to reflect changes
-          const templateData = getTemplateById(templateId);
-          await loadDonorsFromAPI(templateData);
-        }
+        // The 'field' variable now directly corresponds to the API/database field name
+        const updatePayload = { [field]: value };
+        await donorService.updateDonor(taskId, updatePayload);
+        // No reload needed, UI is already updated.
       } catch (error) {
         console.error('Error updating donor:', error);
+        // Optional: Here you could implement a rollback mechanism on API failure
       }
-    } else {
-      // Local state update for other templates
-      setGroups(groups.map(g =>
-        g.id === groupId ? {
-          ...g,
-          tasks: g.tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t)
-        } : g
-      ));
     }
   };
 
-  // Handler for adding task (used by TanStackBoardTable)
   const handleAddTaskToGroup = async (groupId, taskName) => {
     if (!taskName.trim()) return;
 
-    // If donors template, use API
+    const newTask = {
+      id: `temp-${Date.now()}`,
+      donor_name: taskName,
+      owner: null,
+      status: null,
+      dueDate: '',
+      overdue: false,
+      grantAmount: 0,
+      grantProvider: '',
+      email: '',
+      phone: '',
+      donated: 0,
+      donations: ''
+    };
+
+    // Optimistic update for all templates
+    setGroups(prevGroups =>
+      prevGroups.map(g =>
+        g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g
+      )
+    );
+
+    // If donors template, use API and then sync the new item
     if (templateId === 'donors') {
       try {
-        const { createDonor } = await import('../services/api/donorService');
-        const response = await createDonor({
+        const response = await donorService.createDonor({
           donor_name: taskName,
-          email: `${taskName.toLowerCase().replace(/\s+/g, '')}@example.com`, // Temporary email
-          status: groupId // Use group id as status
+          email: `${taskName.toLowerCase().replace(/\s+/g, '')}@example.com`,
+          status: groupId
         });
 
-        if (response.success) {
-          // Reload donors from API
-          const templateData = getTemplateById(templateId);
-          await loadDonorsFromAPI(templateData);
+        if (response.success && response.data) {
+          // Replace temporary task with the real one from the server
+          setGroups(prevGroups =>
+            prevGroups.map(g => {
+              if (g.id === groupId) {
+                return {
+                  ...g,
+                  tasks: g.tasks.map(t => (t.id === newTask.id ? { ...response.data, id: response.data._id } : t))
+                };
+              }
+              return g;
+            })
+          );
+        } else {
+          throw new Error(response.message || 'Failed to create donor on server');
         }
       } catch (error) {
         console.error('Error creating donor:', error);
+        // Rollback: remove the optimistically added task
+        setGroups(prevGroups =>
+          prevGroups.map(g => ({
+            ...g,
+            tasks: g.tasks.filter(t => t.id !== newTask.id)
+          }))
+        );
       }
-    } else {
-      // Local state update for other templates
-      setGroups(groups.map(g =>
-        g.id === groupId ? {
-          ...g,
-          tasks: [...g.tasks, {
-            id: Date.now().toString(),
-            name: taskName,
-            owner: null,
-            status: null,
-            dueDate: '',
-            overdue: false,
-            grantAmount: 0,
-            grantProvider: '',
-            email: '',
-            phone: '',
-            donated: 0,
-            donations: ''
-          }]
-        } : g
-      ));
     }
   };
 
   // Handler for adding a new column
   const handleAddColumn = async (columnType) => {
-    // If donors template, use API
+    const newColumn = {
+      id: `temp-col-${Date.now()}`,
+      title: `New ${columnType.charAt(0).toUpperCase() + columnType.slice(1)}`,
+      type: columnType,
+      width: 150
+    };
+
+    // Optimistic update for all templates
+    setBoardColumns(prevColumns => [...prevColumns, newColumn]);
+
     if (templateId === 'donors') {
       try {
-        const { createColumn } = await import('../services/api/columnService');
         const columnKey = `custom_${columnType}_${Date.now()}`;
-        const response = await createColumn({
+        const response = await columnService.createColumn({
           column_key: columnKey,
-          title: `New ${columnType}`,
+          title: newColumn.title,
           type: columnType,
           width: 150
         });
 
-        if (response.success) {
-          // Reload columns from API
-          const { fetchColumns } = await import('../services/api/columnService');
-          const columnsResponse = await fetchColumns();
-          if (columnsResponse.success) {
-            const apiColumns = columnsResponse.data.map(col => ({
-              id: col.column_key,
-              title: col.title,
-              type: col.type,
-              width: col.width || 150
-            }));
-            setBoardColumns(apiColumns);
-          }
+        if (response.success && response.data) {
+          // Replace temporary column with the real one from the server
+          setBoardColumns(prevColumns =>
+            prevColumns.map(c => (c.id === newColumn.id ? { ...response.data, id: response.data.column_key } : c))
+          );
+        } else {
+          throw new Error(response.message || 'Failed to create column on server');
         }
       } catch (error) {
         console.error('Error creating column:', error);
+        // Rollback: remove the optimistically added column
+        setBoardColumns(prevColumns => prevColumns.filter(c => c.id !== newColumn.id));
       }
-    } else {
-      // Local state update for other templates
-      const newColumn = {
-        id: `col-${Date.now()}`,
-        title: `New ${columnType}`,
-        type: columnType,
-        width: 150
-      };
-      setBoardColumns([...boardColumns, newColumn]);
     }
   };
 
 
   // Handler for renaming a column
   const handleRenameColumn = async (columnId, newTitle) => {
+    const originalColumns = [...boardColumns];
+    setBoardColumns(boardColumns.map(col =>
+      col.id === columnId ? { ...col, title: newTitle } : col
+    ));
+
     if (templateId === 'donors') {
       try {
-        const { renameColumn } = await import('../services/api/columnService');
-        const response = await renameColumn(columnId, newTitle);
-
-        if (response.success) {
-          // Update local state
-          setBoardColumns(boardColumns.map(col =>
-            col.id === columnId ? { ...col, title: newTitle } : col
-          ));
-        }
+        await columnService.renameColumn(columnId, newTitle);
       } catch (error) {
         console.error('Error renaming column:', error);
-        // Still update locally if API fails
-        setBoardColumns(boardColumns.map(col =>
-          col.id === columnId ? { ...col, title: newTitle } : col
-        ));
+        setBoardColumns(originalColumns); // Rollback
       }
-    } else {
-      // Local state update for other templates
-      setBoardColumns(boardColumns.map(col =>
-        col.id === columnId ? { ...col, title: newTitle } : col
-      ));
     }
   };
 
   // Handler for deleting a column
   const handleDeleteColumn = async (columnId) => {
+    const originalColumns = [...boardColumns];
+    setBoardColumns(boardColumns.filter(col => col.id !== columnId));
+
     if (templateId === 'donors') {
       try {
-        const { deleteColumn } = await import('../services/api/columnService');
-        const response = await deleteColumn(columnId);
-
-        if (response.success) {
-          setBoardColumns(boardColumns.filter(col => col.id !== columnId));
-        }
+        await columnService.deleteColumn(columnId);
       } catch (error) {
         console.error('Error deleting column:', error);
-        // Still delete locally if API fails
-        setBoardColumns(boardColumns.filter(col => col.id !== columnId));
+        setBoardColumns(originalColumns); // Rollback
       }
-    } else {
-      setBoardColumns(boardColumns.filter(col => col.id !== columnId));
     }
   };
 
   // Handler for duplicating a column
   const handleDuplicateColumn = async (columnId) => {
+    const columnToDuplicate = boardColumns.find(col => col.id === columnId);
+    if (!columnToDuplicate) return;
+
+    const newColumn = {
+      ...columnToDuplicate,
+      id: `temp-col-${Date.now()}`,
+      title: `${columnToDuplicate.title} (Copy)`
+    };
+
+    const originalColumns = [...boardColumns];
+    const columnIndex = originalColumns.findIndex(c => c.id === columnId);
+    
+    const newColumns = [...originalColumns];
+    newColumns.splice(columnIndex + 1, 0, newColumn);
+    setBoardColumns(newColumns);
+
     if (templateId === 'donors') {
       try {
-        const { duplicateColumn, fetchColumns } = await import('../services/api/columnService');
-        const response = await duplicateColumn(columnId);
-
-        if (response.success) {
-          // Reload all columns from API
-          const columnsResponse = await fetchColumns();
-          if (columnsResponse.success) {
-            const apiColumns = columnsResponse.data.map(col => ({
-              id: col.column_key,
-              title: col.title,
-              type: col.type,
-              width: col.width || 150
-            }));
-            setBoardColumns(apiColumns);
-          }
+        const response = await columnService.duplicateColumn(columnId);
+        if (!response.success) throw new Error('Failed to duplicate column on server');
+        
+        const columnsResponse = await columnService.fetchColumns();
+        if (columnsResponse.success) {
+          const apiColumns = columnsResponse.data.map(col => ({
+            id: col.column_key,
+            title: col.title,
+            type: col.type,
+            width: col.width || 150
+          }));
+          setBoardColumns(apiColumns);
         }
       } catch (error) {
         console.error('Error duplicating column:', error);
-        // Fallback to local duplication
-        const columnToDuplicate = boardColumns.find(col => col.id === columnId);
-        if (columnToDuplicate) {
-          const newColumn = {
-            ...columnToDuplicate,
-            id: `${columnId}_copy_${Date.now()}`,
-            title: `${columnToDuplicate.title} (Copy)`
-          };
-          setBoardColumns([...boardColumns, newColumn]);
-        }
-      }
-    } else {
-      // Local duplication for other templates
-      const columnToDuplicate = boardColumns.find(col => col.id === columnId);
-      if (columnToDuplicate) {
-        const newColumn = {
-          ...columnToDuplicate,
-          id: `${columnId}_copy_${Date.now()}`,
-          title: `${columnToDuplicate.title} (Copy)`
-        };
-        setBoardColumns([...boardColumns, newColumn]);
+        setBoardColumns(originalColumns); // Rollback
       }
     }
   };
 
   // Handler for adding column to the right
   const handleAddColumnToRight = async (columnId) => {
+    const newColumn = {
+      id: `temp-col-${Date.now()}`,
+      title: 'New Column',
+      type: 'text',
+      width: 150
+    };
+
+    const originalColumns = [...boardColumns];
+    const columnIndex = originalColumns.findIndex(c => c.id === columnId);
+    if (columnIndex === -1) return;
+
+    const newColumns = [...originalColumns];
+    newColumns.splice(columnIndex + 1, 0, newColumn);
+    setBoardColumns(newColumns);
+
     if (templateId === 'donors') {
       try {
-        const { addColumnToRight, fetchColumns } = await import('../services/api/columnService');
-        const response = await addColumnToRight(columnId, {
+        const response = await columnService.addColumnToRight(columnId, {
           column_key: `new_col_${Date.now()}`,
           title: 'New Column',
           type: 'text'
         });
 
-        if (response.success) {
-          // Reload all columns from API
-          const columnsResponse = await fetchColumns();
-          if (columnsResponse.success) {
-            const apiColumns = columnsResponse.data.map(col => ({
-              id: col.column_key,
-              title: col.title,
-              type: col.type,
-              width: col.width || 150
-            }));
-            setBoardColumns(apiColumns);
-          }
+        if (!response.success) throw new Error('Failed to add column to right on server');
+
+        const columnsResponse = await columnService.fetchColumns();
+        if (columnsResponse.success) {
+          const apiColumns = columnsResponse.data.map(col => ({
+            id: col.column_key,
+            title: col.title,
+            type: col.type,
+            width: col.width || 150
+          }));
+          setBoardColumns(apiColumns);
         }
       } catch (error) {
         console.error('Error adding column to right:', error);
-        // Fallback to local addition
-        const columnIndex = boardColumns.findIndex(col => col.id === columnId);
-        if (columnIndex !== -1) {
-          const newColumn = {
-            id: `col_${Date.now()}`,
-            title: 'New Column',
-            type: 'text',
-            width: 150
-          };
-          const newColumns = [...boardColumns];
-          newColumns.splice(columnIndex + 1, 0, newColumn);
-          setBoardColumns(newColumns);
-        }
-      }
-    } else {
-      // Local addition for other templates
-      const columnIndex = boardColumns.findIndex(col => col.id === columnId);
-      if (columnIndex !== -1) {
-        const newColumn = {
-          id: `col_${Date.now()}`,
-          title: 'New Column',
-          type: 'text',
-          width: 150
-        };
-        const newColumns = [...boardColumns];
-        newColumns.splice(columnIndex + 1, 0, newColumn);
-        setBoardColumns(newColumns);
+        setBoardColumns(originalColumns); // Rollback
       }
     }
   };

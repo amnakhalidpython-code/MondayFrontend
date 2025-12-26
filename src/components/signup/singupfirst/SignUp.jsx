@@ -126,9 +126,9 @@ const SignUp = () => {
 
   const saveEmailToBackend = async (emailAddress) => {
     try {
-      const response = await fetch('https://monday-clone-backend.vercel.app/api/users/email', {
+      const response = await fetch('http://localhost:3002/api/users/email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+
         body: JSON.stringify({ email: emailAddress })
       });
       const data = await response.json();
@@ -148,7 +148,7 @@ const SignUp = () => {
   const saveAccountToMongoDB = async (user) => {
     try {
       const accountName = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
-      const response = await fetch('https://monday-clone-backend.vercel.app/api/account/save-account', {
+      const response = await fetch('http://localhost:3002/api/account/save-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
