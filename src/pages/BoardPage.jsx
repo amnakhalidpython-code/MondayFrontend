@@ -260,54 +260,60 @@ const BoardPage = () => {
       />
 
       <div className="p-8 flex-1 overflow-y-auto bg-white">
-        {(searchQuery ? filteredGroups : groups).map(group => (
-          <div key={group.id} className="mb-10">
-            {/* Group Header - Aligned to match Monday Design */}
-            <div 
-              className="flex items-center gap-2 mb-3 cursor-pointer group/header"
-              onClick={() => toggleGroup(group.id)}
-            >
-              <div className="p-1 rounded hover:bg-gray-100 transition-colors">
-                {group.expanded ? (
-                  <ChevronDown size={20} style={{ color: group.color }} />
-                ) : (
-                    <ChevronRight size={20} style={{ color: group.color }} />
+        {loading ? (
+          <div className="text-center py-10">Loading board...</div>
+        ) : (
+          <>
+            {(searchQuery ? filteredGroups : groups).map(group => (
+              <div key={group.id} className="mb-10">
+                {/* Group Header - Aligned to match Monday Design */}
+                <div 
+                  className="flex items-center gap-2 mb-3 cursor-pointer group/header"
+                  onClick={() => toggleGroup(group.id)}
+                >
+                  <div className="p-1 rounded hover:bg-gray-100 transition-colors">
+                    {group.expanded ? (
+                      <ChevronDown size={20} style={{ color: group.color }} />
+                    ) : (
+                        <ChevronRight size={20} style={{ color: group.color }} />
+                    )}
+                  </div>
+                  <h3 className="text-[18px] font-normal leading-none" style={{ color: group.color }}>
+                    {group.name}
+                  </h3>
+                  <span className="text-[14px] text-gray-400 font-light ml-2">
+                    {group.tasks.length} {group.tasks.length === 1 ? 'Donor' : 'Donors'}
+                  </span>
+                </div>
+
+                {group.expanded && (
+                  <div className="pl-1 border-2 border-purple-500">
+                    <TanStackBoardTable
+                      data={group.tasks}
+                      columns={visibleColumns}
+                        groupColor={group.color}
+                        statusConfig={statusConfig}
+                      onUpdateTask={handleUpdateTask}
+                      onAddTask={(val) => handleAddTask(group.id, val)}
+                      onAddColumn={handleAddColumn}
+                      onSort={handleSort}
+                      onFilter={handleHideColumns}
+                      onGroupBy={handleGroupBy}
+                    />
+                  </div>
                 )}
               </div>
-              <h3 className="text-[18px] font-normal leading-none" style={{ color: group.color }}>
-                {group.name}
-              </h3>
-              <span className="text-[14px] text-gray-400 font-light ml-2">
-                {group.tasks.length} {group.tasks.length === 1 ? 'Donor' : 'Donors'}
-              </span>
+            ))}
+
+            {/* Empty state "Add Group" at bottom */}
+            <div className="mt-4">
+              <button className="flex items-center gap-2 px-3 py-2 text-gray-500 hover:bg-gray-100 rounded transition-colors text-sm">
+                <Plus size={16} />
+                <span>Add new group</span>
+              </button>
             </div>
-
-            {group.expanded && (
-              <div className="pl-1">
-                <TanStackBoardTable
-                  data={group.tasks}
-                  columns={visibleColumns}
-                    groupColor={group.color}
-                    statusConfig={statusConfig}
-                  onUpdateTask={handleUpdateTask}
-                  onAddTask={(val) => handleAddTask(group.id, val)}
-                  onAddColumn={handleAddColumn}
-                  onSort={handleSort}
-                  onFilter={handleHideColumns}
-                  onGroupBy={handleGroupBy}
-                />
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* Empty state "Add Group" at bottom */}
-        <div className="mt-4">
-          <button className="flex items-center gap-2 px-3 py-2 text-gray-500 hover:bg-gray-100 rounded transition-colors text-sm">
-            <Plus size={16} />
-            <span>Add new group</span>
-          </button>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

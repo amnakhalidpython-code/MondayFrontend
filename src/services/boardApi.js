@@ -1,5 +1,5 @@
 // src/services/boardApi.js - API Service for Board Operations
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://monday-clone-backend.vercel.app/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
 // ================================
 // CREATE BOARD FROM TEMPLATE

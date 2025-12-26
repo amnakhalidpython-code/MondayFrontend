@@ -42,7 +42,7 @@ const CRMDashboard = () => {
         return;
       }
 
-     const response = await fetch(`https://monday-clone-backend.vercel.app/api/boards/user/${encodeURIComponent(userId)}`);
+     const response = await fetch(`http://localhost:3002/api/boards/user/${encodeURIComponent(userId)}`);
       const data = await response.json();
       
       if (data.success) {

@@ -45,7 +45,7 @@ const CreateAccountSecond = () => {
 
       console.log('Saving account with:', { email: userEmail, fullName, accountName });
 
-      const res = await fetch("https://monday-clone-backend.vercel.app/api/account/save-account", {
+      const res = await fetch("http://localhost:3002/api/account/save-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

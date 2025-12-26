@@ -162,8 +162,7 @@ const MondayCRMNavbar = () => {
       return;
     }
 
-    // Simulate search - in real app, call backend API
-    setSearchResults([
+     setSearchResults([
       { id: 1, type: 'board', title: 'Sales Pipeline', subtitle: 'Board' },
       { id: 2, type: 'task', title: 'Follow up with client', subtitle: 'Task in Sales Board' },
       { id: 3, type: 'contact', title: 'John Smith', subtitle: 'Contact' }
@@ -175,7 +174,7 @@ const MondayCRMNavbar = () => {
     if (!inviteEmail) return;
     
     try {
-      const response = await fetch('https://monday-clone-backend.vercel.app/api/invitations', {
+      const response = await fetch('http://localhost:3002/api/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -263,7 +262,7 @@ const MondayCRMNavbar = () => {
       handleMarkAsRead(notification._id);
     }
     if (notification.link) {
-      window.location.href = notification.link;
+      navigate(notification.link);
     }
   };
 

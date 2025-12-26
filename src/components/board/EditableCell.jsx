@@ -28,6 +28,7 @@ const EditableCell = ({ value, onSave, type = 'text', placeholder = '', classNam
   };
 
   const handleKeyDown = (e) => {
+    e.preventdefault()
     if (e.key === 'Enter') {
       handleSave();
     } else if (e.key === 'Escape') {

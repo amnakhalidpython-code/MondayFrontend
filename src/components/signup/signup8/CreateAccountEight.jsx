@@ -88,7 +88,7 @@ const CreateAccountEight = () => {
           return;
         }
 
-        const response = await fetch('https://monday-clone-backend.vercel.app/api/account/get-account', {
+        const response = await fetch('http://localhost:3002/api/account/get-account', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
@@ -162,7 +162,7 @@ const CreateAccountEight = () => {
         invitations: validInvitations
       };
 
-      const response = await fetch('https://monday-clone-backend.vercel.app/api/invitations/send', {
+      const response = await fetch('http://localhost:3002/api/invitations/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
