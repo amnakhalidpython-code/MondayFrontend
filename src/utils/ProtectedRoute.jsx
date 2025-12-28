@@ -27,9 +27,9 @@ export const SignupProtectedRoute = ({ children }) => {
   // Allow access if:
   // - User completed email step (emailForSignup exists), OR
   // - User authenticated via OAuth (user exists)
-  if (!emailForSignup && !user) {
-    return <Navigate to="/one" replace />;
-  }
+  // if (!emailForSignup && !user) {
+  //   return <Navigate to="/one" replace />;
+  // }
 
   return children;
 };
@@ -56,9 +56,9 @@ export const AuthProtectedRoute = ({ children }) => {
   }
 
   // If not authenticated, redirect to /one
-  if (!user) {
-    return <Navigate to="/one" replace />;
-  }
+  // if (!user) {
+  //   return <Navigate to="/one" replace />;
+  // }
 
   return children;
 };
