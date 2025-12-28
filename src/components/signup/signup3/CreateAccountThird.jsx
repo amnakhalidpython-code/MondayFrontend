@@ -56,7 +56,7 @@ export default function CreateAccountThird() {
   };
 
   const handleBack = () => {
-    navigate('/two');
+    navigate('/');
     if (selectedGoal && !selectedRole) {
       setSelectedGoal(null);
     } else if (selectedRole) {

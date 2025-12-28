@@ -234,7 +234,7 @@ const SignUp = () => {
     if (saved) {
       localStorage.setItem('userEmail', email);
       saveEmailForSignup(email);
-      navigate('/two');
+      navigate('/three');
     }
     
     setContinueLoading(false);

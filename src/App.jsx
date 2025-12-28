@@ -28,7 +28,7 @@ import Navbar from "./components/Navbar";
 // Pages
 import WorkManagementPage from "./pages/work-management/WorkManagementBasicPage";
 // import SignUp from "./components/signup/singupfirst/SignUp";
-import CreateAccountSecond from "./components/signup/signup2/CreateAccountSecond";
+// import CreateAccountSecond from "./components/signup/signup2/CreateAccountSecond";
 import CreateAccountThird from "./components/signup/signup3/CreateAccountThird";
 import CreateAccountForth from "./components/signup/signup4/CreateAccountForth";
 import CreateAccountFifth from "./components/signup/signup5/CreateAccountFifth";
@@ -54,7 +54,7 @@ function AppContent() {
   // Pages jahan Navbar hide krna hai
   const hideNavbarRoutes = [
     // "/one",
-    "/two",
+    // "/two",
     "/three",
     "/four",
     "/five",
@@ -94,14 +94,14 @@ function AppContent() {
         {/* <Route path="/one" element={<SignUp />} /> */}
 
         {/* Protected Signup Steps */}
-        <Route 
+        {/* <Route 
           path="/two" 
           element={
             <SignupProtectedRoute>
               <CreateAccountSecond />
             </SignupProtectedRoute>
           } 
-        />
+        /> */}
         
         <Route 
           path="/three" 
