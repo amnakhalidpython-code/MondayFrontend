@@ -140,7 +140,7 @@ const WorkManagementPage = () => {
 
                 {/* Get Started Button */}
                 <Link
-                  to="/one"
+                  to="/two"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',

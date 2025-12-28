@@ -39,7 +39,7 @@ const CreateAccountSecond = () => {
       
       if (!userEmail) {
         alert('Email not found. Please go back and enter your email again.');
-        window.location.href = '/one';
+        // window.location.href = '/one';
         return;
       }
 
@@ -71,7 +71,7 @@ const CreateAccountSecond = () => {
 
   const handleBack = () => {
     console.log('Back clicked');
-    window.location.href = '/one';
+    // window.location.href = '/one';
   };
 
   return (
