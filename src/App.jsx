@@ -106,99 +106,99 @@ function AppContent() {
         <Route 
           path="/three" 
           element={
-            <SignupProtectedRoute>
+           
               <CreateAccountThird />
-            </SignupProtectedRoute>
+           
           } 
         />
         
         <Route 
           path="/four" 
           element={
-            <SignupProtectedRoute>
+          
               <CreateAccountForth />
-            </SignupProtectedRoute>
+            
           } 
         />
         
         <Route 
           path="/five" 
           element={
-            <SignupProtectedRoute>
+            
               <CreateAccountFifth />
-            </SignupProtectedRoute>
+            
           } 
         />
         
         <Route 
           path="/six" 
           element={
-            <SignupProtectedRoute>
+            
               <CreateAccountSixth />
-            </SignupProtectedRoute>
+           
           } 
         />
         
         <Route 
           path="/seven" 
           element={
-            <SignupProtectedRoute>
+           
               <CreateAccountSeven />
-            </SignupProtectedRoute>
+           
           } 
         />
         
         <Route 
           path="/eight" 
           element={
-            <SignupProtectedRoute>
+           
               <CreateAccountEight />
-            </SignupProtectedRoute>
+
           } 
         />
         
         <Route 
           path="/nine" 
           element={
-            <SignupProtectedRoute>
+           
               <CreateAccountNine />
-            </SignupProtectedRoute>
+          
           } 
         />
 
         <Route 
           path="/ten" 
           element={
-            <SignupProtectedRoute>
+
               <CreateAccountTen />
-            </SignupProtectedRoute>
+      
           } 
         />
 
         <Route 
           path="/eleven" 
           element={
-            <SignupProtectedRoute>
+           
               <CreateAccountEleven />
-            </SignupProtectedRoute>
+      
           } 
         />
         
         <Route
           path="/twelve"
           element={
-            <SignupProtectedRoute>
+
               <CreateAccount12 />
-            </SignupProtectedRoute>
+         
           }
         />
 
         <Route
           path="/thirteen"
           element={
-            <SignupProtectedRoute>
+          
               <CreateAccount13 />
-            </SignupProtectedRoute>
+
           }
         />
 
