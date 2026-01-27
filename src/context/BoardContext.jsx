@@ -1,4 +1,3 @@
-// src/context/BoardContext.js
 import React, { createContext, useState, useContext } from 'react';
 
 const BoardContext = createContext();
@@ -16,7 +15,18 @@ export const BoardProvider = ({ children }) => {
       notes: false,
       budget: false,
       files: false
-    }
+    },
+    // Default Widgets (Step 11)
+    selectedWidgets: {
+      tasksOverview: true,
+      tasksByStatus: true,
+      tasksByOwner: true,
+      overdueTasks: false,
+      tasksByDueDate: false
+    },
+    // Default View (Step 12)
+    selectedView: 'table',
+    tasks: ['', '', ''] // Step 13
   });
 
   return (
@@ -26,10 +36,4 @@ export const BoardProvider = ({ children }) => {
   );
 };
 
-export const useBoardContext = () => {
-  const context = useContext(BoardContext);
-  if (!context) {
-    throw new Error('useBoardContext must be used within BoardProvider');
-  }
-  return context;
-};
+export const useBoardContext = () => useContext(BoardContext);

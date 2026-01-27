@@ -9,37 +9,42 @@ import {
   CardsIcon,
   CalendarIcon,
 } from '../../icons/BoardIcons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useBoardContext } from '../../../context/BoardContext';
-import { useNavigate } from 'react-router-dom';
-
-
 
 const CreateAccount12 = () => {
-     const navigate = useNavigate();
-    const { userCategory } = useAuth();
-  const { boardData } = useBoardContext();
+  const navigate = useNavigate();
+  const { userCategory } = useAuth();
+
+  // 1. Fetch Board Data from Context
+  const { boardData, setBoardData } = useBoardContext();
+
   const [selectedView, setSelectedView] = useState('table');
-    const boardName = boardData.boardName || 'first'; 
+  const boardName = boardData.boardName || 'first';
 
+  // 2. Save View Selection to Context on Next
+  const handleNext = () => {
+    setBoardData(prev => ({ ...prev, selectedView }));
+    navigate('/thirteen');
+  };
 
-      useEffect(() => {
-        const category = userCategory || sessionStorage.getItem('userCategory');
-        if (category === 'ngo' || category === 'nonprofit') {
-          console.log('⏭️ Skipping this step for non-profit');
-          navigate('/dashboard');
-        }
-      }, [userCategory, navigate]);
-      
-      if (userCategory === 'ngo' || userCategory === 'nonprofit') {
-        return null;
-      }
+  useEffect(() => {
+    const category = userCategory || sessionStorage.getItem('userCategory');
+    if (category === 'ngo' || category === 'nonprofit') {
+      console.log('⏭️ Skipping this step for non-profit');
+      navigate('/dashboard');
+    }
+  }, [userCategory, navigate]);
 
-const views = [
+  if (userCategory === 'ngo' || userCategory === 'nonprofit') {
+    return null;
+  }
+
+  const views = [
     {
       id: 'table',
       label: 'Table',
-      icon: <TableIcon />,           
+      icon: <TableIcon />,
       description: 'Table view is your default layout. Plan, track and manage anything using a visual board.',
     },
     {
@@ -75,7 +80,27 @@ const views = [
   ];
 
   return (
-    <div className="fixed inset-0 bg-[rgba(41,47,76,0.7)] flex items-center justify-center" style={{ fontFamily: 'Figtree, Roboto, ' }}>
+    <div className="fixed inset-0 bg-[rgba(41,47,76,0.7)] flex items-center justify-center" style={{ fontFamily: 'Figtree, Roboto, sans-serif' }}>
+
+      {/* 3. Custom Scrollbar Styling */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          height: 12px;
+          width: 12px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #c3c6d4;
+          border-radius: 10px;
+          border: 3px solid #ffffff;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: #9092a0;
+        }
+      `}</style>
+
       <div className="bg-white w-full h-full overflow-hidden shadow-2xl flex relative">
         <button className="fixed top-2.5 right-2.5 z-10 w-10 h-10 flex items-center justify-center rounded hover:bg-gray-100 transition-colors" aria-label="Close">
           <X className="w-5 h-5 text-[#323338]" />
@@ -103,11 +128,10 @@ const views = [
                   <button
                     key={view.id}
                     onClick={() => setSelectedView(view.id)}
-                    className={`h-[44px] px-5 rounded-md flex items-center gap-1 transition-all text-[15px] font-light border ${
-                      selectedView === view.id
-                        ? 'border-2 border-[#0073ea] bg-white text-[#323338]  shadow-sm' 
-                        : 'border-[#c3c6d4] bg-white hover:bg-[#F5F6F8] text-[#323338] shadow-sm'
-                    }`}
+                    className={`h-[44px] px-5 rounded-md flex items-center gap-1 transition-all text-[15px] font-light border ${selectedView === view.id
+                      ? 'border-2 border-[#0073ea] bg-white text-[#323338] shadow-sm'
+                      : 'border-[#c3c6d4] bg-white hover:bg-[#F5F6F8] text-[#323338] shadow-sm'
+                      }`}
                   >
                     <span className="text-lg">{view.icon}</span>
                     {view.label}
@@ -116,20 +140,20 @@ const views = [
               </div>
 
               <div className="flex flex-row w-fit max-w-[400px]">
-                <div 
+                <div
                   className="w-[5px] rounded-tl-lg rounded-bl-lg"
-                  style={{ 
-                    backgroundColor: selectedView === 'table' ? '#0020b1' : 
-                                   selectedView === 'calendar' ? '#fdab3d' : 
-                                   selectedView === 'gantt' ? '#037f4c' : 
-                                   selectedView === 'kanban' ? '#216edf' : 
-                                   selectedView === 'timeline' ? '#ff6d3b' : 
-                                   '#faa1f1'
+                  style={{
+                    backgroundColor: selectedView === 'table' ? '#0020b1' :
+                      selectedView === 'calendar' ? '#fdab3d' :
+                        selectedView === 'gantt' ? '#037f4c' :
+                          selectedView === 'kanban' ? '#216edf' :
+                            selectedView === 'timeline' ? '#ff6d3b' :
+                              '#faa1f1'
                   }}
                 ></div>
                 <aside className="bg-[#f6f7fb] rounded-tr-lg rounded-br-lg p-4 relative" role="alert" style={{ borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }}>
                   <div className="flex items-center justify-start" style={{ gap: '4px' }}>
-                    <p className="text-[14px] leading-[20px] text-[#323338] font-normal m-0" style={{ fontFamily: 'Figtree, Roboto, ' }}>
+                    <p className="text-[14px] leading-[20px] text-[#323338] font-normal m-0" style={{ fontFamily: 'Figtree, Roboto, sans-serif' }}>
                       {views.find(v => v.id === selectedView)?.description}
                     </p>
                   </div>
@@ -138,36 +162,37 @@ const views = [
             </div>
           </div>
 
-         <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white ">
-           <Link to={
-  userCategory === 'ngo' || userCategory === 'nonprofit' 
-    ? '/eight' 
-    : '/eleven'
-}>
-                     <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
-                       <ChevronLeft className="w-5 h-5" />
-                       Back
-                     </button>
-                      </Link>
+          <div className="sticky bottom-0 px-20 py-6 flex justify-between items-center bg-white ">
+            <Link to={
+              userCategory === 'ngo' || userCategory === 'nonprofit'
+                ? '/eight'
+                : '/eleven'
+            }>
+              <button className="px-4 py-2 border border-[#c3c6d4] rounded text-[#323338] hover:bg-[#e6e9ef] transition-colors flex items-center gap-1">
+                <ChevronLeft className="w-5 h-5" />
+                Back
+              </button>
+            </Link>
 
-                     <Link to='/thirteen'> 
-                     <button className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1">
-                       Next
-                       <ChevronRight className="w-5 h-5" />
-                     </button>
-                      </Link>
-                   </div>
-                 </div>
+            <button
+              onClick={handleNext}
+              className="px-4 py-2 bg-[#0073ea] text-white rounded hover:bg-[#0060b9] transition-colors flex items-center gap-1"
+            >
+              Next
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
 
         {/* RIGHT PANEL - PREVIEW */}
-      <div className="w-1/2 bg-[#eceff8] flex items-center justify-center overflow-hidden">
-  <div className="bg-white w-full h-[650px] relative ml-16 rounded-tl-2xl rounded-bl-2xl overflow-hidden" style={{ filter: 'drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.2))', paddingTop: '30px', paddingLeft: '30px' }}>
+        <div className="w-1/2 bg-[#eceff8] flex items-center justify-center overflow-hidden">
+          <div className="bg-white w-full h-[650px] relative ml-16 rounded-tl-2xl rounded-bl-2xl overflow-hidden" style={{ filter: 'drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.2))', paddingTop: '30px', paddingLeft: '30px' }}>
 
-   <div className="mb-6">
-             <h1 className="text-[32px] font-medium text-[#323338] leading-[40px] tracking-[-0.5px] mb-4" style={{ fontFamily: 'Poppins, Roboto, sans-serif' }}>
-  {boardName}  {/* Dynamic board name */}
-</h1>
-              
+            <div className="mb-6">
+              <h1 className="text-[32px] font-medium text-[#323338] leading-[40px] tracking-[-0.5px] mb-4" style={{ fontFamily: 'Poppins, Roboto, sans-serif' }}>
+                {boardName}  {/* Dynamic board name */}
+              </h1>
+
               {/* Tabs */}
               <div className="flex gap-4 border-b border-[#d0d4e4]">
                 <button className="pb-2 px-1 text-[15px] font-medium text-[#323338] border-b-2 border-[#0073ea]">
@@ -182,7 +207,8 @@ const views = [
 
             {/* CONTENT AREA */}
             <div className="h-[456px] overflow-hidden">
-              {selectedView === 'table' && <TableView />}
+              {/* 4. Pass selectedColumns from context to TableView */}
+              {selectedView === 'table' && <TableView selectedColumns={boardData.selectedColumns} />}
               {selectedView === 'calendar' && <CalendarView />}
               {selectedView === 'gantt' && <GanttView />}
               {selectedView === 'kanban' && <KanbanView />}
@@ -196,275 +222,202 @@ const views = [
   );
 };
 
-const TableView = () => (
-  <div>
-    <div className="flex gap-0">
-      {/* Left Column - Items (Fixed 240px width) */}
+// --- TABLE VIEW COMPONENT ---
+const TableView = ({ selectedColumns }) => {
+  // Map internal column IDs to labels
+  const columnsList = [
+    { id: 'owner', label: 'Owner' },
+    { id: 'status', label: 'Status' },
+    { id: 'dueDate', label: 'Due date' },
+    { id: 'priority', label: 'Priority' },
+    { id: 'notes', label: 'Notes' },
+    { id: 'budget', label: 'Budget' },
+    { id: 'files', label: 'Files' },
+    { id: 'timeline', label: 'Timeline' },
+    { id: 'lastUpdated', label: 'Last updated' },
+  ];
+
+  // Filter columns based on user selection from Step 10
+  const activeColumns = columnsList.filter(col => selectedColumns && selectedColumns[col.id]);
+
+  return (
+    // 5. Applied 'custom-scrollbar' class here
+    <div className="flex gap-0 overflow-x-auto pb-4 custom-scrollbar">
+      {/* Left Column - Fixed Item Names */}
       <div style={{ width: '240px', flexShrink: 0 }}>
         {/* Group 1 - Blue (#579bfc) */}
         <div className="mb-0">
-          {/* Group Header with exact spacing */}
           <div className="flex items-center mb-3" style={{ height: '24px' }}>
             <div className="h-1.5 w-[120px] bg-[#579bfc] rounded"></div>
           </div>
 
-          {/* Column Name Header */}
-          <div 
-            className="flex items-center bg-white" 
-            style={{ 
-              borderLeft: '4px solid #579bfc',
-              borderTop: '0.8px solid #d0d4e4',
-              borderBottom: '0.8px solid #d0d4e4',
-              borderRight: '0.8px solid #d0d4e4',
-              borderTopLeftRadius: '4px',
-              height: '40px',
-              paddingLeft: '12px'
-            }}
-          >
+          <div className="flex items-center bg-white" style={{ borderLeft: '4px solid #579bfc', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderTopLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
             <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
           </div>
 
-          {/* Item Rows - 3 items */}
           {[0, 1, 2].map((i) => (
-            <div 
-              key={i}
-              className="flex items-center bg-white" 
-              style={{ 
-                borderLeft: '4px solid #579bfc',
-                borderBottom: '0.8px solid #d0d4e4',
-                borderRight: '0.8px solid #d0d4e4',
-                height: '40px',
-                paddingLeft: '12px'
-              }}
-            >
+            <div key={i} className="flex items-center bg-white" style={{ borderLeft: '4px solid #579bfc', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', height: '40px', paddingLeft: '12px' }}>
               <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
             </div>
           ))}
 
-          {/* Add Item Row (lighter border) */}
-          <div 
-            className="flex items-center bg-white" 
-            style={{ 
-              borderLeft: '4px solid rgba(87, 155, 252, 0.5)',
-              borderBottom: '0.8px solid #d0d4e4',
-              borderRight: '0.8px solid #d0d4e4',
-              borderBottomLeftRadius: '4px',
-              height: '40px',
-              paddingLeft: '12px'
-            }}
-          >
+          <div className="flex items-center bg-white" style={{ borderLeft: '4px solid rgba(87, 155, 252, 0.5)', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderBottomLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
             <div className="h-1 w-20 bg-[rgba(103,104,121,0.1)] rounded"></div>
           </div>
 
-          {/* Empty Row */}
           <div style={{ height: '40px', borderRight: '0.8px solid #d0d4e4' }}></div>
         </div>
 
         {/* Group 2 - Green (#00c875) */}
         <div>
-          {/* Group Header */}
           <div className="flex items-center mb-3" style={{ height: '24px' }}>
             <div className="h-1.5 w-[120px] bg-[#00c875] rounded"></div>
           </div>
 
-          {/* Column Name Header */}
-          <div 
-            className="flex items-center bg-white" 
-            style={{ 
-              borderLeft: '4px solid #00c875',
-              borderTop: '0.8px solid #d0d4e4',
-              borderBottom: '0.8px solid #d0d4e4',
-              borderRight: '0.8px solid #d0d4e4',
-              borderTopLeftRadius: '4px',
-              height: '40px',
-              paddingLeft: '12px'
-            }}
-          >
+          <div className="flex items-center bg-white" style={{ borderLeft: '4px solid #00c875', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderTopLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
             <div className="h-1 w-20 bg-[#c3c6d4] rounded"></div>
           </div>
 
-          {/* Add Item Row */}
-          <div 
-            className="flex items-center bg-white" 
-            style={{ 
-              borderLeft: '4px solid rgba(0, 200, 117, 0.5)',
-              borderBottom: '0.8px solid #d0d4e4',
-              borderRight: '0.8px solid #d0d4e4',
-              borderBottomLeftRadius: '4px',
-              height: '40px',
-              paddingLeft: '12px'
-            }}
-          >
+          <div className="flex items-center bg-white" style={{ borderLeft: '4px solid rgba(0, 200, 117, 0.5)', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', borderBottomLeftRadius: '4px', height: '40px', paddingLeft: '12px' }}>
             <div className="h-1 w-20 bg-[rgba(103,104,121,0.1)] rounded"></div>
           </div>
 
-          {/* Empty Row */}
           <div style={{ height: '40px', borderRight: '0.8px solid #d0d4e4' }}></div>
         </div>
       </div>
 
-      {/* Right Columns - Data Columns */}
+      {/* Right Columns - Data Columns DYNAMICALLY RENDERED */}
       <div className="flex-1 min-w-0">
-        {/* Group 1 Data Columns */}
         <div className="mb-0">
-          {/* Empty space for group header alignment */}
           <div style={{ height: '24px', marginBottom: '12px' }}></div>
 
-          {/* Column Headers Row */}
+          {/* Dynamic Header Row */}
           <div className="flex" style={{ height: '40px' }}>
-            <div 
-              className="flex items-center justify-center bg-white" 
-              style={{ 
-                borderTop: '0.8px solid #d0d4e4',
-                borderBottom: '0.8px solid #d0d4e4',
-                borderRight: '0.8px solid #d0d4e4',
-                width: '136px',
-                flexShrink: 0
-              }}
-            >
-              <span className="text-[15px] text-[#323338]">Owner</span>
-            </div>
-            <div 
-              className="flex items-center justify-center bg-white" 
-              style={{ 
-                borderTop: '0.8px solid #d0d4e4',
-                borderBottom: '0.8px solid #d0d4e4',
-                borderRight: '0.8px solid #d0d4e4',
-                width: '136px',
-                flexShrink: 0
-              }}
-            >
-              <span className="text-[15px] text-[#323338]">Status</span>
-            </div>
-            <div 
-              className="flex items-center justify-center bg-white" 
-              style={{ 
-                borderTop: '0.8px solid #d0d4e4',
-                borderBottom: '0.8px solid #d0d4e4',
-                borderRight: '0.8px solid #d0d4e4',
-                width: '136px',
-                flexShrink: 0
-              }}
-            >
-              <span className="text-[15px] text-[#323338]">Due date</span>
-            </div>
-            <div 
-              className="flex items-center justify-center bg-white" 
-              style={{ 
-                width: '48px',
-                borderTop: '0.8px solid #d0d4e4',
-                borderBottom: '0.8px solid #d0d4e4'
-              }}
-            >
+            {activeColumns.map(col => (
+              <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                <span className="text-[15px] text-[#323338]">{col.label}</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-center bg-white" style={{ width: '48px', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4' }}>
               <span className="text-[#676879] text-lg font-light">+</span>
             </div>
           </div>
 
-          {/* Item Rows - 3 rows of data */}
+          {/* Dynamic Data Rows (Group 1) */}
           {[0, 1, 2].map((rowIdx) => (
             <div key={rowIdx} className="flex" style={{ height: '40px' }}>
-              <div 
-                className="flex items-center justify-center bg-white" 
-                style={{ 
-                  borderBottom: '0.8px solid #d0d4e4',
-                  borderRight: '0.8px solid #d0d4e4',
-                  width: '136px',
-                  flexShrink: 0
-                }}
-              >
-                <img 
-                  src="https://cdn1.monday.com/dapulse_default_photo.png" 
-                  alt="owner" 
-                  className="w-[24px] h-[24px] rounded-full"
-                />
-              </div>
-              <div 
-                className="flex items-center justify-center" 
-                style={{ 
-                  borderBottom: '0.8px solid #d0d4e4',
-                  borderRight: '0.8px solid #d0d4e4',
-                  width: '136px',
-                  flexShrink: 0,
-                  backgroundColor: rowIdx === 0 ? '#fdab3d' : rowIdx === 1 ? '#00c875' : '#df2f4a'
-                }}
-              >
-                <span className="text-[15px] text-white leading-[40px]">
-                  {rowIdx === 0 ? 'Working on it' : rowIdx === 1 ? 'Done' : 'Stuck'}
-                </span>
-              </div>
-              <div 
-                className="flex items-center justify-center bg-white gap-1" 
-                style={{ 
-                  borderBottom: '0.8px solid #d0d4e4',
-                  borderRight: '0.8px solid #d0d4e4',
-                  width: '136px',
-                  flexShrink: 0
-                }}
-              >
-                {rowIdx === 0 && <><span className="text-red-500 text-sm">⚠</span><span className="text-[15px] text-[#323338]">Dec 7</span></>}
-                {rowIdx === 1 && <><span className="text-green-500 text-sm">✓</span><span className="text-[15px] text-[#323338]">Dec 8</span></>}
-                {rowIdx === 2 && <><span className="text-gray-500 text-sm">◐</span><span className="text-[15px] text-[#323338]">Dec 9</span></>}
-              </div>
-              <div 
-                className="bg-white" 
-                style={{ 
-                  width: '48px',
-                  borderBottom: '0.8px solid #d0d4e4'
-                }}
-              ></div>
+              {activeColumns.map(col => {
+                // UI Logic for different column types
+                if (col.id === 'owner') {
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      <img src="https://cdn1.monday.com/dapulse_default_photo.png" alt="owner" className="w-[24px] h-[24px] rounded-full" />
+                    </div>
+                  );
+                } else if (col.id === 'status') {
+                  const statusColor = rowIdx === 0 ? '#fdab3d' : rowIdx === 1 ? '#00c875' : '#df2f4a';
+                  const statusText = rowIdx === 0 ? 'Working on it' : rowIdx === 1 ? 'Done' : 'Stuck';
+                  return (
+                    <div key={col.id} className="flex items-center justify-center" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0, backgroundColor: statusColor }}>
+                      <span className="text-[15px] text-white leading-[40px]">{statusText}</span>
+                    </div>
+                  );
+                } else if (col.id === 'priority') {
+                  const priorityColor = rowIdx === 0 ? '#5eb7f1' : rowIdx === 1 ? '#401694' : '#5559df';
+                  const priorityText = rowIdx === 0 ? 'Low' : rowIdx === 1 ? 'High' : 'Medium';
+                  return (
+                    <div key={col.id} className="flex items-center justify-center" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0, backgroundColor: priorityColor }}>
+                      <span className="text-[15px] text-white leading-[40px]">{priorityText}</span>
+                    </div>
+                  );
+                } else if (col.id === 'dueDate') {
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white gap-1" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      {rowIdx === 0 && <span className="text-red-500 text-sm">⚠</span>}
+                      {rowIdx === 1 && <span className="text-green-500 text-sm">✓</span>}
+                      {rowIdx === 2 && <span className="text-gray-500 text-sm">◐</span>}
+                      <span className="text-[15px] text-[#323338]">Dec {7 + rowIdx}</span>
+                    </div>
+                  );
+                } else if (col.id === 'lastUpdated') {
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white gap-1" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      <img src="https://cdn1.monday.com/dapulse_default_photo.png" alt="user" className="w-5 h-5 rounded-full" />
+                      <span className="text-[15px] text-[#323338]">{rowIdx + 2}h ago</span>
+                    </div>
+                  );
+                } else if (col.id === 'budget') {
+                  const budgets = ['$100', '$1000', '$500'];
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      <span className="text-[15px] text-[#323338]">{budgets[rowIdx]}</span>
+                    </div>
+                  );
+                } else if (col.id === 'files') {
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      <img src="https://dapulse-res.cloudinary.com/image/upload/file.png" alt="file" className="w-[20px] h-[24px]" />
+                    </div>
+                  );
+                } else if (col.id === 'timeline') {
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      <div className="h-4 w-24 bg-[#579bfc] rounded-md"></div>
+                    </div>
+                  );
+                } else {
+                  // Fallback for notes etc.
+                  return (
+                    <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                      <div className="h-1 w-12 bg-[#c3c6d4] rounded"></div>
+                    </div>
+                  );
+                }
+              })}
+              <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
             </div>
           ))}
 
-          {/* Add Item Row - Empty */}
-          <div className="flex" style={{ height: '40px' }}>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
-          </div>
-
-          {/* Empty Row */}
-          <div className="flex" style={{ height: '40px' }}>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
-          </div>
+          {/* Empty spacer rows */}
+          {[0, 1].map(emptyRowIdx => (
+            <div key={`empty-${emptyRowIdx}`} className="flex" style={{ height: '40px' }}>
+              {activeColumns.map(col => (
+                <div key={col.id} className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
+              ))}
+              <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
+            </div>
+          ))}
         </div>
 
-        {/* Group 2 Data Columns */}
+        {/* Group 2 Data Columns (Just header & spacers) */}
         <div>
-          {/* Empty space for group header alignment */}
           <div style={{ height: '24px', marginBottom: '12px' }}></div>
-
-          {/* Column Headers Row */}
           <div className="flex" style={{ height: '40px' }}>
-            <div className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}><span className="text-[15px] text-[#323338]">Owner</span></div>
-            <div className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}><span className="text-[15px] text-[#323338]">Status</span></div>
-            <div className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}><span className="text-[15px] text-[#323338]">Due date</span></div>
-            <div className="flex items-center justify-center bg-white" style={{ width: '48px', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4' }}><span className="text-[#676879] text-lg font-light">+</span></div>
+            {activeColumns.map(col => (
+              <div key={col.id} className="flex items-center justify-center bg-white" style={{ borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}>
+                <span className="text-[15px] text-[#323338]">{col.label}</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-center bg-white" style={{ width: '48px', borderTop: '0.8px solid #d0d4e4', borderBottom: '0.8px solid #d0d4e4' }}>
+              <span className="text-[#676879] text-lg font-light">+</span>
+            </div>
           </div>
 
-          {/* Add Item Row - Empty */}
-          <div className="flex" style={{ height: '40px' }}>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
-          </div>
-
-          {/* Empty Row */}
-          <div className="flex" style={{ height: '40px' }}>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
-            <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
-          </div>
+          {[0, 1].map(emptyRowIdx => (
+            <div key={`g2-empty-${emptyRowIdx}`} className="flex" style={{ height: '40px' }}>
+              {activeColumns.map(col => (
+                <div key={col.id} className="bg-white" style={{ borderBottom: '0.8px solid #d0d4e4', borderRight: '0.8px solid #d0d4e4', width: '136px', flexShrink: 0 }}></div>
+              ))}
+              <div className="bg-white" style={{ width: '48px', borderBottom: '0.8px solid #d0d4e4' }}></div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+// --- OTHER FIXED VIEW COMPONENTS ---
 
 const CalendarView = () => (
   <div className="border border-[#c3c6d4] rounded-lg pt-1.5">
@@ -567,7 +520,7 @@ const TimelineView = () => (
         <div key={idx} className="flex items-center gap-4">
           <div className="w-24 text-sm font-medium">{item.name}</div>
           <div className="flex-1 relative h-8 bg-gray-50 rounded">
-            <div 
+            <div
               className="absolute h-full rounded text-white text-xs flex items-center justify-center font-medium"
               style={{ background: item.color, left: item.left, width: item.width }}
             >

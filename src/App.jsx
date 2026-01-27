@@ -5,6 +5,7 @@ import TemplateBoardPage from './pages/TemplateBoardPage';
 import WorkspacePage from './pages/WorkspacePage';
 import DashboardLayout from './pages/DashboardLayout';
 import DashboardHome from './pages/DashboardHome';
+import Login from "./components/auth/Login";
 
 // WORKSPACE PAGES
 import GrantsManagementPage from './pages/workspace/GrantsManagementPage';
@@ -27,8 +28,8 @@ import Navbar from "./components/Navbar";
 
 // Pages
 import WorkManagementPage from "./pages/work-management/WorkManagementBasicPage";
-// import SignUp from "./components/signup/singupfirst/SignUp";
-// import CreateAccountSecond from "./components/signup/signup2/CreateAccountSecond";
+import SignUp from "./components/signup/singupfirst/SignUp";
+import CreateAccountSecond from "./components/signup/signup2/CreateAccountSecond";
 import CreateAccountThird from "./components/signup/signup3/CreateAccountThird";
 import CreateAccountForth from "./components/signup/signup4/CreateAccountForth";
 import CreateAccountFifth from "./components/signup/signup5/CreateAccountFifth";
@@ -46,6 +47,8 @@ import VolunteerLearningCenter from "./pages/docs/VolunteerLearningCenter";
 import PMlearningCenter from "./pages/docs/ProjectManagementLearningCenter";
 import GrantsDashboard from "./pages/dasboard/GrantDashboard";
 import DonorsDashboard from "./pages/dasboard/DonorsDashboard";
+import DashboardReport from "./components/DashboardReport";
+
 
 // Navbar ko conditionally hide karne ke liye separate component
 function AppContent() {
@@ -53,8 +56,8 @@ function AppContent() {
   
   // Pages jahan Navbar hide krna hai
   const hideNavbarRoutes = [
-    // "/one",
-    // "/two",
+    "/one",
+    "/two",
     "/three",
     "/four",
     "/five",
@@ -67,7 +70,10 @@ function AppContent() {
     "/twelve",
     "/thirteen",
     "/workspace",
-    "/templates"
+    "/templates",
+    // "/signup"
+    "/login"
+
   ];
 
   // Check if current path starts with /dashboard, /boards, /workspaces, /docs, OR /dashboards
@@ -91,17 +97,18 @@ function AppContent() {
         <Route path="/w/work-management" element={<WorkManagementPage />} />
 
         {/* Signup Page - PUBLIC (No Protection) */}
-        {/* <Route path="/one" element={<SignUp />} /> */}
+        <Route path="/one" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
 
         {/* Protected Signup Steps */}
-        {/* <Route 
+        <Route 
           path="/two" 
           element={
             <SignupProtectedRoute>
               <CreateAccountSecond />
             </SignupProtectedRoute>
           } 
-        /> */}
+        />
         
         <Route 
           path="/three" 
@@ -201,11 +208,13 @@ function AppContent() {
 
           }
         />
+        {/* <Route path="/signup" element={<MondaySignup />} /> */}
 
         {/* Dashboard with Sidebar - Nested Routes */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardHome />} />
         </Route>
+
 
         {/* WORKSPACE ROUTES - Each workspace has its own page */}
         <Route path="/workspaces/:workspaceId" element={<DashboardLayout />}>
@@ -229,6 +238,7 @@ function AppContent() {
         <Route path="/dashboards" element={<DashboardLayout />}>
           <Route path="overview" element={<GrantsDashboard />} />
           <Route path="donor-dashboard" element={<DonorsDashboard />} />
+          <Route path=":boardId" element={<DashboardReport />}></Route>
         </Route>
 
         {/* TEMPLATE BOARD ROUTE - For predefined templates */}

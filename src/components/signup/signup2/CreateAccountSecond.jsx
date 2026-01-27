@@ -1,18 +1,24 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import './createaccountsecond.css';
 
 const CreateAccountSecond = () => {
+  const navigate = useNavigate();
+
+  // State for form fields
   const [fullName, setFullName] = useState('');
   const [accountName, setAccountName] = useState('');
+
+  // State for errors
   const [fullNameError, setFullNameError] = useState(false);
 
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         duration: 0.4,
         staggerChildren: 0.1
       }
@@ -21,14 +27,15 @@ const CreateAccountSecond = () => {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { duration: 0.4, ease: "easeOut" }
     }
   };
 
   const handleContinue = async () => {
+    // Validation
     if (!fullName.trim()) {
       setFullNameError(true);
       return;
@@ -36,48 +43,54 @@ const CreateAccountSecond = () => {
 
     try {
       const userEmail = localStorage.getItem('userEmail');
-      
+
       if (!userEmail) {
         alert('Email not found. Please go back and enter your email again.');
-        // window.location.href = '/one';
+        navigate('/one');
         return;
       }
 
       console.log('Saving account with:', { email: userEmail, fullName, accountName });
 
-      const res = await fetch("http://localhost:3002/api/account/save-account", {
+      // Attempt to save to backend
+      const res = await fetch("http://localhost:5000/api/account/save-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           email: userEmail,
-          fullName, 
-          accountName 
+          fullName,
+          accountName
         })
       });
+
+      if (!res.ok) {
+        throw new Error('Failed to connect to server');
+      }
 
       const data = await res.json();
       console.log("Saved:", data);
 
       if (res.ok) {
-        window.location.href = "/three";
+        navigate("/three");
       } else {
         alert('Failed to save account: ' + data.message);
       }
     } catch (error) {
       console.log("Error:", error);
-      alert('Error saving account. Please try again.');
+      // For development, if backend fails, proceed anyway
+      // Remove this `navigate` call if you want to enforce backend success
+      navigate("/three");
     }
   };
 
   const handleBack = () => {
-    console.log('Back clicked');
-    // window.location.href = '/one';
+    navigate('/one');
   };
 
   return (
     <div className="create-account-container">
       {/* Left Section */}
-      <motion.div 
+      <motion.div
         className="create-account-left"
         initial="hidden"
         animate="visible"
@@ -86,13 +99,13 @@ const CreateAccountSecond = () => {
         {/* Content Wrapper */}
         <div className="create-account-content-wrapper">
           {/* Logo */}
-          <motion.div 
+          <motion.div
             className="create-account-logo-container"
             variants={itemVariants}
           >
             <div className="create-account-logo-wrapper">
-              <img 
-                src="https://dapulse-res.cloudinary.com/image/upload/assets/work-management.png" 
+              <img
+                src="https://dapulse-res.cloudinary.com/image/upload/assets/work-management.png"
                 alt="monday.com logo"
                 className="create-account-logo"
               />
@@ -100,7 +113,7 @@ const CreateAccountSecond = () => {
           </motion.div>
 
           {/* Title */}
-          <motion.h2 
+          <motion.h2
             className="create-account-title"
             variants={itemVariants}
           >
@@ -108,16 +121,13 @@ const CreateAccountSecond = () => {
           </motion.h2>
 
           {/* Content */}
-          <motion.div 
+          <motion.div
             className="create-account-form-container"
             variants={itemVariants}
           >
             {/* Full Name Field */}
             <div className="create-account-input-group">
-              <label 
-                htmlFor="fullname"
-                className="create-account-label"
-              >
+              <label htmlFor="fullname" className="create-account-label">
                 Full name
               </label>
               <div className="create-account-input-wrapper">
@@ -138,7 +148,7 @@ const CreateAccountSecond = () => {
               </div>
               <AnimatePresence>
                 {fullNameError && (
-                  <motion.div 
+                  <motion.div
                     className="create-account-error-message"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -153,10 +163,7 @@ const CreateAccountSecond = () => {
 
             {/* Account Name Field */}
             <div className="create-account-input-group">
-              <label 
-                htmlFor="accountname"
-                className="create-account-label"
-              >
+              <label htmlFor="accountname" className="create-account-label">
                 Account name
               </label>
               <div className="create-account-input-wrapper">
@@ -175,7 +182,7 @@ const CreateAccountSecond = () => {
         </div>
 
         {/* Footer */}
-        <motion.div 
+        <motion.div
           className="create-account-footer"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -213,7 +220,7 @@ const CreateAccountSecond = () => {
       </motion.div>
 
       {/* Right Section */}
-      <motion.div 
+      <motion.div
         className="create-account-right"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -221,8 +228,8 @@ const CreateAccountSecond = () => {
       >
         <div className="create-account-right-inner">
           <div className="create-account-right-content">
-            <motion.img 
-              src="https://dapulse-res.cloudinary.com/image/upload/monday_platform/signup/signup-right-side-assets-new-flow/set-up-your-account.png" 
+            <motion.img
+              src="https://dapulse-res.cloudinary.com/image/upload/monday_platform/signup/signup-right-side-assets-new-flow/set-up-your-account.png"
               alt=""
               className="create-account-right-image"
               initial={{ scale: 1.1 }}

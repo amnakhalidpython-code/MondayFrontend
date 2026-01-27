@@ -15,6 +15,7 @@ import TeamAccordionSection from './sections/TeamAccordionSection';
 import ProductsShowcase from './sections/ProductsShowcase';
 import Footer from '../../components/Footer';
 import { Link } from 'react-router-dom';
+import SignUp from '../../components/signup/singupfirst/SignUp';
 
 const WorkManagementPage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
@@ -41,7 +42,7 @@ const WorkManagementPage = () => {
     <>
       <div className="min-h-screen bg-white font-['Poppins',sans-serif]">
         {/* Navbar */}
-        <WorkManagementNavbar />
+        {/* <WorkManagementNavbar /> */}
 
         {/* Hero Section */}
         <div style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '0', paddingBottom: '1rem', overflow: 'visible', transition: 'all 0.2s', display: 'block' }}>
@@ -140,7 +141,7 @@ const WorkManagementPage = () => {
 
                 {/* Get Started Button */}
                 <Link
-                  to="/three"
+                  to="/one"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',

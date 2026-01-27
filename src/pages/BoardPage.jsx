@@ -1,395 +1,445 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { 
-  ChevronDown, 
-  ChevronRight,
-  Plus
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import BoardHeader from '../components/board/components/BoardHeader';
 import ActionBar from '../components/board/components/ActionBar';
-import BoardHeader from '../components/board/components/BoardHeader'; 
 import TanStackBoardTable from '../components/board/TanStackBoardTable';
-import boardApi from '../services/boardApi';
-import boardTemplates from '../config/boardTemplates';
 import { useAuth } from '../context/AuthContext';
+import boardTemplates from '../config/boardTemplates';
 
 const BoardPage = () => {
   const { boardId } = useParams();
   const { user } = useAuth();
 
-  // Lazy initialize state from localStorage
-  const [boardName, setBoardName] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`board_name_${boardId}`);
-      return saved ? JSON.parse(saved) : 'Loading...';
-    } catch {
-      return 'Loading...';
-    }
-  });
+  const [boardName, setBoardName] = useState('Loading...');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [groups, setGroups] = useState([]);
+  const [boardColumns, setBoardColumns] = useState([]);
+  const [columnTitles, setColumnTitles] = useState({});
+
+  // Configs
+  const [statusConfig, setStatusConfig] = useState({});
+  const [priorityConfig, setPriorityConfig] = useState({});
+
   const [hiddenColumns, setHiddenColumns] = useState([]);
   const [currentSort, setCurrentSort] = useState(null);
   const [currentGroupBy, setCurrentGroupBy] = useState(null);
   const [filteredGroups, setFilteredGroups] = useState([]);
-  
-  // Board Data
-  const [groups, setGroups] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`board_groups_${boardId}`);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
+
+  // --- 1. Helper: Generate unique column ID with auto-numbering ---
+  const generateUniqueColumnId = (baseType, existingColumns, existingTitles) => {
+    // Count how many columns of this base type already exist
+    const existingOfType = existingColumns.filter(col => {
+      const colId = col.id;
+      // Match columns like "notes", "notes_1", "notes_2", etc.
+      return colId === baseType || colId.startsWith(`${baseType}_`);
+    });
+
+    if (existingOfType.length === 0) {
+      // First column of this type - return base type
+      return baseType;
+    } else {
+      // Column already exists - add number suffix
+      // Start from 1: email_1, email_2, status_1, status_2, etc.
+      return `${baseType}_${existingOfType.length}`;
     }
-  });
-  const [boardColumns, setBoardColumns] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`board_columns_${boardId}`);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-  const [statusConfig, setStatusConfig] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`board_status_${boardId}`);
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
-
-  console.log('Component Render State:', { boardColumns, groups, loading });
-
-  // Effect to save state to localStorage whenever it changes
-  useEffect(() => {
-    if (!loading && boardId) {
-      try {
-        localStorage.setItem(`board_name_${boardId}`, JSON.stringify(boardName));
-        localStorage.setItem(`board_groups_${boardId}`, JSON.stringify(groups));
-        localStorage.setItem(`board_columns_${boardId}`, JSON.stringify(boardColumns));
-        localStorage.setItem(`board_status_${boardId}`, JSON.stringify(statusConfig));
-      } catch (error) {
-        console.error("Failed to save to local storage", error);
-      }
-    }
-  }, [boardName, groups, boardColumns, statusConfig, boardId, loading]);
-
-  // Fetch board data from API
-  const fetchBoardData = useCallback(async () => {
-    // if (!user || !boardId) return;
-
-    // try {
-    //   setLoading(true);
-
-    //   // Using getBoardById from service
-    //   const data = await boardApi.getBoardById(boardId, user.uid);
-    //   console.log('API Response Data:', data);
-
-    //   if (data.success && data.board) {
-    //     setBoardName(data.board.name || 'Untitled Board');
-
-    //     let columns = Array.isArray(data.board.columns) ? data.board.columns : [];
-    //     let statuses = data.board.statusConfig || {};
-    //     let apiGroups = data.board.groups || [];
-
-    //     // Force "Donors" template structure if acceptable or empty
-    //     if (columns.length === 0 || data.board.name?.toLowerCase().includes('donor')) {
-    //       columns = [
-    //         { id: 'name', title: 'Donor', type: 'text', width: 280 },
-    //         { id: 'status', title: 'Status', type: 'status', width: 140 },
-    //         { id: 'email', title: 'Email', type: 'email', width: 200 },
-    //         { id: 'phone', title: 'Phone', type: 'phone', width: 180 },
-    //         { id: 'donated', title: '$ Donated', type: 'number', width: 140 },
-    //         { id: 'donations', title: 'Donations', type: 'text', width: 140 }, // Using text to show "-" or custom format
-    //         { id: 'files', title: 'Files', type: 'file', width: 120 }
-    //       ];
-    //       statuses = {
-    //         potential: { label: 'Potential', bg: '#FFCB00' },
-    //         active: { label: 'Active', bg: '#00C875' }
-    //       };
-
-    //       // If groups are empty, provide a clean "Potential Donors" group
-    //       if (apiGroups.length === 0) {
-    //         apiGroups = [
-    //           { 
-    //             id: 'group-potential',
-    //             name: 'Potential Donors',
-    //             color: '#FDAB3D',
-    //             expanded: true,
-    //             tasks: [
-    //               {
-    //                 id: 't1',
-    //                 name: 'Lorenzo Harvey',
-    //                 email: 'Lorenzo@email.com',
-    //                 phone: '+1 541 754 3010',
-    //                 status: 'potential',
-    //                 donated: 0,
-    //                 donations: null
-    //               }
-    //             ]
-    //           },
-    //           { 
-    //             id: 'group-active',
-    //             name: 'Active Donors',
-    //             color: '#00C875',
-    //             expanded: true,
-    //             tasks: []
-    //           }
-    //         ];
-    //       }
-    //     }
-
-    //     setBoardColumns(columns);
-    //     setStatusConfig(statuses);
-    //     setGroups(apiGroups);
-    //   } else {
-    //     setBoardName('Untitled Board');
-    //     setBoardColumns([]);
-    //     setStatusConfig({});
-    //     setGroups([]);
-    //   }
-
-    // } catch (error) {
-    //   console.error('Error fetching board:', error);
-    //   // Fallback for demo/error state
-    //   setBoardName('Donors');
-    //   setBoardColumns([
-    //     { id: 'name', title: 'Donor', type: 'text', width: 280 },
-    //     { id: 'status', title: 'Status', type: 'status', width: 140 },
-    //     { id: 'email', title: 'Email', type: 'email', width: 200 },
-    //     { id: 'phone', title: 'Phone', type: 'phone', width: 180 },
-    //     { id: 'donated', title: '$ Donated', type: 'number', width: 140 },
-    //     { id: 'donations', title: 'Donations', type: 'text', width: 140 },
-    //     { id: 'files', title: 'Files', type: 'file', width: 120 }
-    //   ]);
-    //   setGroups([
-    //     {
-    //       id: 'group-fallback',
-    //       name: 'Potential Donors',
-    //       color: '#FDAB3D',
-    //       expanded: true,
-    //       tasks: []
-    //     }
-    //   ]);
-    // } finally {
-    //   setLoading(false);
-    // }
-    setLoading(false); // Set loading to false to show the UI
-  }, [boardId, user]);
-
-  useEffect(() => {
-    fetchBoardData();
-  }, [fetchBoardData]);
-
-  // Search functionality
-  const handleSearch = (query) => {
-    setSearchQuery(query);
   };
 
-  // Filter groups based on search
-  useEffect(() => {
-    if (!searchQuery) {
-      setFilteredGroups(groups);
-      return;
+  // --- 2. Helper: Get default title for column ---
+  const getDefaultColumnTitle = (columnId, columnType) => {
+    const typeToTitleMap = {
+      text: 'Text',
+      email: 'Email',
+      numbers: 'Numbers',
+      formula: 'Formula',
+      status: 'Status',
+      file: 'Files',
+      date: 'Date',
+      phone: 'Phone',
+      checkbox: 'Checkbox',
+      person: 'Person',
+      dropdown: 'Dropdown',
+      notes: 'Notes',
+      timeline: 'Timeline',
+      priority: 'Priority',
+      budget: 'Budget',
+      owner: 'Owner',
+      dueDate: 'Due Date',
+      lastUpdated: 'Last Updated',
+      files: 'Files'
+    };
+
+    // Extract base type from columnId (handles both "email" and "email_1")
+    const baseType = columnId.includes('_') ? columnId.split('_')[0] : columnId;
+    const baseTitle = typeToTitleMap[baseType] || typeToTitleMap[columnType] || 'Column';
+
+    // If it's a numbered column (like email_1, status_2), add the number to title
+    if (columnId.includes('_')) {
+      const number = columnId.split('_')[1];
+      return `${baseTitle} ${number}`;
     }
 
+    return baseTitle;
+  };
+
+  // --- 3. Map Backend Columns to Frontend ---
+  const mapBackendColumnsToFrontend = (backendCols, customTitles = {}) => {
+    const columns = [
+      { id: 'name', title: 'Task', type: 'text', width: 280, fixed: true }
+    ];
+
+    // Base column definitions with proper types
+    const columnDefs = {
+      owner: { type: 'person', width: 100 },
+      status: { type: 'status', width: 140 },
+      dueDate: { type: 'date', width: 130 },
+      priority: { type: 'status', width: 140 },
+      timeline: { type: 'timeline', width: 180 },
+      lastUpdated: { type: 'date', width: 140 },
+      notes: { type: 'text', width: 200 },
+      budget: { type: 'number', width: 120 },
+      files: { type: 'file', width: 100 },
+      email: { type: 'email', width: 180 },
+      phone: { type: 'phone', width: 140 },
+      numbers: { type: 'number', width: 120 },
+      checkbox: { type: 'checkbox', width: 100 },
+      dropdown: { type: 'dropdown', width: 140 },
+      formula: { type: 'formula', width: 140 }
+    };
+
+    // Process ALL backend columns (including numbered ones like email_1, status_2)
+    Object.keys(backendCols).forEach(colKey => {
+      if (!backendCols[colKey]) return; // Skip if false
+
+      // Extract base type for numbered columns (email_1 → email)
+      const baseType = colKey.includes('_') ? colKey.split('_')[0] : colKey;
+
+      // Get column definition (use base type to find the def)
+      const def = columnDefs[baseType];
+
+      if (def) {
+        // Use custom title if exists, otherwise generate default
+        const title = customTitles[colKey] || getDefaultColumnTitle(colKey, def.type);
+
+        columns.push({
+          id: colKey,
+          title,
+          type: def.type,
+          width: def.width
+        });
+      }
+    });
+
+    return columns;
+  };
+
+  // --- 4. Configurations ---
+  const getStatusConfig = () => ({
+    'Done': { label: 'Done', bg: '#00c875', color: '#fff' },
+    'Working on it': { label: 'Working on it', bg: '#fdab3d', color: '#fff' },
+    'Stuck': { label: 'Stuck', bg: '#df2f4a', color: '#fff' },
+    'Not Started': { label: 'Not Started', bg: '#c4c4c4', color: '#fff' },
+    '': { label: '', bg: '#c4c4c4', color: '#fff' }
+  });
+
+  const getPriorityConfig = () => ({
+    'Critical': { label: 'Critical ⚠️', bg: '#333333', color: '#fff' },
+    'High': { label: 'High', bg: '#401694', color: '#fff' },
+    'Medium': { label: 'Medium', bg: '#5559df', color: '#fff' },
+    'Low': { label: 'Low', bg: '#579bfc', color: '#fff' },
+    '': { label: '', bg: '#c4c4c4', color: '#fff' }
+  });
+
+  // --- 5. Fetch Data ---
+  const fetchBoardData = useCallback(async () => {
+    if (!boardId) return;
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/api/boards/${boardId}`);
+      const data = await response.json();
+
+      if (data.success && data.board) {
+        const board = data.board;
+        setBoardName(board.name);
+        setColumnTitles(board.columnTitles || {});
+        setBoardColumns(mapBackendColumnsToFrontend(board.columns || {}, board.columnTitles || {}));
+        setStatusConfig(getStatusConfig());
+        setPriorityConfig(getPriorityConfig());
+
+        const allItems = (board.items || []).map(item => {
+          const colValues = item.column_values || {};
+          const mappedItem = {
+            id: item._id || item.id,
+            name: item.title,
+            group: item.group || 'group_todo'
+          };
+
+          // Map all column values dynamically
+          Object.keys(colValues).forEach(key => {
+            mappedItem[key] = colValues[key];
+          });
+
+          return mappedItem;
+        });
+
+        const todoItems = allItems.filter(item => item.group === 'group_todo' || !item.group || item.group === 'default');
+        const completedItems = allItems.filter(item => item.group === 'group_completed');
+
+        setGroups([
+          { id: 'group_todo', name: 'To-Do', color: '#579bfc', expanded: true, tasks: todoItems },
+          { id: 'group_completed', name: 'Completed', color: '#00c875', expanded: true, tasks: completedItems }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching board:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [boardId]);
+
+  useEffect(() => { fetchBoardData(); }, [fetchBoardData]);
+
+  // --- 6. Actions ---
+  const handleSearch = (query) => setSearchQuery(query);
+
+  useEffect(() => {
+    if (!searchQuery) { setFilteredGroups(groups); return; }
     const filtered = groups.map(group => ({
       ...group,
-      tasks: group.tasks.filter(task => 
-        task.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.email?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      tasks: group.tasks.filter(task => task.name?.toLowerCase().includes(searchQuery.toLowerCase()))
     })).filter(group => group.tasks.length > 0);
-
     setFilteredGroups(filtered);
   }, [searchQuery, groups]);
 
   const toggleGroup = (groupId) => {
-    setGroups(groups.map(g =>
-      g.id === groupId ? { ...g, expanded: !g.expanded } : g
-    ));
+    setGroups(groups.map(g => g.id === groupId ? { ...g, expanded: !g.expanded } : g));
   };
 
-  // Backend Integration: Add Task
-  const handleAddTask = async (groupId, taskName) => {
-    if (!taskName.trim()) return;
-
-    // 1. Optimistic Update
-    const newTask = {
-      id: Date.now().toString(),
-      name: taskName,
-      status: null,
-      email: '',
-      phone: '',
-      donated: 0,
-      donations: null
+  // ✅ CREATE COLUMN with Auto-Numbering
+  const handleCreateColumn = async (columnType) => {
+    const keyMap = {
+      text: 'notes',
+      email: 'email',
+      numbers: 'numbers',
+      formula: 'formula',
+      status: 'status',
+      file: 'files',
+      date: 'dueDate',
+      phone: 'phone',
+      checkbox: 'checkbox',
+      person: 'owner',
+      dropdown: 'dropdown',
+      timeline: 'timeline',
+      priority: 'priority',
+      budget: 'budget'
     };
-    const originalGroups = groups; // Save original state for rollback
-    const newGroups = groups.map(g =>
-      g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g
-    );
-    setGroups(newGroups);
 
-    // try {
-    //   // 2. API Call
-    //   const response = await boardApi.addItemToBoard(boardId, groupId, { name: taskName });
+    const baseKey = keyMap[columnType] || columnType;
 
-    //   // 3. Re-fetch data on success
-    //   if (response.success) {
-    //     // API call was successful, re-fetch the entire board to get the correct IDs
-    //     await fetchBoardData();
-    //   } else {
-    //     // API call failed, roll back the optimistic update.
-    //     console.error("Failed to add task on server, rolling back.", response);
-    //     setGroups(originalGroups);
-    //   }
-    // } catch (err) {
-    //   console.error("Failed to add task:", err);
-    //   // Network or other error, roll back.
-    //   setGroups(originalGroups);
-    // }
-  };
+    // ✅ ALWAYS generate unique column ID (even if base doesn't exist)
+    // This ensures that adding "text" when "notes" exists creates "notes_1"
+    const newColumnId = generateUniqueColumnId(baseKey, boardColumns, columnTitles);
 
-  // Backend Integration: Update Task
-  const handleUpdateTask = async (taskId, field, value) => {
-    console.log(`Updating Task: ${taskId}, Field: ${field}, Value:`, value);
+    // Get default title
+    const defaultTitle = getDefaultColumnTitle(newColumnId, columnType);
+
     try {
-      // Optimistic Update
-      setGroups(prev => prev.map(g => ({
-        ...g,
-        tasks: g.tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t)
-      })));
+      const response = await fetch(`http://localhost:5000/api/boards/${boardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          selectedColumns: { [newColumnId]: true },
+          columnTitles: { [newColumnId]: defaultTitle }
+        })
+      });
 
-      // API Call
-      // await boardApi.updateBoardItem(boardId, taskId, { [field]: value });
+      if (response.ok) {
+        fetchBoardData();
+      }
     } catch (err) {
-      console.error("Failed to update task:", err);
+      console.error('Error creating column:', err);
     }
   };
 
-  // Backend Integration: Delete Task
-  const handleDeleteTask = async (taskId) => {
-    const originalGroups = groups;
-    
-    // Optimistic Update
-    const newGroups = groups.map(group => ({
-      ...group,
-      tasks: group.tasks.filter(task => task.id !== taskId)
-    }));
-    setGroups(newGroups);
-
-    // try {
-    //   // API Call
-    //   await boardApi.deleteItemFromBoard(boardId, taskId);
-    // } catch (err) {
-    //   console.error("Failed to delete task:", err);
-    //   // Rollback on failure
-    //   setGroups(originalGroups);
-    // }
-  };
-
-  // Add New Column Handler
-  const handleAddColumn = async (type) => {
-    // Generate new column
-    const newColId = `col_${Date.now()}`;
-    const newColumn = {
-      id: newColId,
-      title: type.charAt(0).toUpperCase() + type.slice(1), // e.g. "Text", "Date"
-      type: type,
-      width: 150
-    };
-
-    // Optimistic Update
-    setBoardColumns([...boardColumns, newColumn]);
+  // ✅ RENAME COLUMN
+  const handleRenameColumn = async (columnId, newTitle) => {
+    if (!newTitle || newTitle.trim() === '') return;
 
     try {
-      // API call to persist (assuming endpoint exists as per boardApi.js)
-      await boardApi.addColumnToBoard(boardId, newColumn.title, type);
-    } catch (error) {
-      console.error("Failed to add column:", error);
+      const response = await fetch(`http://localhost:5000/api/boards/${boardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          columnTitles: { [columnId]: newTitle.trim() }
+        })
+      });
+
+      if (response.ok) {
+        // Update local state immediately
+        setColumnTitles(prev => ({ ...prev, [columnId]: newTitle.trim() }));
+        setBoardColumns(prev => prev.map(col =>
+          col.id === columnId ? { ...col, title: newTitle.trim() } : col
+        ));
+      }
+    } catch (err) {
+      console.error('Error renaming column:', err);
+    }
+  };
+  // ✅ DELETE COLUMN
+  const handleDeleteColumn = async (columnId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/boards/${boardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          selectedColumns: { [columnId]: false }
+        })
+      });
+
+      if (response.ok) {
+        fetchBoardData();
+      }
+    } catch (err) {
+      console.error('Error deleting column:', err);
+    }
+  
+  }
+
+  // ✅ Add Task (Syncs ID with Backend)
+  const handleAddTask = async (groupId, taskName) => {
+    const tempId = Date.now().toString();
+
+    const newTask = {
+      id: tempId,
+      name: taskName,
+      group: groupId,
+      status: 'Working on it',
+      priority: ''
+    };
+
+    // Optimistic UI Update
+    setGroups(prev => prev.map(g => g.id === groupId ? { ...g, tasks: [...g.tasks, newTask] } : g));
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/boards/${boardId}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: taskName,
+          group: groupId,
+          column_values: { status: 'Working on it' }
+        })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        const createdItem = data.board.items[data.board.items.length - 1];
+        const realId = createdItem._id;
+
+        setGroups(prevGroups => prevGroups.map(group => {
+          if (group.id === groupId) {
+            return {
+              ...group,
+              tasks: group.tasks.map(t => t.id === tempId ? { ...t, id: realId } : t)
+            };
+          }
+          return group;
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to save task", err);
     }
   };
 
+  // ✅ Update Task
+  const handleUpdateTask = async (taskId, columnId, newValue) => {
+    // Optimistic Update
+    setGroups(prevGroups => prevGroups.map(group => ({
+      ...group,
+      tasks: group.tasks.map(task => {
+        if (task.id === taskId) {
+          return { ...task, [columnId]: newValue };
+        }
+        return task;
+      })
+    })));
 
-  // Handle various actions
-  const handleSort = (columnId, order) => setCurrentSort({ column: columnId, order });
-  const handleHideColumns = (columnId) => {
-    setHiddenColumns(prev => prev.includes(columnId) ? prev.filter(c => c !== columnId) : [...prev, columnId]);
+    let bodyPayload = {};
+
+    if (columnId === 'name') {
+      bodyPayload = { title: newValue };
+    } else {
+      bodyPayload = { column_values: { [columnId]: newValue } };
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/boards/${boardId}/items/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyPayload)
+      });
+
+      if (!response.ok) {
+        console.error("Failed update:", await response.text());
+      }
+    } catch (err) {
+      console.error("Failed to update task", err);
+    }
   };
-  const handleGroupBy = (columnId) => setCurrentGroupBy(columnId);
 
   const visibleColumns = boardColumns.filter(c => !hiddenColumns.includes(c.id));
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <BoardHeader boardTitle={boardName} />
-      <ActionBar 
+      <ActionBar
         columns={boardColumns}
         onSearch={handleSearch}
-        onSort={handleSort}
-        onHideColumns={handleHideColumns}
-        onGroupBy={handleGroupBy}
+        onAddTask={() => groups.length > 0 && handleAddTask(groups[0].id, "New Task")}
+        addItemText="+ Add Task"
+        onSort={(c, o) => setCurrentSort({ column: c, order: o })}
+        onHideColumns={(c) => setHiddenColumns(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
+        onGroupBy={(c) => setCurrentGroupBy(c)}
         hiddenColumns={hiddenColumns}
         currentSort={currentSort}
         currentGroupBy={currentGroupBy}
-        onAddTask={() => {
-          if (groups.length > 0) handleAddTask(groups[0].id, "New Donor");
-        }}
-        addItemText="+ Add donor"
       />
 
       <div className="p-8 flex-1 overflow-y-auto bg-white">
-        {loading ? (
-          <div className="text-center py-10">Loading board...</div>
-        ) : (
+        {loading ? <div className="text-center text-gray-500 mt-10">Loading board...</div> : (
           <>
             {(searchQuery ? filteredGroups : groups).map(group => (
               <div key={group.id} className="mb-10">
-                {/* Group Header - Aligned to match Monday Design */}
-                <div 
-                  className="flex items-center gap-2 mb-3 cursor-pointer group/header"
-                  onClick={() => toggleGroup(group.id)}
-                >
+                <div className="flex items-center gap-2 mb-3 cursor-pointer group/header" onClick={() => toggleGroup(group.id)}>
                   <div className="p-1 rounded hover:bg-gray-100 transition-colors">
-                    {group.expanded ? (
-                      <ChevronDown size={20} style={{ color: group.color }} />
-                    ) : (
-                        <ChevronRight size={20} style={{ color: group.color }} />
-                    )}
+                    {group.expanded ? <ChevronDown size={20} style={{ color: group.color }} /> : <ChevronRight size={20} style={{ color: group.color }} />}
                   </div>
-                  <h3 className="text-[18px] font-normal leading-none" style={{ color: group.color }}>
-                    {group.name}
-                  </h3>
-                  <span className="text-[14px] text-gray-400 font-light ml-2">
-                    {group.tasks.length} {group.tasks.length === 1 ? 'Donor' : 'Donors'}
-                  </span>
+                  <h3 className="text-[18px] font-normal leading-none" style={{ color: group.color }}>{group.name}</h3>
+                  <span className="text-[14px] text-gray-400 font-light ml-2">{group.tasks.length} Task{group.tasks.length !== 1 && 's'}</span>
                 </div>
-
                 {group.expanded && (
                   <div className="pl-1">
                     <TanStackBoardTable
                       data={group.tasks}
                       columns={visibleColumns}
-                        groupColor={group.color}
-                        statusConfig={statusConfig}
-                      onUpdateTask={handleUpdateTask}
-                      onDeleteTask={handleDeleteTask}
+                      groupColor={group.color}
+                      statusConfig={statusConfig}
+                      priorityConfig={priorityConfig}
                       onAddTask={(val) => handleAddTask(group.id, val)}
-                      onAddColumn={handleAddColumn}
-                      onSort={handleSort}
-                      onFilter={handleHideColumns}
-                      onGroupBy={handleGroupBy}
+                      onUpdateTask={handleUpdateTask}
+                      onAddColumn={handleCreateColumn}
+                      onRename={handleRenameColumn}
+                      onDelete={handleDeleteColumn}
                     />
                   </div>
                 )}
               </div>
             ))}
-
-            {/* Empty state "Add Group" at bottom */}
             <div className="mt-4">
               <button className="flex items-center gap-2 px-3 py-2 text-gray-500 hover:bg-gray-100 rounded transition-colors text-sm">
-                <Plus size={16} />
-                <span>Add new group</span>
+                <Plus size={16} /> <span>Add new group</span>
               </button>
             </div>
           </>
