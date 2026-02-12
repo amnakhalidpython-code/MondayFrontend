@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { 
-  ChevronDown, 
+import {
+  ChevronDown,
   ChevronRight,
-  Plus, 
+  Plus,
   User,
   Info,
   MessageSquare,
@@ -44,7 +44,7 @@ const TemplateBoardPage = () => {
         if (templateId === 'donors') {
           loadDonorsFromAPI(templateData);
         } else {
-        // Use hardcoded data for other templates
+          // Use hardcoded data for other templates
           setGroups(templateData.groups);
           setBoardColumns(templateData.columns);
         }
@@ -86,6 +86,7 @@ const TemplateBoardPage = () => {
         const donorTasks = donorsResponse.data.donors.map(donor => ({
           ...donor, // Use all original fields like 'donor_name', 'email', etc.
           id: donor._id, // Ensure 'id' is present for the table's internal keying
+          name: donor.donor_name, // Map for UI compatibility
         }));
 
         console.log('--- DEBUG: Mapped Rows for UI ---', donorTasks);
@@ -146,7 +147,7 @@ const TemplateBoardPage = () => {
     }
     const filtered = groups.map(group => ({
       ...group,
-      tasks: group.tasks.filter(task => 
+      tasks: group.tasks.filter(task =>
         task.donor_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.owner?.name?.toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -192,10 +193,10 @@ const TemplateBoardPage = () => {
   const handleGroupBy = (columnId) => {
     setCurrentGroupBy(columnId);
     if (!columnId) return;
-    
+
     const allTasks = groups.flatMap(g => g.tasks);
     const grouped = {};
-    
+
     allTasks.forEach(task => {
       let groupKey = task[columnId];
       if (columnId === 'owner') {
@@ -206,7 +207,7 @@ const TemplateBoardPage = () => {
       if (!grouped[groupKey]) grouped[groupKey] = [];
       grouped[groupKey].push(task);
     });
-    
+
     const newGroups = Object.entries(grouped).map(([key, tasks], index) => ({
       id: `group-${index}`,
       name: key,
@@ -240,9 +241,9 @@ const TemplateBoardPage = () => {
       setNewTaskInput({ groupId: null, value: '' });
       return;
     }
-    setGroups(groups.map(g => 
-      g.id === groupId ? { 
-        ...g, 
+    setGroups(groups.map(g =>
+      g.id === groupId ? {
+        ...g,
         tasks: [...g.tasks, {
           id: Date.now().toString(),
           name: newTaskInput.value,
@@ -259,7 +260,7 @@ const TemplateBoardPage = () => {
   };
 
   const updateTaskStatus = (groupId, taskId, newStatus) => {
-    setGroups(groups.map(g => 
+    setGroups(groups.map(g =>
       g.id === groupId ? {
         ...g,
         tasks: g.tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t)
@@ -285,7 +286,8 @@ const TemplateBoardPage = () => {
     if (templateId === 'donors') {
       try {
         // The 'field' variable now directly corresponds to the API/database field name
-        const updatePayload = { [field]: value };
+        const apiField = field === 'name' ? 'donor_name' : field;
+        const updatePayload = { [apiField]: value };
         await donorService.updateDonor(taskId, updatePayload);
         // No reload needed, UI is already updated.
       } catch (error) {
@@ -301,6 +303,7 @@ const TemplateBoardPage = () => {
     const newTask = {
       id: `temp-${Date.now()}`,
       donor_name: taskName,
+      name: taskName, // Ensure name is present for UI display
       owner: null,
       status: null,
       dueDate: '',
@@ -336,7 +339,7 @@ const TemplateBoardPage = () => {
               if (g.id === groupId) {
                 return {
                   ...g,
-                  tasks: g.tasks.map(t => (t.id === newTask.id ? { ...response.data, id: response.data._id } : t))
+                  tasks: g.tasks.map(t => (t.id === newTask.id ? { ...response.data, id: response.data._id, name: response.data.donor_name } : t))
                 };
               }
               return g;
@@ -442,7 +445,7 @@ const TemplateBoardPage = () => {
 
     const originalColumns = [...boardColumns];
     const columnIndex = originalColumns.findIndex(c => c.id === columnId);
-    
+
     const newColumns = [...originalColumns];
     newColumns.splice(columnIndex + 1, 0, newColumn);
     setBoardColumns(newColumns);
@@ -451,7 +454,7 @@ const TemplateBoardPage = () => {
       try {
         const response = await columnService.duplicateColumn(columnId);
         if (!response.success) throw new Error('Failed to duplicate column on server');
-        
+
         const columnsResponse = await columnService.fetchColumns();
         if (columnsResponse.success) {
           const apiColumns = columnsResponse.data.map(col => ({
@@ -557,7 +560,7 @@ const TemplateBoardPage = () => {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fff', display: 'flex', flexDirection: 'column' }}>
       <BoardHeader boardTitle={template.title} />
-      <ActionBar 
+      <ActionBar
         columns={boardColumns}
         onSearch={handleSearch}
         onSort={handleSort}
@@ -574,7 +577,7 @@ const TemplateBoardPage = () => {
         {(searchQuery ? filteredGroups : groups).map(group => (
           <div key={group.id} style={{ marginBottom: '24px' }}>
             {/* GROUP HEADER */}
-            <div 
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -627,7 +630,7 @@ const TemplateBoardPage = () => {
         ))}
 
         <div style={{ marginTop: '16px' }}>
-          <button 
+          <button
             onClick={addNewGroup}
             style={{
               padding: '8px 16px',
@@ -660,7 +663,7 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
   const [showActions, setShowActions] = useState(false);
 
   return (
-    <div 
+    <div
       style={{
         borderBottom: '1px solid #e6e9ef',
         minHeight: '36px',
@@ -717,7 +720,7 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
           return (
             <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
               {task.owner ? (
-                <div 
+                <div
                   style={{
                     width: '24px',
                     height: '24px',
@@ -745,7 +748,7 @@ const TaskRow = ({ task, groupId, groupColor, columns, statusConfig, updateTaskS
         if (col.type === 'status') {
           return (
             <div key={col.id} style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', borderRight: '1px solid #e6e9ef' }}>
-              <StatusCell 
+              <StatusCell
                 currentStatus={task.status}
                 statusConfig={statusConfig}
                 onChange={(newStatus) => updateTaskStatus(groupId, task.id, newStatus)}
@@ -831,7 +834,7 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
         {isOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-            <StatusMenu 
+            <StatusMenu
               statusConfig={statusConfig}
               onChange={(status) => {
                 onChange(status);
@@ -859,7 +862,7 @@ const StatusCell = ({ currentStatus, statusConfig, onChange }) => {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <StatusMenu 
+          <StatusMenu
             statusConfig={statusConfig}
             onChange={(status) => {
               onChange(status);

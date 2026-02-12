@@ -50,7 +50,7 @@ const TaskNameCell = ({ value, rowId, onUpdate, toggleExpanded, isExpanded }) =>
 
   const handleBlur = () => {
     setIsEditing(false);
-    if (inputValue.trim() !== value) {
+    if (inputValue !== value) {
       onUpdate(inputValue);
     }
   };

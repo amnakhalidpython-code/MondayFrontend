@@ -100,7 +100,7 @@ const Sidebar = ({ boards = [], onBoardClick }) => {
             transform: 'translate(-50%, -50%)',
             width: '2px',
             height: '40px',
-            background: isResizing ? '#0073ea' : 'rgba(0, 115, 234, 0.3)',
+            // background: isResizing ? '#0073ea' : 'rgba(0, 115, 234, 0.3)',
             borderRadius: '1px',
             opacity: isResizing ? 1 : 0.3,
             transition: 'opacity 0.2s ease, background 0.2s ease',

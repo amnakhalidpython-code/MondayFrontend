@@ -51,7 +51,7 @@ const BoardHeader = ({ boardTitle = 'my ui' }) => {
       inviterUserId: "user_001", // Current user ID
       inviterName: "Wasiullah",
       inviterEmail: "wasi@gmail.com",
-      accountName: "Wasiullah Organization",
+      accountName: "Monday Organization",
       invitations: [
         { email: emailInput, role: 'Member' }
       ]
@@ -185,7 +185,7 @@ const BoardHeader = ({ boardTitle = 'my ui' }) => {
               {/* Organization Info */}
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 mb-8">
                 <Grid size={18} className="text-gray-500" />
-                <span className="text-sm text-gray-700">Anyone at <span className="font-semibold text-gray-900">Wasiullah Organization</span> can access this board</span>
+                <span className="text-sm text-gray-700">Anyone at <span className="font-semibold text-gray-900">Monday Organization</span> can access this board</span>
               </div>
 
               {/* People List */}
