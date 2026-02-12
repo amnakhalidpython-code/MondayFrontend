@@ -55,7 +55,7 @@ const WorkspacePage = ({ workspace }) => {  // ← Yeh prop add kiya (App.jsx se
         return;
       }
 
-      const response = await fetch(`http://localhost:3002/api/boards/user/${encodeURIComponent(userId)}`);
+      const response = await fetch(`http://localhost:5000/api/boards/user/${encodeURIComponent(userId)}`);
       const data = await response.json();
 
       if (data.success) {

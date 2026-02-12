@@ -18,6 +18,7 @@ import { getTemplateById } from '../config/boardTemplates';
 import * as donorService from '../services/api/donorService';
 import * as columnService from '../services/api/columnService';
 
+
 const TemplateBoardPage = () => {
   const { templateId } = useParams();
   const [template, setTemplate] = useState(null);

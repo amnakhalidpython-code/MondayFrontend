@@ -43,7 +43,7 @@ const CreateAccountFifth = () => {
   };
 
   const handleBack = () => {
-    navigate(-1);
+    navigate('/four');
   };
 
   const handleContinue = () => {

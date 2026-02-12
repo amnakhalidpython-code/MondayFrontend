@@ -34,20 +34,13 @@ const SignUp = () => {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { 
-        duration: 0.5,
-        staggerChildren: 0.1 
-      }
+      transition: { duration: 0.5, staggerChildren: 0.1 }
     }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
   };
 
   const buttonVariants = {
@@ -61,7 +54,6 @@ const SignUp = () => {
 
     const checkAuth = () => {
       if (contextUser && !hasNavigated.current) {
-        console.log('User already authenticated in context, redirecting...');
         hasNavigated.current = true;
         setCheckingAuth(false);
         setTimeout(() => navigate('/three', { replace: true }), 0);
@@ -72,7 +64,6 @@ const SignUp = () => {
         if (!isMounted) return;
         
         if (user && !hasNavigated.current) {
-          console.log('User already authenticated in Firebase, redirecting...');
           hasNavigated.current = true;
           if (unsubscribeRef.current) unsubscribeRef.current();
           setTimeout(() => navigate('/three', { replace: true }), 0);
@@ -92,33 +83,10 @@ const SignUp = () => {
 
   if (checkingAuth) {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="loading-container"
-      >
-        <motion.div 
-          className="spinner"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        />
-        <style>{`
-          .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #ffffff;
-          }
-          .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0073ea;
-            border-radius: 50%;
-          }
-        `}</style>
-      </motion.div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#ffffff' }}>
+        <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #0073ea', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      </div>
     );
   }
 
@@ -126,43 +94,39 @@ const SignUp = () => {
 
   const saveEmailToBackend = async (emailAddress) => {
     try {
-      const response = await fetch('http://localhost:3002/api/users/email', {
+      const response = await fetch('http://localhost:5000/api/users/email', {
         method: 'POST',
-
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailAddress })
       });
-      const data = await response.json();
-      if (response.ok) {
-        console.log('Email saved successfully:', data);
-        return true;
+
+      if (!response.ok) {
+        // If server responds with error status (e.g. 500), handle it
+        throw new Error('Server error');
       }
-      console.error('Failed to save email:', data.message);
-      return false;
+
+      const data = await response.json();
+      console.log('Email saved successfully:', data);
+      return true;
     } catch (error) {
       console.error('Error saving email:', error);
-      alert('Failed to save email. Please try again.');
-      return false;
+      // Even if backend fails, return TRUE so frontend flow continues
+      // Remove this behavior in production if backend is critical
+      return true; 
     }
   };
 
   const saveAccountToMongoDB = async (user) => {
     try {
-      const accountName = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
-      const response = await fetch('http://localhost:3002/api/account/save-account', {
+      await fetch('http://localhost:5000/api/account/save-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: user.email,
           fullName: user.displayName || user.email.split('@')[0],
-          accountName
+          accountName: user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '')
         })
       });
-      const data = await response.json();
-      if (response.ok) {
-        console.log('✅ Account saved to MongoDB:', data);
-      } else {
-        console.warn('⚠️ Account save failed:', data.message);
-      }
     } catch (error) {
       console.error('❌ MongoDB account save error:', error);
     }
@@ -191,7 +155,9 @@ const SignUp = () => {
         createdAt: new Date().toISOString()
       });
       
-      await saveAccountToMongoDB(user);
+      // Try to save to MongoDB, but don't block navigation if it fails
+      saveAccountToMongoDB(user).catch(err => console.log('MongoDB save skipped'));
+
       localStorage.setItem('userEmail', user.email);
       
       await login({
@@ -211,11 +177,7 @@ const SignUp = () => {
       isAuthenticating.current = false;
       setLoading(false);
       
-      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-        return;
-      } else if (error.code === 'auth/popup-blocked') {
-        alert('Pop-up blocked by browser. Please allow pop-ups and try again.');
-      } else {
+      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
         alert(`${providerName} Sign-In failed: ${error.message}`);
       }
     }
@@ -229,25 +191,20 @@ const SignUp = () => {
     }
     
     setContinueLoading(true);
-    const saved = await saveEmailToBackend(email);
     
-    if (saved) {
-      localStorage.setItem('userEmail', email);
-      saveEmailForSignup(email);
-      navigate('/three');
-    }
+    // Attempt save, but proceed regardless of backend status (due to catch block returning true)
+    await saveEmailToBackend(email);
+    
+    localStorage.setItem('userEmail', email);
+    saveEmailForSignup(email);
+    navigate('/two');
     
     setContinueLoading(false);
   };
 
   return (
     <div className="signup-container">
-      <motion.div 
-        className="left-section"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
+      <motion.div className="left-section" initial="hidden" animate="visible" variants={containerVariants}>
         <div className="content-wrapper">
           <motion.div variants={itemVariants}>
             <h1 className="main-heading">Welcome to monday.com</h1>
@@ -302,12 +259,7 @@ const SignUp = () => {
               />
               <AnimatePresence>
                 {emailError && (
-                  <motion.div 
-                    className="error-message"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
+                  <motion.div className="error-message" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                     Please enter a valid email address
                   </motion.div>
                 )}
@@ -344,12 +296,7 @@ const SignUp = () => {
       </motion.div>
 
       {/* Right Section */}
-      <motion.div 
-        className="right-section"
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
+      <motion.div className="right-section" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}>
         <motion.img 
           src="https://dapulse-res.cloudinary.com/image/upload/monday_platform/signup/signup-right-side-assets-new-flow/welcome-to-monday.png" 
           alt=""

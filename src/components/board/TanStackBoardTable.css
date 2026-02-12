@@ -1,0 +1,715 @@
+/* ==========================================
+   MONDAY.COM TABLE - EXACT STYLING
+   ========================================== */
+
+/* ==========================================
+   TABLE CONTAINER & SCROLLBAR
+   ========================================== */
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c5c7d0 #f8f9fb;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f8f9fb;
+  border-radius: 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c5c7d0;
+  border-radius: 6px;
+  border: 3px solid #f8f9fb;
+  transition: background 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9699a6;
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: #f8f9fb;
+}
+
+/* ==========================================
+   TABLE WRAPPER
+   ========================================== */
+
+.w-fit.bg-white {
+  box-shadow: none;
+  background: #ffffff;
+}
+
+/* ==========================================
+   HEADER ROW
+   ========================================== */
+
+.border-t.border-b.border-\[\#d0d4e4\] {
+  background: #f5f6f8 !important;
+  border-top: 1px solid #d0d4e4 !important;
+  border-bottom: 1px solid #d0d4e4 !important;
+  transition: background-color 0.2s ease;
+}
+
+.border-t.border-b.border-\[\#d0d4e4\]:hover {
+  background: #ebedf0 !important;
+}
+
+/* Header Text Styling */
+.border-t.border-b.border-\[\#d0d4e4\] span {
+  font-size: 14px;
+  font-weight: 400;
+  color: #323338;
+  letter-spacing: 0;
+}
+
+/* ==========================================
+   DATA ROWS
+   ========================================== */
+
+/* Default Row State */
+.border-b.border-\[\#d0d4e4\].bg-white {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e6e9ef !important;
+  transition: background-color 0.15s ease;
+}
+
+/* Row Hover State */
+.group\/row:hover {
+  background: #f5f6f8 !important;
+}
+
+.group\/row:hover > div {
+  background: #f5f6f8 !important;
+}
+
+/* Sticky columns on hover */
+.group\/row:hover .sticky.bg-white {
+  background: #f5f6f8 !important;
+}
+
+/* ==========================================
+   CELL BORDERS
+   ========================================== */
+
+[style*="borderRight: \"1px solid #d0d4e4\""],
+.border-r.border-\[\#d0d4e4\] {
+  border-right: 1px solid #e6e9ef !important;
+}
+
+/* ==========================================
+   CHECKBOX
+   ========================================== */
+
+input[type="checkbox"] {
+  accent-color: #0073ea;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  transition: opacity 0.15s ease;
+}
+
+input[type="checkbox"]:hover {
+  opacity: 1 !important;
+}
+
+/* Checkbox container */
+.group input[type="checkbox"] {
+  opacity: 0;
+}
+
+.group:hover input[type="checkbox"],
+input[type="checkbox"]:checked {
+  opacity: 1;
+}
+
+/* ==========================================
+   TASK NAME CELL
+   ========================================== */
+
+.group\/cell {
+  padding: 0;
+}
+
+/* Chevron button */
+.group\/cell button.rounded-sm {
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.group\/cell button.rounded-sm:hover {
+  background-color: #e6e9ef;
+}
+
+/* Task name text */
+.group\/cell span.truncate {
+  font-size: 14px;
+  font-weight: 400;
+  color: #323338;
+}
+
+/* Hover buttons */
+.group\/cell .opacity-0 {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.group\/cell:hover .opacity-0 {
+  opacity: 1;
+}
+
+/* ==========================================
+   STATUS CELLS
+   ========================================== */
+
+button[style*="backgroundColor"]:not(.rounded-full) {
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 8px;
+  height: 32px;
+  box-shadow: none;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+button[style*="backgroundColor"]:not(.rounded-full):hover {
+  opacity: 0.9;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ==========================================
+   DATE & TIMELINE PILLS
+   ========================================== */
+
+.rounded-full[style*="backgroundColor"] {
+  box-shadow: none;
+  transition: all 0.15s ease;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.rounded-full[style*="backgroundColor"]:hover {
+  opacity: 0.9;
+  transform: none;
+}
+
+/* ==========================================
+   AVATAR / PERSON CELL
+   ========================================== */
+
+.rounded-full[alt="owner"],
+.rounded-full.border-white {
+  box-shadow: 0 0 0 2px #ffffff;
+  transition: transform 0.15s ease;
+}
+
+.rounded-full[alt="owner"]:hover {
+  transform: scale(1.1);
+}
+
+/* Empty avatar placeholder */
+.bg-gray-200.rounded-full {
+  background: #e6e9ef;
+}
+
+/* ==========================================
+   INPUT FIELDS
+   ========================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="number"] {
+  font-size: 14px;
+  color: #323338;
+  transition: all 0.15s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus {
+  border-color: #0073ea !important;
+  box-shadow: 0 0 0 1px #0073ea;
+}
+
+/* Placeholder text */
+input::placeholder {
+  color: #9699a6;
+  font-weight: 400;
+}
+
+/* ==========================================
+   DROPDOWN/PORTAL MENUS
+   ========================================== */
+
+.fixed.z-\[9999\] {
+  animation: menuFadeIn 0.15s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   CALENDAR PICKER
+   ========================================== */
+
+.shadow-\[0_8px_30px_rgba\(0\,0\,0\,0\.12\)\] {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e6e9ef;
+}
+
+/* Calendar day cells */
+.grid-cols-7 button {
+  transition: all 0.15s ease;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.grid-cols-7 button:hover:not(.bg-\[\#0073ea\]) {
+  background-color: #ebedf0;
+}
+
+.grid-cols-7 button.bg-\[\#0073ea\] {
+  background-color: #0073ea;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+button.rounded,
+button.rounded-sm {
+  transition: all 0.15s ease;
+}
+
+button.hover\:bg-gray-200:hover {
+  background-color: #e6e9ef !important;
+}
+
+button.hover\:bg-gray-100:hover {
+  background-color: #f5f6f8 !important;
+}
+
+button.hover\:bg-gray-50:hover {
+  background-color: #fafbfc !important;
+}
+
+/* Primary buttons */
+.bg-\[\#335eea\],
+button[style*="background: rgb(51, 94, 234)"],
+button[style*="background-color: rgb(51, 94, 234)"] {
+  background: #0073ea !important;
+  box-shadow: none;
+  transition: all 0.15s ease;
+}
+
+.bg-\[\#335eea\]:hover {
+  background: #0060bd !important;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ==========================================
+   ICON STYLING
+   ========================================== */
+
+svg {
+  transition: none;
+}
+
+button:hover svg {
+  transform: none;
+}
+
+/* ==========================================
+   SUMMARY ROW
+   ========================================== */
+
+.group\/summary {
+  background: #f5f6f8;
+  border-top: 1px solid #e6e9ef;
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.group\/summary .text-\[10px\] {
+  font-size: 11px;
+  font-weight: 600;
+  color: #676879;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Summary bar visualization */
+.border.border-gray-200.rounded-full {
+  box-shadow: none;
+  transition: all 0.15s ease;
+}
+
+.border.border-gray-200.rounded-full:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ==========================================
+   ADD TASK ROW
+   ========================================== */
+
+.group\/add {
+  transition: background-color 0.15s ease;
+}
+
+.group\/add:hover {
+  background: #fafbfc !important;
+}
+
+.group\/add:hover > div {
+  background: #fafbfc !important;
+}
+
+.group\/add input::placeholder {
+  color: #c4c4c4;
+  font-weight: 400;
+}
+
+.group\/add:hover input::placeholder {
+  color: #9699a6;
+}
+
+/* ==========================================
+   SUBITEMS
+   ========================================== */
+
+.bg-\[\#f7f9fb\] {
+  background: #f5f6f8 !important;
+}
+
+/* ==========================================
+   GROUP COLOR BAR
+   ========================================== */
+
+[style*="backgroundColor"][style*="height: '100%'"][style*="position: 'absolute'"] {
+  border-radius: 0;
+  opacity: 1;
+}
+
+/* ==========================================
+   TEXT & TYPOGRAPHY
+   ========================================== */
+
+.text-\[13px\] {
+  font-size: 14px;
+}
+
+.text-\[11px\] {
+  font-size: 12px;
+}
+
+.text-\[12px\] {
+  font-size: 13px;
+}
+
+.text-\[14px\] {
+  font-size: 14px;
+}
+
+/* ==========================================
+   COLORS
+   ========================================== */
+
+.text-\[\#323338\] {
+  color: #323338;
+}
+
+.text-gray-400 {
+  color: #9699a6;
+}
+
+.text-gray-500 {
+  color: #676879;
+}
+
+.text-gray-600 {
+  color: #676879;
+}
+
+.text-gray-700 {
+  color: #323338;
+}
+
+.bg-gray-50 {
+  background: #fafbfc;
+}
+
+.bg-gray-100 {
+  background: #f5f6f8;
+}
+
+.bg-gray-200 {
+  background: #e6e9ef;
+}
+
+/* ==========================================
+   HOVER EFFECTS - MINIMAL
+   ========================================== */
+
+.hover\:bg-gray-50:hover {
+  background: #fafbfc !important;
+}
+
+.hover\:bg-gray-100:hover {
+  background: #f5f6f8 !important;
+}
+
+/* Remove all transforms and scale effects */
+button:hover,
+button:active,
+.cursor-pointer:hover {
+  transform: none !important;
+}
+
+/* ==========================================
+   EMAIL CELL
+   ========================================== */
+
+.group\/email a {
+  color: #0073ea;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.group\/email a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================
+   FILE CELL
+   ========================================== */
+
+.bg-gray-100.rounded.border {
+  background: #f5f6f8;
+  border: 1px solid #e6e9ef;
+  transition: all 0.15s ease;
+}
+
+.bg-gray-100.rounded.border:hover {
+  background: #ebedf0;
+  transform: none;
+}
+
+/* ==========================================
+   NUMBER CELL
+   ========================================== */
+
+.border.border-transparent {
+  border: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.border.border-transparent:hover {
+  border-color: #e6e9ef;
+}
+
+/* ==========================================
+   STICKY COLUMNS
+   ========================================== */
+
+.sticky.left-0,
+.sticky.left-\[36px\] {
+  z-index: 20;
+}
+
+/* Remove sticky column shadows */
+.sticky {
+  box-shadow: none;
+}
+
+/* ==========================================
+   FOCUS STATES
+   ========================================== */
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #0073ea;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SELECTION
+   ========================================== */
+
+::selection {
+  background: rgba(0, 115, 234, 0.2);
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+  .text-\[13px\],
+  .text-\[14px\] {
+    font-size: 13px;
+  }
+}
+
+/* ==========================================
+   PERFORMANCE
+   ========================================== */
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   PRINT
+   ========================================== */
+
+@media print {
+  .custom-scrollbar,
+  button:not(.status-button),
+  input[type="checkbox"] {
+    display: none !important;
+  }
+}
+
+/* ==========================================
+   DROPDOWN ARROW (STATUS MENU)
+   ========================================== */
+
+.absolute.-top-1\.5.left-1\/2 {
+  /* Small arrow on status dropdown */
+  background: #ffffff;
+  border-top: 1px solid #e6e9ef;
+  border-left: 1px solid #e6e9ef;
+}
+
+/* ==========================================
+   COLUMN HEADER MENU BUTTON
+   ========================================== */
+
+.group button.opacity-0 {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.group:hover button.opacity-0 {
+  opacity: 1;
+}
+
+button[ref="menuButtonRef"] {
+  color: #676879;
+}
+
+button[ref="menuButtonRef"]:hover {
+  background: #e6e9ef;
+  color: #323338;
+}
+
+/* ==========================================
+   LAST UPDATED CELL
+   ========================================== */
+
+.bg-\[\#e6e9ef\].rounded-full {
+  background: #e6e9ef;
+}
+
+.text-\[12px\].text-gray-500 {
+  color: #676879;
+  font-size: 13px;
+}
+
+/* ==========================================
+   PLUS ICON STYLING
+   ========================================== */
+
+.text-gray-300 {
+  color: #d0d4e4;
+}
+
+.text-gray-400 {
+  color: #9699a6;
+}
+
+.group:hover .text-gray-300,
+.group:hover .text-gray-400 {
+  color: #676879;
+}
+
+/* ==========================================
+   REMOVE UNNECESSARY ANIMATIONS
+   ========================================== */
+
+/* Remove all unnecessary transform effects */
+button:hover,
+button:active {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove scale effects */
+input[type="checkbox"]:hover {
+  transform: none !important;
+}
+
+/* Remove all fancy animations */
+.transition-all,
+.transition-colors,
+.transition-opacity {
+  transition: all 0.15s ease !important;
+}
+
+/* ==========================================
+   FINAL OVERRIDES
+   ========================================== */
+
+/* Ensure clean borders */
+div[style*="border"] {
+  border-color: #e6e9ef !important;
+}
+
+/* Ensure clean backgrounds */
+.bg-white {
+  background: #ffffff !important;
+}
+
+/* Clean row backgrounds */
+.hover\:bg-\[\#f5f7f9\] {
+  transition: background 0.15s ease;
+}
+
+.hover\:bg-\[\#f5f7f9\]:hover {
+  background: #f5f6f8 !important;
+}

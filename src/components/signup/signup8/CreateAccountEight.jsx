@@ -88,7 +88,7 @@ const CreateAccountEight = () => {
           return;
         }
 
-        const response = await fetch('http://localhost:3002/api/account/get-account', {
+        const response = await fetch('http://localhost:5000/api/account/get-account', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
