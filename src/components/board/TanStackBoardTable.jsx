@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import ColumnMenu from "./ColumnMenu";
 import AddColumnMenu from "./AddColumnMenu";
+import "./TanStackBoardTable.css";
 
 // ==========================================
 // TASK NAME CELL COMPONENT (Editable)
@@ -905,12 +906,12 @@ const TanStackBoardTable = ({
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
 
   return (
-    <div className="w-full overflow-x-auto custom-scrollbar">
-      {/* Container fix: Added padding-right to prevent clipping beside the + button */}
-      <div className="w-fit bg-white rounded-bl-lg border-b border-gray-200 relative isolate pb-4">
+    <div className="w-full h-full overflow-x-auto overflow-y-auto custom-scrollbar bg-white">
+      {/* Full-width container for Monday.com style */}
+      <div className="min-w-full bg-white relative">
         <div className="sticky left-0 top-0 bottom-0 w-[6px] z-[30] rounded-l-md" style={{ backgroundColor: groupColor, height: '100%', position: 'absolute' }} />
 
-        <div className="flex bg-white pl-[6px]">
+        <div className="flex bg-white pl-[6px] min-w-full">
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header, index) => {
@@ -921,6 +922,7 @@ const TanStackBoardTable = ({
                     key={header.id}
                     style={{
                       width: header.getSize(),
+                      minWidth: header.getSize(),
                       borderRight: "1px solid #d0d4e4",
                       left: isSticky ? leftPos : undefined,
                       zIndex: isSticky ? 25 : 10
@@ -931,6 +933,8 @@ const TanStackBoardTable = ({
                   </div>
                 );
               })}
+              {/* Flex spacer to fill remaining width */}
+              <div className="flex-1 min-w-0 h-9 border-t border-b border-[#d0d4e4] bg-white" />
             </React.Fragment>
           ))}
         </div>
@@ -939,7 +943,7 @@ const TanStackBoardTable = ({
         <div className="flex flex-col pl-[6px]">
           {table.getRowModel().rows.map((row) => (
             <React.Fragment key={row.id}>
-              <div className="flex border-b border-[#d0d4e4] hover:bg-[#f5f7f9] bg-white h-[36px] group/row transition-colors">
+              <div className="flex border-b border-[#d0d4e4] hover:bg-[#f5f7f9] bg-white h-[36px] group/row transition-colors min-w-full">
                 {row.getVisibleCells().map((cell, index) => {
                   const isSticky = index < 2;
                   const leftPos = index === 0 ? 0 : 36;
@@ -948,6 +952,7 @@ const TanStackBoardTable = ({
                       key={cell.id}
                       style={{
                         width: cell.column.getSize(),
+                        minWidth: cell.column.getSize(),
                         borderRight: "1px solid #d0d4e4",
                         left: isSticky ? leftPos : undefined,
                         zIndex: isSticky ? 20 : 1
@@ -958,6 +963,8 @@ const TanStackBoardTable = ({
                     </div>
                   );
                 })}
+                {/* Flex spacer to fill remaining width */}
+                <div className="flex-1 min-w-0 h-full bg-inherit" />
               </div>
               {expandedRows.has(row.original.id) && <div className="border-b border-[#d0d4e4] sticky left-0 z-10"><SubitemTable /></div>}
             </React.Fragment>
@@ -965,7 +972,7 @@ const TanStackBoardTable = ({
 
 
           {/* ADD TASK ROW */}
-          <div className="flex h-[36px] items-center border-b border-[#d0d4e4] hover:bg-[#f5f7f9] cursor-text bg-white group/add">
+          <div className="flex h-[36px] items-center border-b border-[#d0d4e4] hover:bg-[#f5f7f9] cursor-text bg-white group/add min-w-full">
             {/* Sticky spacer and Task Input */}
             <div style={{ width: 36, left: 0, zIndex: 20 }} className="sticky left-0 bg-white group-hover/add:bg-[#f5f7f9] border-r border-[#d0d4e4] h-full flex items-center justify-center flex-shrink-0">
               <div className="w-4 h-4 border border-gray-200 rounded-[3px] bg-white"></div>
@@ -973,6 +980,7 @@ const TanStackBoardTable = ({
             <div
               style={{
                 width: propColumns.find((c) => c.id === "name")?.width || 200,
+                minWidth: propColumns.find((c) => c.id === "name")?.width || 200,
                 left: 36,
                 zIndex: 20
               }}
@@ -987,13 +995,15 @@ const TanStackBoardTable = ({
             </div>
             {/* Empty space for other columns */}
             {propColumns.filter((c) => c.id !== "name").map((col, idx) => (
-              <div key={`spacer-${idx}`} style={{ width: col.width || 140 }} className="h-full border-r border-[#d0d4e4] flex-shrink-0" />
+              <div key={`spacer-${idx}`} style={{ width: col.width || 140, minWidth: col.width || 140 }} className="h-full border-r border-[#d0d4e4] flex-shrink-0" />
             ))}
-            <div style={{ width: 48 }} className="h-full flex-shrink-0 bg-white border-r border-[#d0d4e4]" />
+            <div style={{ width: 48, minWidth: 48 }} className="h-full flex-shrink-0 bg-white border-r border-[#d0d4e4]" />
+            {/* Flex spacer to fill remaining width */}
+            <div className="flex-1 min-w-0 h-full bg-inherit" />
           </div>
 
           {/* --- SUM / SUMMARY ROW (Advanced) --- */}
-          <div className="flex bg-white h-[44px] border-b border-[#d0d4e4] group/summary">
+          <div className="flex bg-white h-[44px] border-b border-[#d0d4e4] group/summary min-w-full">
             {/* select spacer - Sticky */}
             <div style={{ width: 36, left: 0, zIndex: 20 }} className="border-r border-[#d0d4e4] h-full flex-shrink-0 bg-white sticky left-0" />
 
@@ -1001,6 +1011,7 @@ const TanStackBoardTable = ({
             <div
               style={{
                 width: propColumns.find((c) => c.id === "name")?.width || 200,
+                minWidth: propColumns.find((c) => c.id === "name")?.width || 200,
                 left: 36,
                 zIndex: 20
               }}
@@ -1021,6 +1032,7 @@ const TanStackBoardTable = ({
                   key={`summary-${idx}`}
                   style={{
                     width: col.width || 140,
+                    minWidth: col.width || 140,
                     borderRight: "1px solid #d0d4e4"
                   }}
                   className="h-full flex items-center justify-center flex-shrink-0 bg-white"
@@ -1056,10 +1068,12 @@ const TanStackBoardTable = ({
                 </div>
               )
             })}
-            <div style={{ width: 48 }} className="h-full flex-shrink-0 bg-white border-r border-[#d0d4e4]" />
+            <div style={{ width: 48, minWidth: 48 }} className="h-full flex-shrink-0 bg-white border-r border-[#d0d4e4]" />
+            {/* Flex spacer to fill remaining width */}
+            <div className="flex-1 min-w-0 h-full bg-inherit" />
           </div>
         </div>
-        </div>
+      </div>
 
       {/* Portal for Add Column Menu */}
       {isAddColumnMenuOpen && createPortal(
